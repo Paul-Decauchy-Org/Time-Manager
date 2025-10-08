@@ -10,3 +10,4 @@ COPY . .
 
 CMD ["run", "go", "PLACEHOLDER.go"]
 
+EXPOSE 8080
