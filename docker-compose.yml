@@ -1,0 +1,36 @@
+services:
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+    networks:
+      - Time-Manager-Network
+  database:
+    image: 'postgres:latest'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=timemanager
+    ports:
+      - 5432:5432
+    env_file:
+      - ./back/.env
+    networks:
+      - Time-Manager-Network
+  back:
+    build:  
+      context: ./back
+      dockerfile: Dockerfile
+    depends_on:
+      - database
+    ports:
+      - "8084:8080"
+    networks:
+      - Time-Manager-Network
+networks:
+  Time-Manager-Network:
+    driver: bridge
