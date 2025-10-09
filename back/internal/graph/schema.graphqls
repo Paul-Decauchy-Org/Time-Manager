@@ -110,7 +110,18 @@ input UpdateTimeEntryInput {
   status: Boolean
 }
 
+input SignUpInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  password: String!
+}
+
 type Mutation {
+  #auth mutations
+  signUp(input: SignUpInput!): User!
+
   #user mutations
   createUser(input: CreateUserInput!): User!
   updateUser(id: ID!, input: UpdateUserInput!): User!
