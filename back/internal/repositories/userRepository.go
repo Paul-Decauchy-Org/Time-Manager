@@ -29,6 +29,17 @@ func ListUsers() ([]*gmodel.User, error) {
 	return out, nil
 }
 
+func GetUserByEmail(email string) (*gmodel.User, error) {
+	if database.DB == nil {
+		return nil, errors.New("database not initialized")
+	}
+	var user models.User
+	if err := database.DB.First(&user, "email = ?", email).Error; err != nil {
+		return nil, err
+	}
+	return mappers.DBUserToGraph(&user), nil
+}
+
 // ICI ce sont toutes les mutations des USERS
 
 // CreateUserInput persists a new user (from GraphQL CreateUserInput) and returns the created GraphQL user

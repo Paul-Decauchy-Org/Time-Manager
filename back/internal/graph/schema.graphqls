@@ -60,6 +60,7 @@ type Query {
   roles: [Role!]!
   timeTableEntries: [TimeTableEntry!]!
   timeTables: [TimeTable!]!
+  userByEmail(email: String!): User
 }
 
 
