@@ -27,3 +27,15 @@ func SignUp(input model.SignUpInput) (*model.User, error) {
 	}
 	return mappers.DBUserToGraph(user), nil
 }
+
+func Login(email, password string) (*model.User, error) {
+	db := database.DB
+	var user models.User
+	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, err
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+		return nil, err
+	}
+	return mappers.DBUserToGraph(&user), nil
+}
