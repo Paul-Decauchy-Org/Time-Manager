@@ -5,27 +5,28 @@ import (
 	"fmt"
 
 	"github.com/epitech/timemanager/internal/graph/model"
-	"github.com/epitech/timemanager/internal/repositories"
+	"github.com/epitech/timemanager/internal/repositories/mutationRepository/userMutations"
+	"github.com/epitech/timemanager/internal/repositories/queryRepository/userQueries"
 )
 
 // Users resolver
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	return repositories.ListUsers()
+	return userQueries.ListUsers()
 }
 
 // UserByEmail implements graph.QueryResolver.
 func (r *queryResolver) UserByEmail(ctx context.Context, email string) (*model.User, error) {
-	return repositories.GetUserByEmail(email)
+	return userQueries.GetUserByEmail(email)
 }
 
 // UsersByGroup implements graph.QueryResolver.
 func (r *queryResolver) UsersByGroup(ctx context.Context, inGroup bool) ([]*model.User, error) {
-	return repositories.GetUsersByGroup(inGroup)
+	return userQueries.GetUsersByGroup(inGroup)
 }
 
 // CreateUser resolver
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
-	return repositories.CreateUserInput(input)
+	return userMutations.CreateUserInput(input)
 }
 
 func (r *mutationResolver) CreateMassiveUsers(ctx context.Context, input model.CreateMassiveUsersInput) ([]*model.User, error) {
@@ -33,7 +34,7 @@ func (r *mutationResolver) CreateMassiveUsers(ctx context.Context, input model.C
 	for i, u := range input.Users {
 		users[i] = *u
 	}
-	return repositories.CreateMassiveUsers(users)
+	return userMutations.CreateMassiveUsers(users)
 }
 
 // UpdateUser resolver
