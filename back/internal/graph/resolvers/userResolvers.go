@@ -23,6 +23,14 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 	return repositories.CreateUserInput(input)
 }
 
+func (r *mutationResolver) CreateMassiveUsers(ctx context.Context, input model.CreateMassiveUsersInput) ([]*model.User, error) {
+	users := make([]model.CreateUserInput, len(input.Users))
+	for i, u := range input.Users {
+		users[i] = *u
+	}
+	return repositories.CreateMassiveUsers(users)
+}
+
 // UpdateUser resolver
 func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input model.UpdateUserInput) (*model.User, error) {
 	return nil, fmt.Errorf("UpdateUser not implemented in repositories")
