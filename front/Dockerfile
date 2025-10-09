@@ -15,7 +15,6 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
-
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
@@ -31,6 +30,7 @@ RUN \
   if [ -f package-lock.json ]; then npm run build; \
   else echo "Lockfile not found." && exit 1; \
   fi
+RUN npm run codegen
 
 # Production image, copy all the files and run next
 FROM base AS runner
