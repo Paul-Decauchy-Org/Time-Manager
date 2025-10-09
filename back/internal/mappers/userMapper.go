@@ -17,7 +17,8 @@ func DBUserToGraph(u *gmodel.User) *model.User {
 		LastName:  u.LastName,
 		Email:     u.Email,
 		Phone:     u.Phone,
-		Password:  u.Password,
+		// Do not expose hashed password in GraphQL responses
+		Password:  "",
 		Role:      model.Role(u.Role),
 	}
 }
