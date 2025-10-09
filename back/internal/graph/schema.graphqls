@@ -74,6 +74,10 @@ input CreateUserInput {
   role: Role!
 }
 
+input CreateMassiveUsersInput {
+  users: [CreateUserInput!]!
+}
+
 input UpdateUserInput {
   firstName: String
   lastName: String
@@ -126,6 +130,7 @@ type Mutation {
 
   #user mutations
   createUser(input: CreateUserInput!): User!
+  createMassiveUsers(input: CreateMassiveUsersInput!): [User!]!
   updateUser(id: ID!, input: UpdateUserInput!): User!
   deleteUser(id: ID!): Boolean!
 
