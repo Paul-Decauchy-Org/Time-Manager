@@ -18,6 +18,11 @@ func (r *queryResolver) UserByEmail(ctx context.Context, email string) (*model.U
 	return repositories.GetUserByEmail(email)
 }
 
+// UsersByGroup implements graph.QueryResolver.
+func (r *queryResolver) UsersByGroup(ctx context.Context, inGroup bool) ([]*model.User, error) {
+	return repositories.GetUsersByGroup(inGroup)
+}
+
 // CreateUser resolver
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
 	return repositories.CreateUserInput(input)
