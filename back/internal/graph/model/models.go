@@ -39,6 +39,14 @@ type Mutation struct {
 type Query struct {
 }
 
+type SignUpInput struct {
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Email     string `json:"email"`
+	Phone     string `json:"phone"`
+	Password  string `json:"password"`
+}
+
 type Team struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
