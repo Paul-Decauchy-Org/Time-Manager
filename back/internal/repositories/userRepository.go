@@ -94,3 +94,18 @@ func CreateUserInput(input gmodel.CreateUserInput) (*gmodel.User, error) {
 
 	return mappers.DBUserToGraph(dbUser), nil
 }
+
+func CreateMassiveUsers(input []gmodel.CreateUserInput) ([]*gmodel.User, error) {
+	if database.DB == nil {
+		return nil, errors.New("database not initialized")
+	}
+	createdUsers := make([]*gmodel.User, 0, len(input))
+	for _, userInput := range input {
+		user, err := CreateUserInput(userInput)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create user %s: %w", userInput.Email, err)
+		}
+		createdUsers = append(createdUsers, user)
+	}
+	return createdUsers, nil
+}
