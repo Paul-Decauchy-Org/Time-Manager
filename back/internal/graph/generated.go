@@ -56,6 +56,7 @@ type ComplexityRoot struct {
 		DeleteTeam         func(childComplexity int, id string) int
 		DeleteTimeEntry    func(childComplexity int, id string) int
 		DeleteUser         func(childComplexity int, id string) int
+		Login              func(childComplexity int, email string, password string) int
 		SignUp             func(childComplexity int, input model.SignUpInput) int
 		UpdateTeam         func(childComplexity int, id string, input model.UpdateTeamInput) int
 		UpdateTimeEntry    func(childComplexity int, id string, input model.UpdateTimeEntryInput) int
