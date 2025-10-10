@@ -13,8 +13,10 @@ services:
     image: 'postgres:latest'
     ports:
       - 5432:5432
-    env_file:
-      - ./back/.env
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=timemanager
     networks:
       - Time-Manager-Network
   back:
