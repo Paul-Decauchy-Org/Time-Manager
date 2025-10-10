@@ -28,6 +28,8 @@ COPY . .
 # ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run codegen
 
+RUN npm run codegen
+
 RUN \
   if [ -f package-lock.json ]; then npm run build; \
   else echo "Lockfile not found." && exit 1; \
