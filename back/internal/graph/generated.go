@@ -69,8 +69,10 @@ type ComplexityRoot struct {
 		TimeTableEntries func(childComplexity int) int
 		TimeTables       func(childComplexity int) int
 		UserByEmail      func(childComplexity int, email string) int
+		UserWithAllData  func(childComplexity int, id string) int
 		Users            func(childComplexity int) int
 		UsersByGroup     func(childComplexity int, inGroup bool) int
+		UsersWithAllData func(childComplexity int) int
 	}
 
 	Team struct {
@@ -112,6 +114,19 @@ type ComplexityRoot struct {
 		Phone     func(childComplexity int) int
 		Role      func(childComplexity int) int
 	}
+
+	UserWithAllData struct {
+		Email            func(childComplexity int) int
+		FirstName        func(childComplexity int) int
+		ID               func(childComplexity int) int
+		LastName         func(childComplexity int) int
+		Password         func(childComplexity int) int
+		Phone            func(childComplexity int) int
+		Role             func(childComplexity int) int
+		Teams            func(childComplexity int) int
+		TimeTableEntries func(childComplexity int) int
+		TimeTables       func(childComplexity int) int
+	}
 }
 
 type MutationResolver interface {
@@ -136,6 +151,8 @@ type QueryResolver interface {
 	TimeTables(ctx context.Context) ([]*model.TimeTable, error)
 	UserByEmail(ctx context.Context, email string) (*model.User, error)
 	UsersByGroup(ctx context.Context, inGroup bool) ([]*model.User, error)
+	UserWithAllData(ctx context.Context, id string) (*model.UserWithAllData, error)
+	UsersWithAllData(ctx context.Context) ([]*model.UserWithAllData, error)
 }
 
 type executableSchema struct {
@@ -320,6 +337,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.UserByEmail(childComplexity, args["email"].(string)), true
+	case "Query.userWithAllData":
+		if e.complexity.Query.UserWithAllData == nil {
+			break
+		}
+
+		args, err := ec.field_Query_userWithAllData_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.UserWithAllData(childComplexity, args["id"].(string)), true
 	case "Query.users":
 		if e.complexity.Query.Users == nil {
 			break
@@ -337,6 +365,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.UsersByGroup(childComplexity, args["inGroup"].(bool)), true
+	case "Query.UsersWithAllData":
+		if e.complexity.Query.UsersWithAllData == nil {
+			break
+		}
+
+		return e.complexity.Query.UsersWithAllData(childComplexity), true
 
 	case "Team.description":
 		if e.complexity.Team.Description == nil {
@@ -492,6 +526,67 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.User.Role(childComplexity), true
+
+	case "UserWithAllData.email":
+		if e.complexity.UserWithAllData.Email == nil {
+			break
+		}
+
+		return e.complexity.UserWithAllData.Email(childComplexity), true
+	case "UserWithAllData.firstName":
+		if e.complexity.UserWithAllData.FirstName == nil {
+			break
+		}
+
+		return e.complexity.UserWithAllData.FirstName(childComplexity), true
+	case "UserWithAllData.id":
+		if e.complexity.UserWithAllData.ID == nil {
+			break
+		}
+
+		return e.complexity.UserWithAllData.ID(childComplexity), true
+	case "UserWithAllData.lastName":
+		if e.complexity.UserWithAllData.LastName == nil {
+			break
+		}
+
+		return e.complexity.UserWithAllData.LastName(childComplexity), true
+	case "UserWithAllData.password":
+		if e.complexity.UserWithAllData.Password == nil {
+			break
+		}
+
+		return e.complexity.UserWithAllData.Password(childComplexity), true
+	case "UserWithAllData.phone":
+		if e.complexity.UserWithAllData.Phone == nil {
+			break
+		}
+
+		return e.complexity.UserWithAllData.Phone(childComplexity), true
+	case "UserWithAllData.role":
+		if e.complexity.UserWithAllData.Role == nil {
+			break
+		}
+
+		return e.complexity.UserWithAllData.Role(childComplexity), true
+	case "UserWithAllData.teams":
+		if e.complexity.UserWithAllData.Teams == nil {
+			break
+		}
+
+		return e.complexity.UserWithAllData.Teams(childComplexity), true
+	case "UserWithAllData.timeTableEntries":
+		if e.complexity.UserWithAllData.TimeTableEntries == nil {
+			break
+		}
+
+		return e.complexity.UserWithAllData.TimeTableEntries(childComplexity), true
+	case "UserWithAllData.timeTables":
+		if e.complexity.UserWithAllData.TimeTables == nil {
+			break
+		}
+
+		return e.complexity.UserWithAllData.TimeTables(childComplexity), true
 
 	}
 	return 0, false
@@ -780,6 +875,17 @@ func (ec *executionContext) field_Query_userByEmail_args(ctx context.Context, ra
 		return nil, err
 	}
 	args["email"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_userWithAllData_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -1757,6 +1863,120 @@ func (ec *executionContext) fieldContext_Query_usersByGroup(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_userWithAllData(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_userWithAllData,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().UserWithAllData(ctx, fc.Args["id"].(string))
+		},
+		nil,
+		ec.marshalOUserWithAllData2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserWithAllData,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_userWithAllData(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_UserWithAllData_id(ctx, field)
+			case "firstName":
+				return ec.fieldContext_UserWithAllData_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_UserWithAllData_lastName(ctx, field)
+			case "email":
+				return ec.fieldContext_UserWithAllData_email(ctx, field)
+			case "phone":
+				return ec.fieldContext_UserWithAllData_phone(ctx, field)
+			case "password":
+				return ec.fieldContext_UserWithAllData_password(ctx, field)
+			case "role":
+				return ec.fieldContext_UserWithAllData_role(ctx, field)
+			case "teams":
+				return ec.fieldContext_UserWithAllData_teams(ctx, field)
+			case "timeTableEntries":
+				return ec.fieldContext_UserWithAllData_timeTableEntries(ctx, field)
+			case "timeTables":
+				return ec.fieldContext_UserWithAllData_timeTables(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserWithAllData", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_userWithAllData_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_UsersWithAllData(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_UsersWithAllData,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Query().UsersWithAllData(ctx)
+		},
+		nil,
+		ec.marshalNUserWithAllData2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserWithAllDataᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_UsersWithAllData(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_UserWithAllData_id(ctx, field)
+			case "firstName":
+				return ec.fieldContext_UserWithAllData_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_UserWithAllData_lastName(ctx, field)
+			case "email":
+				return ec.fieldContext_UserWithAllData_email(ctx, field)
+			case "phone":
+				return ec.fieldContext_UserWithAllData_phone(ctx, field)
+			case "password":
+				return ec.fieldContext_UserWithAllData_password(ctx, field)
+			case "role":
+				return ec.fieldContext_UserWithAllData_role(ctx, field)
+			case "teams":
+				return ec.fieldContext_UserWithAllData_teams(ctx, field)
+			case "timeTableEntries":
+				return ec.fieldContext_UserWithAllData_timeTableEntries(ctx, field)
+			case "timeTables":
+				return ec.fieldContext_UserWithAllData_timeTables(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserWithAllData", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -2659,6 +2879,332 @@ func (ec *executionContext) fieldContext_User_role(_ context.Context, field grap
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Role does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserWithAllData_id(ctx context.Context, field graphql.CollectedField, obj *model.UserWithAllData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserWithAllData_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserWithAllData_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserWithAllData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserWithAllData_firstName(ctx context.Context, field graphql.CollectedField, obj *model.UserWithAllData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserWithAllData_firstName,
+		func(ctx context.Context) (any, error) {
+			return obj.FirstName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserWithAllData_firstName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserWithAllData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserWithAllData_lastName(ctx context.Context, field graphql.CollectedField, obj *model.UserWithAllData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserWithAllData_lastName,
+		func(ctx context.Context) (any, error) {
+			return obj.LastName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserWithAllData_lastName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserWithAllData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserWithAllData_email(ctx context.Context, field graphql.CollectedField, obj *model.UserWithAllData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserWithAllData_email,
+		func(ctx context.Context) (any, error) {
+			return obj.Email, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserWithAllData_email(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserWithAllData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserWithAllData_phone(ctx context.Context, field graphql.CollectedField, obj *model.UserWithAllData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserWithAllData_phone,
+		func(ctx context.Context) (any, error) {
+			return obj.Phone, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserWithAllData_phone(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserWithAllData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserWithAllData_password(ctx context.Context, field graphql.CollectedField, obj *model.UserWithAllData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserWithAllData_password,
+		func(ctx context.Context) (any, error) {
+			return obj.Password, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserWithAllData_password(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserWithAllData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserWithAllData_role(ctx context.Context, field graphql.CollectedField, obj *model.UserWithAllData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserWithAllData_role,
+		func(ctx context.Context) (any, error) {
+			return obj.Role, nil
+		},
+		nil,
+		ec.marshalNRole2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐRole,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserWithAllData_role(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserWithAllData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Role does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserWithAllData_teams(ctx context.Context, field graphql.CollectedField, obj *model.UserWithAllData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserWithAllData_teams,
+		func(ctx context.Context) (any, error) {
+			return obj.Teams, nil
+		},
+		nil,
+		ec.marshalNTeam2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserWithAllData_teams(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserWithAllData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Team_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Team_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Team_description(ctx, field)
+			case "managerID":
+				return ec.fieldContext_Team_managerID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Team", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserWithAllData_timeTableEntries(ctx context.Context, field graphql.CollectedField, obj *model.UserWithAllData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserWithAllData_timeTableEntries,
+		func(ctx context.Context) (any, error) {
+			return obj.TimeTableEntries, nil
+		},
+		nil,
+		ec.marshalNTimeTableEntry2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTimeTableEntryᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserWithAllData_timeTableEntries(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserWithAllData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TimeTableEntry_id(ctx, field)
+			case "userID":
+				return ec.fieldContext_TimeTableEntry_userID(ctx, field)
+			case "day":
+				return ec.fieldContext_TimeTableEntry_day(ctx, field)
+			case "arrival":
+				return ec.fieldContext_TimeTableEntry_arrival(ctx, field)
+			case "departure":
+				return ec.fieldContext_TimeTableEntry_departure(ctx, field)
+			case "status":
+				return ec.fieldContext_TimeTableEntry_status(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TimeTableEntry", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserWithAllData_timeTables(ctx context.Context, field graphql.CollectedField, obj *model.UserWithAllData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserWithAllData_timeTables,
+		func(ctx context.Context) (any, error) {
+			return obj.TimeTables, nil
+		},
+		nil,
+		ec.marshalNTimeTable2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTimeTableᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserWithAllData_timeTables(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserWithAllData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TimeTable_id(ctx, field)
+			case "userID":
+				return ec.fieldContext_TimeTable_userID(ctx, field)
+			case "day":
+				return ec.fieldContext_TimeTable_day(ctx, field)
+			case "start":
+				return ec.fieldContext_TimeTable_start(ctx, field)
+			case "end":
+				return ec.fieldContext_TimeTable_end(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TimeTable", field.Name)
 		},
 	}
 	return fc, nil
@@ -4827,6 +5373,47 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "userWithAllData":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_userWithAllData(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "UsersWithAllData":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_UsersWithAllData(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -5127,6 +5714,90 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "role":
 			out.Values[i] = ec._User_role(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var userWithAllDataImplementors = []string{"UserWithAllData"}
+
+func (ec *executionContext) _UserWithAllData(ctx context.Context, sel ast.SelectionSet, obj *model.UserWithAllData) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userWithAllDataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserWithAllData")
+		case "id":
+			out.Values[i] = ec._UserWithAllData_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "firstName":
+			out.Values[i] = ec._UserWithAllData_firstName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "lastName":
+			out.Values[i] = ec._UserWithAllData_lastName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "email":
+			out.Values[i] = ec._UserWithAllData_email(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "phone":
+			out.Values[i] = ec._UserWithAllData_phone(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "password":
+			out.Values[i] = ec._UserWithAllData_password(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "role":
+			out.Values[i] = ec._UserWithAllData_role(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "teams":
+			out.Values[i] = ec._UserWithAllData_teams(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "timeTableEntries":
+			out.Values[i] = ec._UserWithAllData_timeTableEntries(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "timeTables":
+			out.Values[i] = ec._UserWithAllData_timeTables(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -5979,6 +6650,60 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋepitechᚋtimemanager
 	return ec._User(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNUserWithAllData2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserWithAllDataᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.UserWithAllData) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNUserWithAllData2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserWithAllData(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNUserWithAllData2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserWithAllData(ctx context.Context, sel ast.SelectionSet, v *model.UserWithAllData) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UserWithAllData(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
 	return ec.___Directive(ctx, sel, &v)
 }
@@ -6355,6 +7080,13 @@ func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋepitechᚋtimemanager
 		return graphql.Null
 	}
 	return ec._User(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOUserWithAllData2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserWithAllData(ctx context.Context, sel ast.SelectionSet, v *model.UserWithAllData) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UserWithAllData(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

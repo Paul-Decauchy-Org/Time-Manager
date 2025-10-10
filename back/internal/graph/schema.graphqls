@@ -12,6 +12,19 @@ type User {
   role: Role!
 }
 
+type UserWithAllData {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  password: String!
+  role: Role!
+  teams: [Team!]!
+  timeTableEntries: [TimeTableEntry!]!
+  timeTables: [TimeTable!]!
+}
+
 enum Role {
   USER
   ADMIN
@@ -62,6 +75,8 @@ type Query {
   timeTables: [TimeTable!]!
   userByEmail(email: String!): User
   usersByGroup(inGroup: Boolean!): [User!]!
+  userWithAllData(id: ID!): UserWithAllData
+  UsersWithAllData: [UserWithAllData!]!
 }
 
 

@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"github.com/epitech/timemanager/internal/graph/model"
-	"github.com/epitech/timemanager/internal/mappers"
+	userMapper "github.com/epitech/timemanager/internal/mappers/user"
 	models "github.com/epitech/timemanager/internal/models"
 	"github.com/epitech/timemanager/package/database"
 	"golang.org/x/crypto/bcrypt"
@@ -25,5 +25,5 @@ func SignUp(input model.SignUpInput) (*model.User, error) {
 	if err := db.Create(user).Error; err != nil {
 		return nil, err
 	}
-	return mappers.DBUserToGraph(user), nil
+	return userMapper.DBUserToGraph(user), nil
 }
