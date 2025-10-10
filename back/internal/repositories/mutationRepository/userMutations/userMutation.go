@@ -1,4 +1,4 @@
-package repositories
+package userMutations
 
 import (
 	"errors"
@@ -6,32 +6,11 @@ import (
 
 	gmodel "github.com/epitech/timemanager/internal/graph/model"
 	"github.com/epitech/timemanager/internal/mappers"
-	models "github.com/epitech/timemanager/internal/models"
 	"github.com/epitech/timemanager/package/database"
 	"golang.org/x/crypto/bcrypt"
 	// "github.com/google/uuid"
 )
 
-func ListUsers() ([]*gmodel.User, error) {
-	// Defensive check to avoid panic when DB is not initialized
-	if database.DB == nil {
-		return nil, errors.New("database not initialized")
-	}
-	db := database.DB
-	var users []models.User
-	if err := db.Find(&users).Error; err != nil {
-		return nil, err
-	}
-	out := make([]*gmodel.User, 0, len(users))
-	for i := range users {
-		out = append(out, mappers.DBUserToGraph(&users[i]))
-	}
-	return out, nil
-}
-
-// ICI ce sont toutes les mutations des USERS
-
-// CreateUserInput persists a new user (from GraphQL CreateUserInput) and returns the created GraphQL user
 func CreateUserInput(input gmodel.CreateUserInput) (*gmodel.User, error) {
 	if database.DB == nil {
 		return nil, errors.New("database not initialized")
@@ -58,4 +37,17 @@ func CreateUserInput(input gmodel.CreateUserInput) (*gmodel.User, error) {
 	return mappers.DBUserToGraph(dbUser), nil
 }
 
-
+func CreateMassiveUsers(input []gmodel.CreateUserInput) ([]*gmodel.User, error) {
+	if database.DB == nil {
+		return nil, errors.New("database not initialized")
+	}
+	createdUsers := make([]*gmodel.User, 0, len(input))
+	for _, userInput := range input {
+		user, err := CreateUserInput(userInput)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create user %s: %w", userInput.Email, err)
+		}
+		createdUsers = append(createdUsers, user)
+	}
+	return createdUsers, nil
+}

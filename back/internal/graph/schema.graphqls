@@ -68,6 +68,8 @@ type Query {
   roles: [Role!]!
   timeTableEntries: [TimeTableEntry!]!
   timeTables: [TimeTable!]!
+  userByEmail(email: String!): User
+  usersByGroup(inGroup: Boolean!): [User!]!
 }
 
 
@@ -78,6 +80,10 @@ input CreateUserInput {
   phone: String!
   password: String!
   role: Role!
+}
+
+input CreateMassiveUsersInput {
+  users: [CreateUserInput!]!
 }
 
 input UpdateUserInput {
@@ -133,6 +139,7 @@ type Mutation {
 
   #user mutations
   createUser(input: CreateUserInput!): User!
+  createMassiveUsers(input: CreateMassiveUsersInput!): [User!]!
   updateUser(id: ID!, input: UpdateUserInput!): User!
   deleteUser(id: ID!): Boolean!
 
