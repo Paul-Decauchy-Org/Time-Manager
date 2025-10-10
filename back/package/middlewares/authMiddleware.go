@@ -1,22 +1,24 @@
 package middlewares
 
 import (
-	"os"
-	"time"
 	"context"
 	"net/http"
+	"os"
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 )
 
 var JWTSecret = []byte(os.Getenv("JWT_SECRET"))
 type contextKey string
 
-func GenerateToken(email string) (string, error) {
+func GenerateToken(email string, id string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["email"] = email
+	claims["id"] = id
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 	tokenString, err := token.SignedString(JWTSecret)
 
@@ -27,15 +29,16 @@ func GenerateToken(email string) (string, error) {
 
 }
 
-func ValidateToken(tokenString string) (string, error) {
+func ValidateToken(tokenString string) (string, string, error) {
 	token, err := jwt.Parse(tokenString, func (token * jwt.Token) (any, error) {
 		return JWTSecret, nil
 	})
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		email := claims["email"].(string)
-		return email, nil
+		id := claims["id"].(string)
+		return email, id, nil
 	} else {
-		return "", err
+		return "", "", err
 	}
 }
 
@@ -54,12 +57,13 @@ func AuthRequired(next http.Handler) http.Handler {
             http.Error(w, "Authorization header or cookie missing", http.StatusUnauthorized)
             return
         }
-        email, err := ValidateToken(tokenString)
+        email, id, err := ValidateToken(tokenString)
         if err != nil {
             http.Error(w, "Invalid token", http.StatusUnauthorized)
             return
         }
-        ctx := context.WithValue(r.Context(), contextKey("email"), email)
+		ctx := context.WithValue(r.Context(), contextKey("email"), email)
+		ctx = context.WithValue(ctx, contextKey("id"), id)
         r = r.WithContext(ctx)
         next.ServeHTTP(w, r)
     })
