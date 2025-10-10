@@ -20,7 +20,7 @@ jobs:
             - name: build docker-image
               uses: hoverkraft-tech/compose-action@v2.0.1
               with:
-                compose-file: "docker-compose.yaml"
+                compose-file: "docker-compose.yml"
 
 
 
