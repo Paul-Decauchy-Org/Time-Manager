@@ -16,7 +16,7 @@ jobs:
                 go-version: '1.25.x'
             - name: Install dependencies
               run: |
-                cd back && go install . 
+                cd back/cmd && go install . 
             - name: build docker-image
               uses: hoverkraft-tech/compose-action@v2.0.1
               with:
