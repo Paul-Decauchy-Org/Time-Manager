@@ -22,7 +22,7 @@ func (r *Repository) SignUp(input model.SignUpInput) (*model.User, error) {
 		Email:     input.Email,
 		Phone:     input.Phone,
 		Password:  string(hashedPassword),
-		Role:      models.RoleUser, 
+		Role:      models.RoleUser,
 	}
 	if err := r.DB.Create(user).Error; err != nil {
 		return nil, err
