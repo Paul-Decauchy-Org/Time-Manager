@@ -1,64 +1,62 @@
--- Exemple de seeds : 5 utilisateurs, 1 équipe, 2 membres, et quelques entrées/plannings.
--- Utilise des UUID fixes pour pouvoir facilement référencer les mêmes ids.
-
-BEGIN;
+-- Extensions (UUID generation)
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Users
-INSERT INTO users (id, first_name, last_name, email, phone, password, role) VALUES
-  ('11111111-1111-1111-1111-111111111111', 'Admin',   'System',  'admin@timemanager.com',   '+33123456789', 'adminpass',   'ADMIN')
-ON CONFLICT (email) DO NOTHING;
+CREATE TABLE IF NOT EXISTS users (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  first_name text NOT NULL,
+  last_name text NOT NULL,
+  email text NOT NULL UNIQUE,
+  phone text NOT NULL,
+  password text NOT NULL,
+  role text NOT NULL CHECK (role IN ('USER','ADMIN','MANAGER'))
+);
 
-INSERT INTO users (id, first_name, last_name, email, phone, password, role) VALUES
-  ('22222222-2222-2222-2222-222222222222', 'Manager', 'Project', 'manager@timemanager.com', '+33234567890', 'managerpass', 'MANAGER')
-ON CONFLICT (email) DO NOTHING;
+-- Teams
+CREATE TABLE IF NOT EXISTS teams (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name text NOT NULL,
+  description text NOT NULL,
+  manager_id uuid NOT NULL,
+  CONSTRAINT fk_team_manager FOREIGN KEY (manager_id) REFERENCES users(id) ON DELETE RESTRICT
+);
 
-INSERT INTO users (id, first_name, last_name, email, phone, password, role) VALUES
-  ('33333333-3333-3333-3333-333333333333', 'John',    'Doe',     'john.doe@timemanager.com', '+33345678901', 'johnpass',    'USER')
-ON CONFLICT (email) DO NOTHING;
+CREATE INDEX IF NOT EXISTS idx_teams_manager_id ON teams(manager_id);
 
-INSERT INTO users (id, first_name, last_name, email, phone, password, role) VALUES
-  ('44444444-4444-4444-4444-444444444444', 'Jane',    'Smith',   'jane.smith@timemanager.com', '+33456789012', 'janepass',   'USER')
-ON CONFLICT (email) DO NOTHING;
+-- Team <-> User relation
+CREATE TABLE IF NOT EXISTS team_users (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL,
+  team_id uuid NOT NULL,
+  CONSTRAINT fk_teamuser_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_teamuser_team FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE CASCADE,
+  CONSTRAINT uq_team_user UNIQUE (user_id, team_id)
+);
 
-INSERT INTO users (id, first_name, last_name, email, phone, password, role) VALUES
-  ('55555555-5555-5555-5555-555555555555', 'Alice',   'Johnson', 'alice.johnson@timemanager.com', '+33567890123', 'alicepass', 'USER')
-ON CONFLICT (email) DO NOTHING;
+CREATE INDEX IF NOT EXISTS idx_team_users_user_id ON team_users(user_id);
+CREATE INDEX IF NOT EXISTS idx_team_users_team_id ON team_users(team_id);
 
--- Team
-INSERT INTO teams (id, name, description, manager_id) VALUES
-  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Development Team', 'Main development team for TimeManager project', '22222222-2222-2222-2222-222222222222')
-ON CONFLICT (id) DO NOTHING;
+-- Time table entries (pointage)
+CREATE TABLE IF NOT EXISTS time_table_entries (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL,
+  day date NOT NULL,
+  arrival timestamptz NOT NULL,
+  departure timestamptz NOT NULL,
+  status boolean NOT NULL,
+  CONSTRAINT fk_tte_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
--- Team members (add John and Jane to the team)
-INSERT INTO team_users (id, user_id, team_id) VALUES
-  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '33333333-3333-3333-3333-333333333333', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa')
-ON CONFLICT (user_id, team_id) DO NOTHING;
+CREATE INDEX IF NOT EXISTS idx_tte_user_day ON time_table_entries(user_id, day);
 
-INSERT INTO team_users (id, user_id, team_id) VALUES
-  ('cccccccc-cccc-cccc-cccc-cccccccccccc', '44444444-4444-4444-4444-444444444444', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa')
-ON CONFLICT (user_id, team_id) DO NOTHING;
+-- Time tables (plannings)
+CREATE TABLE IF NOT EXISTS time_tables (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL,
+  day date NOT NULL,
+  start timestamptz NOT NULL,
+  end timestamptz NOT NULL,
+  CONSTRAINT fk_tt_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
--- Time table entries (one sample entry per user for today)
--- Remplacez les dates/heures si nécessaire
-INSERT INTO time_table_entries (id, user_id, day, arrival, departure, status) VALUES
-  ('dddddddd-dddd-dddd-dddd-dddddddddddd', '11111111-1111-1111-1111-111111111111', CURRENT_DATE, now() - interval '8 hours', now() - interval '1 hour', true)
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO time_table_entries (id, user_id, day, arrival, departure, status) VALUES
-  ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', '22222222-2222-2222-2222-222222222222', CURRENT_DATE, now() - interval '8 hours', now() - interval '1 hour', true)
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO time_table_entries (id, user_id, day, arrival, departure, status) VALUES
-  ('ffffffff-ffff-ffff-ffff-ffffffffffff', '33333333-3333-3333-3333-333333333333', CURRENT_DATE, now() - interval '8 hours', now() - interval '1 hour', true)
-ON CONFLICT (id) DO NOTHING;
-
--- Time tables (one sample planning per user for today)
-INSERT INTO time_tables (id, user_id, day, start, "end") VALUES
-  ('10101010-1010-1010-1010-101010101010', '33333333-3333-3333-3333-333333333333', CURRENT_DATE, now() - interval '9 hours', now() + interval '8 hours')
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO time_tables (id, user_id, day, start, "end") VALUES
-  ('12121212-1212-1212-1212-121212121212', '44444444-4444-4444-4444-444444444444', CURRENT_DATE, now() - interval '9 hours', now() + interval '8 hours')
-ON CONFLICT (id) DO NOTHING;
-
-COMMIT;
+CREATE INDEX IF NOT EXISTS idx_tt_user_day ON time_tables(user_id, day);
