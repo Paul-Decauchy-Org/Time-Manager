@@ -12,6 +12,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/epitech/timemanager/internal/graph"
 	"github.com/epitech/timemanager/internal/graph/resolvers"
+	"github.com/epitech/timemanager/internal/repositories"
+	"github.com/epitech/timemanager/services"
 	"github.com/epitech/timemanager/package/database"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -44,8 +46,16 @@ func main() {
 		}
 	}()
 
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &resolvers.Resolver{DB: db}}))
+	authRepo := repositories.NewRepository(db)
+	authService := services.NewAuthService(authRepo)
+	resolver := &resolvers.Resolver{
+		DB: db,
+		AuthService: authService,
+	}
 
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{
+		Resolvers: resolver,
+	}))
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.POST{})

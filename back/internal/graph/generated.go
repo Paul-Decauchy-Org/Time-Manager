@@ -110,11 +110,20 @@ type ComplexityRoot struct {
 		Phone     func(childComplexity int) int
 		Role      func(childComplexity int) int
 	}
+
+	UserLogged struct {
+		Email     func(childComplexity int) int
+		FirstName func(childComplexity int) int
+		LastName  func(childComplexity int) int
+		Phone     func(childComplexity int) int
+		Role      func(childComplexity int) int
+		Token     func(childComplexity int) int
+	}
 }
 
 type MutationResolver interface {
 	SignUp(ctx context.Context, input model.SignUpInput) (*model.User, error)
-	Login(ctx context.Context, email string, password string) (*model.User, error)
+	Login(ctx context.Context, email string, password string) (*model.UserLogged, error)
 	CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error)
 	UpdateUser(ctx context.Context, id string, input model.UpdateUserInput) (*model.User, error)
 	DeleteUser(ctx context.Context, id string) (bool, error)
@@ -466,6 +475,43 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.User.Role(childComplexity), true
+
+	case "UserLogged.email":
+		if e.complexity.UserLogged.Email == nil {
+			break
+		}
+
+		return e.complexity.UserLogged.Email(childComplexity), true
+	case "UserLogged.firstName":
+		if e.complexity.UserLogged.FirstName == nil {
+			break
+		}
+
+		return e.complexity.UserLogged.FirstName(childComplexity), true
+	case "UserLogged.lastName":
+		if e.complexity.UserLogged.LastName == nil {
+			break
+		}
+
+		return e.complexity.UserLogged.LastName(childComplexity), true
+	case "UserLogged.phone":
+		if e.complexity.UserLogged.Phone == nil {
+			break
+		}
+
+		return e.complexity.UserLogged.Phone(childComplexity), true
+	case "UserLogged.role":
+		if e.complexity.UserLogged.Role == nil {
+			break
+		}
+
+		return e.complexity.UserLogged.Role(childComplexity), true
+	case "UserLogged.token":
+		if e.complexity.UserLogged.Token == nil {
+			break
+		}
+
+		return e.complexity.UserLogged.Token(childComplexity), true
 
 	}
 	return 0, false
@@ -870,7 +916,7 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 			return ec.resolvers.Mutation().Login(ctx, fc.Args["email"].(string), fc.Args["password"].(string))
 		},
 		nil,
-		ec.marshalNUser2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUser,
+		ec.marshalNUserLogged2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserLogged,
 		true,
 		true,
 	)
@@ -884,22 +930,20 @@ func (ec *executionContext) fieldContext_Mutation_login(ctx context.Context, fie
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
 			case "firstName":
-				return ec.fieldContext_User_firstName(ctx, field)
+				return ec.fieldContext_UserLogged_firstName(ctx, field)
 			case "lastName":
-				return ec.fieldContext_User_lastName(ctx, field)
+				return ec.fieldContext_UserLogged_lastName(ctx, field)
 			case "email":
-				return ec.fieldContext_User_email(ctx, field)
+				return ec.fieldContext_UserLogged_email(ctx, field)
 			case "phone":
-				return ec.fieldContext_User_phone(ctx, field)
-			case "password":
-				return ec.fieldContext_User_password(ctx, field)
+				return ec.fieldContext_UserLogged_phone(ctx, field)
 			case "role":
-				return ec.fieldContext_User_role(ctx, field)
+				return ec.fieldContext_UserLogged_role(ctx, field)
+			case "token":
+				return ec.fieldContext_UserLogged_token(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type UserLogged", field.Name)
 		},
 	}
 	defer func() {
@@ -2501,6 +2545,180 @@ func (ec *executionContext) fieldContext_User_role(_ context.Context, field grap
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Role does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserLogged_firstName(ctx context.Context, field graphql.CollectedField, obj *model.UserLogged) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserLogged_firstName,
+		func(ctx context.Context) (any, error) {
+			return obj.FirstName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserLogged_firstName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserLogged",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserLogged_lastName(ctx context.Context, field graphql.CollectedField, obj *model.UserLogged) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserLogged_lastName,
+		func(ctx context.Context) (any, error) {
+			return obj.LastName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserLogged_lastName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserLogged",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserLogged_email(ctx context.Context, field graphql.CollectedField, obj *model.UserLogged) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserLogged_email,
+		func(ctx context.Context) (any, error) {
+			return obj.Email, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserLogged_email(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserLogged",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserLogged_phone(ctx context.Context, field graphql.CollectedField, obj *model.UserLogged) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserLogged_phone,
+		func(ctx context.Context) (any, error) {
+			return obj.Phone, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserLogged_phone(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserLogged",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserLogged_role(ctx context.Context, field graphql.CollectedField, obj *model.UserLogged) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserLogged_role,
+		func(ctx context.Context) (any, error) {
+			return obj.Role, nil
+		},
+		nil,
+		ec.marshalNRole2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐRole,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserLogged_role(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserLogged",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Role does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserLogged_token(ctx context.Context, field graphql.CollectedField, obj *model.UserLogged) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserLogged_token,
+		func(ctx context.Context) (any, error) {
+			return obj.Token, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserLogged_token(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserLogged",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4927,6 +5145,70 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
+var userLoggedImplementors = []string{"UserLogged"}
+
+func (ec *executionContext) _UserLogged(ctx context.Context, sel ast.SelectionSet, obj *model.UserLogged) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userLoggedImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserLogged")
+		case "firstName":
+			out.Values[i] = ec._UserLogged_firstName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "lastName":
+			out.Values[i] = ec._UserLogged_lastName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "email":
+			out.Values[i] = ec._UserLogged_email(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "phone":
+			out.Values[i] = ec._UserLogged_phone(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "role":
+			out.Values[i] = ec._UserLogged_role(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "token":
+			out.Values[i] = ec._UserLogged_token(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var __DirectiveImplementors = []string{"__Directive"}
 
 func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionSet, obj *introspection.Directive) graphql.Marshaler {
@@ -5726,6 +6008,20 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋepitechᚋtimemanager
 		return graphql.Null
 	}
 	return ec._User(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNUserLogged2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserLogged(ctx context.Context, sel ast.SelectionSet, v model.UserLogged) graphql.Marshaler {
+	return ec._UserLogged(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUserLogged2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserLogged(ctx context.Context, sel ast.SelectionSet, v *model.UserLogged) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UserLogged(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

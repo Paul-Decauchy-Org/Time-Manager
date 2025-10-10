@@ -1,6 +1,7 @@
 package resolvers
 
 import (
+	"github.com/epitech/timemanager/services"
 	"gorm.io/gorm"
 )
 
@@ -10,4 +11,5 @@ import (
 
 type Resolver struct{
 	DB *gorm.DB
+	AuthService *services.AuthService
 }

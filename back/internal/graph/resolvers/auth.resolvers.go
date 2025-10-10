@@ -3,17 +3,34 @@ package resolvers
 
 import (
 	"context"
+	"errors"
+	"net/http"
 
 	"github.com/epitech/timemanager/internal/graph/model"
-	"github.com/epitech/timemanager/internal/repositories"
 )
+
+
 
 // signUp resolver
 func (r * mutationResolver) SignUp(ctx context.Context, input model.SignUpInput) (*model.User, error) {
-	return repositories.SignUp(input)
+	return r.AuthService.SignUp(input)
 }
 
 // login resolver
-func (r * mutationResolver) Login(ctx context.Context, email, password string) (*model.User, error) {
-	return repositories.Login(email, password)
+func (r * mutationResolver) Login(ctx context.Context, email, password string) (*model.UserLogged, error) {
+	userLogged, err := r.AuthService.Login(email, password)
+	if err != nil {
+		return nil, errors.New("invalid credentials")
+	}
+	if w, ok := ctx.Value("ResponseWriter").(http.ResponseWriter); ok {
+        http.SetCookie(w, &http.Cookie{
+            Name:     "token",
+            Value:    userLogged.Token,
+            Path:     "/",
+            HttpOnly: true,
+            MaxAge:   3600 * 24,
+        })
+    }
+	return userLogged, nil
 }
+
