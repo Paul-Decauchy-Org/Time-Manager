@@ -10,6 +10,10 @@ import (
 	"time"
 )
 
+type CreateMassiveUsersInput struct {
+	Users []*CreateUserInput `json:"users"`
+}
+
 type CreateTeamInput struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`

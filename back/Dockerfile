@@ -1,13 +1,13 @@
 FROM golang:1.25.1
 
-WORKDIR /cmd
+WORKDIR /app
 
-RUN go mod init main.go && go mod tidy
+RUN go mod init cmd/main.go && go mod tidy
 
 COPY go.mod go.sum ./ 
 
 COPY . .
 
-CMD ["run", "go", "main.go"]
+CMD ["go", "run", "cmd/main.go"]
 
 EXPOSE 8080
