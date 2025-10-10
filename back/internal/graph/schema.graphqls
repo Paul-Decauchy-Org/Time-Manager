@@ -1,0 +1,146 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type User {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  password: String!
+  role: Role!
+}
+
+enum Role {
+  USER
+  ADMIN
+  MANAGER
+}
+
+type Team {
+  id: ID!
+  name: String!
+  description: String!
+  managerID: User!
+}
+
+type TeamUser {
+  id: ID!
+  userID: User!
+  teamID: Team!
+}
+
+scalar Time
+scalar Date
+
+# heures pointées
+type TimeTableEntry {
+  id: ID!
+  userID: User!
+  day: Date!
+  arrival: Time!
+  departure: Time!
+  status: Boolean!  # true pour entrée, false pour sortie
+}
+
+type TimeTable {
+  id: ID!
+  userID: User!
+  day: Date!
+  start: Time!
+  end: Time!
+}
+
+
+type Query {
+  users: [User!]!
+  teams: [Team!]!
+  teamUsers: [TeamUser!]!
+  roles: [Role!]!
+  timeTableEntries: [TimeTableEntry!]!
+  timeTables: [TimeTable!]!
+  userByEmail(email: String!): User
+  usersByGroup(inGroup: Boolean!): [User!]!
+}
+
+
+input CreateUserInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  password: String!
+  role: Role!
+}
+
+input CreateMassiveUsersInput {
+  users: [CreateUserInput!]!
+}
+
+input UpdateUserInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  password: String
+  role: Role
+}
+
+
+input CreateTeamInput {
+  name: String!
+  description: String!
+  managerID: ID!
+}
+
+input UpdateTeamInput {
+  name: String
+  description: String
+  managerID: ID
+}
+
+input CreateTimeEntryInput {
+  userID: ID!
+  day: Date!
+  arrival: Time!
+  departure: Time!
+  status: Boolean!
+}
+
+input UpdateTimeEntryInput {
+  userID: ID
+  day: Date
+  arrival: Time
+  departure: Time
+  status: Boolean
+}
+
+input SignUpInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  password: String!
+}
+
+type Mutation {
+  #auth mutations
+  signUp(input: SignUpInput!): User!
+
+  #user mutations
+  createUser(input: CreateUserInput!): User!
+  createMassiveUsers(input: CreateMassiveUsersInput!): [User!]!
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+  deleteUser(id: ID!): Boolean!
+
+  #team mutations
+  createTeam(input: CreateTeamInput!): Team!
+  updateTeam(id: ID!, input: UpdateTeamInput!): Team!
+  deleteTeam(id: ID!): Boolean!
+
+  #time entry mutations
+  createTimeEntry(input: CreateTimeEntryInput!): TimeTableEntry!
+  updateTimeEntry(id: ID!, input: UpdateTimeEntryInput!): TimeTableEntry!
+  deleteTimeEntry(id: ID!): Boolean!
+}
