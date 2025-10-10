@@ -114,6 +114,15 @@ type User struct {
 	Role      Role   `json:"role"`
 }
 
+type UserLogged struct {
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Email     string `json:"email"`
+	Phone     string `json:"phone"`
+	Role      Role   `json:"role"`
+	Token     string `json:"token"`
+}
+
 type Role string
 
 const (

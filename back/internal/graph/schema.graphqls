@@ -52,6 +52,14 @@ type TimeTable {
   end: Time!
 }
 
+type UserLogged {
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  role: Role!
+  token: String!
+}
 
 type Query {
   users: [User!]!
@@ -127,6 +135,7 @@ input SignUpInput {
 type Mutation {
   #auth mutations
   signUp(input: SignUpInput!): User!
+  login(email: String!, password: String!): UserLogged!
 
   #user mutations
   createUser(input: CreateUserInput!): User!
