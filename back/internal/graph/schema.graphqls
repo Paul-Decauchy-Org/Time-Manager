@@ -136,6 +136,7 @@ type Mutation {
   #auth mutations
   signUp(input: SignUpInput!): User!
   login(email: String!, password: String!): UserLogged!
+  logout: String!
 
   #user mutations
   createUser(input: CreateUserInput!): User!
