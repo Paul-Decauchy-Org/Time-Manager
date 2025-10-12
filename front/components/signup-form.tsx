@@ -10,11 +10,14 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import LoginLink from "./links/login-link"
+import React from "react";
 
-export function SignupForm({
+export async function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">

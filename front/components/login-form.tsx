@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import {useActionState, useContext, useState} from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -13,46 +13,22 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import SignupLink from "./links/signup-link"
+import {submitUserForm} from "@/actions/submit-login";
+import {ApolloWrapper} from "@/apollo/client/ApolloWrapper";
+
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setError(null)
-    setLoading(true)
-
-
-    try {
-      const form = new FormData(e.currentTarget)
-
-      const res = await fetch("/api/login", {
-        method: "POST",
-        body: form,
-      })
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({ error: res.statusText }))
-        throw new Error(body?.error || "Login failed")
-      }
-
-      window.location.href = "/dashboard"
-    } catch (err: any) {
-      setError(err?.message ?? "Unknown error")
-    } finally {
-      setLoading(false)
-    }
-  }
+    const [state, formAction, isPending] = useActionState(submitUserForm, null)
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form onSubmit={handleSubmit} className="p-6 md:p-8">
+          <form action={formAction} className="p-6 md:p-8">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -72,9 +48,9 @@ export function LoginForm({
                 <Input id="password" name="password" type="password" required />
               </Field>
               <Field>
-                <Button type="submit" disabled={loading}>{loading ? "Signing in…" : "Login"}</Button>
+                <Button type="submit" disabled={isPending}>{isPending ? "Signing in…" : "Login"}</Button>
               </Field>
-              {error && <div className="text-sm text-red-500 mt-2 px-6">{error}</div>}
+              {state?.error && <div className="text-sm text-red-500 mt-2 px-6">{state.error}</div>}
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">Or continue with</FieldSeparator>
               <Field className="grid grid-cols-3 gap-4">
                 <Button variant="outline" type="button">

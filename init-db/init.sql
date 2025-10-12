@@ -40,7 +40,7 @@ CREATE INDEX IF NOT EXISTS idx_team_users_team_id ON team_users(team_id);
 CREATE TABLE IF NOT EXISTS time_table_entries (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id uuid NOT NULL,
-  day date NOT NULL,
+  entry_date date NOT NULL,
   arrival timestamptz NOT NULL,
   departure timestamptz NOT NULL,
   status boolean NOT NULL,
@@ -53,9 +53,9 @@ CREATE INDEX IF NOT EXISTS idx_tte_user_day ON time_table_entries(user_id, day);
 CREATE TABLE IF NOT EXISTS time_tables (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id uuid NOT NULL,
-  day date NOT NULL,
-  start timestamptz NOT NULL,
-  end timestamptz NOT NULL,
+  entry_date date NOT NULL,
+  start_time timestamptz NOT NULL,
+  end_time timestamptz NOT NULL,
   CONSTRAINT fk_tt_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
