@@ -73,12 +73,12 @@ type TimeTable struct {
 }
 
 type TimeTableEntry struct {
-	ID        string    `json:"id"`
-	UserID    *User     `json:"userID"`
-	Day       string    `json:"day"`
-	Arrival   time.Time `json:"arrival"`
-	Departure time.Time `json:"departure"`
-	Status    bool      `json:"status"`
+	ID        string     `json:"id"`
+	UserID    *User      `json:"userID"`
+	Day       string     `json:"day"`
+	Arrival   time.Time  `json:"arrival"`
+	Departure *time.Time `json:"departure,omitempty"`
+	Status    bool       `json:"status"`
 }
 
 type UpdateProfileInput struct {
