@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"github.com/epitech/timemanager/internal/graph/model"
-	"github.com/epitech/timemanager/internal/mappers"
+	userMapper "github.com/epitech/timemanager/internal/mappers/user"
 	models "github.com/epitech/timemanager/internal/models"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -27,7 +27,7 @@ func (r *Repository) SignUp(input model.SignUpInput) (*model.User, error) {
 	if err := r.DB.Create(user).Error; err != nil {
 		return nil, err
 	}
-	return mappers.DBUserToGraph(user), nil
+	return userMapper.DBUserToGraph(user), nil
 }
 
 func (r *Repository) Login(email, password string) (*model.User, error) {
@@ -38,5 +38,5 @@ func (r *Repository) Login(email, password string) (*model.User, error) {
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
 		return nil, err
 	}
-	return mappers.DBUserToGraph(&user), nil
+	return userMapper.DBUserToGraph(&user), nil
 }

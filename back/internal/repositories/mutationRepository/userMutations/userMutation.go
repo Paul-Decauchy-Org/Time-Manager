@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	gmodel "github.com/epitech/timemanager/internal/graph/model"
-	"github.com/epitech/timemanager/internal/mappers"
+	userMapper "github.com/epitech/timemanager/internal/mappers/user"
 	"github.com/epitech/timemanager/package/database"
 	"golang.org/x/crypto/bcrypt"
 	// "github.com/google/uuid"
@@ -17,7 +17,7 @@ func CreateUserInput(input gmodel.CreateUserInput) (*gmodel.User, error) {
 	}
 
 	// Map graph input to DB model
-	dbUser := mappers.GraphCreateUserInputToDB(input)
+	dbUser := userMapper.GraphCreateUserInputToDB(input)
 
 	// Hash password before saving
 	if dbUser.Password == "" {
@@ -34,7 +34,7 @@ func CreateUserInput(input gmodel.CreateUserInput) (*gmodel.User, error) {
 		return nil, err
 	}
 
-	return mappers.DBUserToGraph(dbUser), nil
+	return userMapper.DBUserToGraph(dbUser), nil
 }
 
 func CreateMassiveUsers(input []gmodel.CreateUserInput) ([]*gmodel.User, error) {

@@ -24,6 +24,16 @@ func (r *queryResolver) UsersByGroup(ctx context.Context, inGroup bool) ([]*mode
 	return userQueries.GetUsersByGroup(inGroup)
 }
 
+// UserWithAllData implements graph.QueryResolver.
+func (r *queryResolver) UserWithAllData(ctx context.Context, id string) (*model.UserWithAllData, error) {
+	panic("unimplemented")
+}
+
+// UsersWithAllData implements graph.QueryResolver.
+func (r *queryResolver) UsersWithAllData(ctx context.Context) ([]*model.UserWithAllData, error) {
+	return userQueries.ListUsersWithAllData()
+}
+
 // CreateUser resolver
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
 	return userMutations.CreateUserInput(input)

@@ -114,6 +114,19 @@ type User struct {
 	Role      Role   `json:"role"`
 }
 
+type UserWithAllData struct {
+	ID               string            `json:"id"`
+	FirstName        string            `json:"firstName"`
+	LastName         string            `json:"lastName"`
+	Email            string            `json:"email"`
+	Phone            string            `json:"phone"`
+	Password         string            `json:"password"`
+	Role             Role              `json:"role"`
+	Teams            []*Team           `json:"teams"`
+	TimeTableEntries []*TimeTableEntry `json:"timeTableEntries"`
+	TimeTables       []*TimeTable      `json:"timeTables"`
+}
+
 type UserLogged struct {
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
