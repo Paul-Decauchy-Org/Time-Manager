@@ -1,0 +1,26 @@
+meta {
+  name: me
+  type: graphql
+  seq: 4
+}
+
+post {
+  url: {{url}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query Me {
+    Me{
+      firstName
+      LastName
+      phone
+    }
+  }
+  
+}
+
+settings {
+  encodeUrl: true
+}
