@@ -85,6 +85,7 @@ type Query {
   usersByGroup(inGroup: Boolean!): [User!]!
   userWithAllData(id: ID!): UserWithAllData
   UsersWithAllData: [UserWithAllData!]!
+  me: User!
 }
 
 
@@ -127,7 +128,7 @@ input CreateTimeEntryInput {
   userID: ID!
   day: Date!
   arrival: Time!
-  departure: Time!
+  departure: Time
   status: Boolean!
 }
 
@@ -147,11 +148,21 @@ input SignUpInput {
   password: String!
 }
 
+input UpdateProfileInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  password: String
+}
+
 type Mutation {
   #auth mutations
   signUp(input: SignUpInput!): User!
   login(email: String!, password: String!): UserLogged!
   logout: String!
+  updateProfile(input: UpdateProfileInput!): User!
+  deleteProfile: Boolean!
 
   #user mutations
   createUser(input: CreateUserInput!): User!
@@ -167,5 +178,8 @@ type Mutation {
   #time entry mutations
   createTimeEntry(input: CreateTimeEntryInput!): TimeTableEntry!
   updateTimeEntry(id: ID!, input: UpdateTimeEntryInput!): TimeTableEntry!
-  deleteTimeEntry(id: ID!): Boolean!
+
+  #pointage mutations
+  clockIn: TimeTableEntry!
+  clockOut: TimeTableEntry!
 }

@@ -73,12 +73,20 @@ type TimeTable struct {
 }
 
 type TimeTableEntry struct {
-	ID        string    `json:"id"`
-	UserID    *User     `json:"userID"`
-	Day       string    `json:"day"`
-	Arrival   time.Time `json:"arrival"`
-	Departure time.Time `json:"departure"`
-	Status    bool      `json:"status"`
+	ID        string     `json:"id"`
+	UserID    *User      `json:"userID"`
+	Day       string     `json:"day"`
+	Arrival   time.Time  `json:"arrival"`
+	Departure *time.Time `json:"departure,omitempty"`
+	Status    bool       `json:"status"`
+}
+
+type UpdateProfileInput struct {
+	FirstName *string `json:"firstName,omitempty"`
+	LastName  *string `json:"lastName,omitempty"`
+	Email     *string `json:"email,omitempty"`
+	Phone     *string `json:"phone,omitempty"`
+	Password  *string `json:"password,omitempty"`
 }
 
 type UpdateTeamInput struct {
@@ -114,6 +122,15 @@ type User struct {
 	Role      Role   `json:"role"`
 }
 
+type UserLogged struct {
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Email     string `json:"email"`
+	Phone     string `json:"phone"`
+	Role      Role   `json:"role"`
+	Token     string `json:"token"`
+}
+
 type UserWithAllData struct {
 	ID               string            `json:"id"`
 	FirstName        string            `json:"firstName"`
@@ -125,15 +142,6 @@ type UserWithAllData struct {
 	Teams            []*Team           `json:"teams"`
 	TimeTableEntries []*TimeTableEntry `json:"timeTableEntries"`
 	TimeTables       []*TimeTable      `json:"timeTables"`
-}
-
-type UserLogged struct {
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-	Email     string `json:"email"`
-	Phone     string `json:"phone"`
-	Role      Role   `json:"role"`
-	Token     string `json:"token"`
 }
 
 type Role string

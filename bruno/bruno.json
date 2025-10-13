@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "time-manager",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/epitech/timemanager/internal/graph/model"
+	timetableEntryMutation "github.com/epitech/timemanager/internal/repositories/mutationRepository/timeTableEntryMutations"
 	"github.com/epitech/timemanager/internal/repositories/mutationRepository/userMutations"
 	"github.com/epitech/timemanager/internal/repositories/queryRepository/userQueries"
 )
@@ -55,4 +56,14 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input mode
 // DeleteUser resolver
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, error) {
 	return false, fmt.Errorf("DeleteUser not implemented in repositories")
+}
+
+// ClockIn resolver
+func (r *mutationResolver) ClockIn(ctx context.Context) (*model.TimeTableEntry, error) {
+	return timetableEntryMutation.ClockIn(ctx, r.DB)
+}
+
+// ClockOut resolver
+func (r *mutationResolver) ClockOut(ctx context.Context) (*model.TimeTableEntry, error) {
+	return timetableEntryMutation.ClockOut(ctx, r.DB)
 }
