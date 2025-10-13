@@ -39,7 +39,7 @@ services:
     env_file:
       - ./back/.env
     ports:
-      - "8084:8080"
+      - "8084:8084"
     networks:
       - Time-Manager-Network
 
