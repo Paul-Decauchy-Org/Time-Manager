@@ -1,0 +1,33 @@
+meta {
+  name: login
+  type: graphql
+  seq: 1
+}
+
+post {
+  url: {{url}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  mutation Login($email: String!, $password: String!) {
+      login(email: $email, password: $password) {
+          firstName
+          lastName
+          role
+          token
+      }
+  }
+}
+
+body:graphql:vars {
+  {
+    "email": "test@test.fr",
+    "password": "password"
+  }
+}
+
+settings {
+  encodeUrl: true
+}
