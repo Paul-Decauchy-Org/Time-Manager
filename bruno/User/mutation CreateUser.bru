@@ -1,0 +1,29 @@
+meta {
+  name: mutation CreateUser
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: http://localhost:8084/
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  mutation CreateUser($input: CreateUserInput!) {
+    createUserInput(input: $input){
+      id
+      firstName
+      lastName
+      email
+      phone
+      password
+      role
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+}

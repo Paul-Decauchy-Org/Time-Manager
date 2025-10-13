@@ -14,21 +14,6 @@ import (
 
 // User mutation resolvers implemented in userResolvers.go
 
-// CreateTeam is the resolver for the createTeam field.
-func (r *mutationResolver) CreateTeam(ctx context.Context, input model.CreateTeamInput) (*model.Team, error) {
-	panic(fmt.Errorf("not implemented: CreateTeam - createTeam"))
-}
-
-// UpdateTeam is the resolver for the updateTeam field.
-func (r *mutationResolver) UpdateTeam(ctx context.Context, id string, input model.UpdateTeamInput) (*model.Team, error) {
-	panic(fmt.Errorf("not implemented: UpdateTeam - updateTeam"))
-}
-
-// DeleteTeam is the resolver for the deleteTeam field.
-func (r *mutationResolver) DeleteTeam(ctx context.Context, id string) (bool, error) {
-	panic(fmt.Errorf("not implemented: DeleteTeam - deleteTeam"))
-}
-
 // CreateTimeEntry is the resolver for the createTimeEntry field.
 func (r *mutationResolver) CreateTimeEntry(ctx context.Context, input model.CreateTimeEntryInput) (*model.TimeTableEntry, error) {
 	panic(fmt.Errorf("not implemented: CreateTimeEntry - createTimeEntry"))
@@ -45,11 +30,6 @@ func (r *mutationResolver) DeleteTimeEntry(ctx context.Context, id string) (bool
 }
 
 // Users resolver is implemented in userResolvers.go
-
-// Teams is the resolver for the teams field.
-func (r *queryResolver) Teams(ctx context.Context) ([]*model.Team, error) {
-	panic(fmt.Errorf("not implemented: Teams - teams"))
-}
 
 // TeamUsers is the resolver for the teamUsers field.
 func (r *queryResolver) TeamUsers(ctx context.Context) ([]*model.TeamUser, error) {

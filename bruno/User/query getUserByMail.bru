@@ -1,0 +1,28 @@
+meta {
+  name: query getUserByMail
+  type: graphql
+  seq: 3
+}
+
+post {
+  url: http://localhost:8084/
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query GetUserByEmail($email: String!) {
+    userByEmail(email: $email){
+      firstName
+      lastName
+      phone
+      role
+      email
+    }
+  
+  }
+}
+
+settings {
+  encodeUrl: true
+}
