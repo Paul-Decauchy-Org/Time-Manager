@@ -24,6 +24,7 @@ type User struct {
 	Password         string           `gorm:"type:text"`
 	Role             Role             `gorm:"type:text"`
 	TeamUsers        []TeamUser       `gorm:"foreignKey:UserID"`
+	Teams            []*Team          `gorm:"many2many:team_users;"`
 	TimeTableEntries []TimeTableEntry `gorm:"foreignKey:UserID"`
 	TimeTables       []TimeTable      `gorm:"foreignKey:UserID"`
 }
@@ -35,6 +36,7 @@ type Team struct {
 	ManagerID   uuid.UUID  `gorm:"type:uuid;index"`
 	Manager     *User      `gorm:"foreignKey:ManagerID;references:ID"`
 	TeamUsers   []TeamUser `gorm:"foreignKey:TeamID"`
+	Users       []*User    `gorm:"many2many:team_users;"`
 }
 
 type TeamUser struct {

@@ -5,12 +5,11 @@ import (
 	"fmt"
 
 	gmodel "github.com/epitech/timemanager/internal/graph/model"
-	"github.com/epitech/timemanager/internal/mappers"
+	userMapper "github.com/epitech/timemanager/internal/mappers/user"
 	models "github.com/epitech/timemanager/internal/models"
 	"github.com/epitech/timemanager/package/database"
 	// "github.com/google/uuid"
 )
-
 
 func ListUsers() ([]*gmodel.User, error) {
 	// Defensive check to avoid panic when DB is not initialized
@@ -24,7 +23,22 @@ func ListUsers() ([]*gmodel.User, error) {
 	}
 	out := make([]*gmodel.User, 0, len(users))
 	for i := range users {
-		out = append(out, mappers.DBUserToGraph(&users[i]))
+		out = append(out, userMapper.DBUserToGraph(&users[i]))
+	}
+	return out, nil
+}
+
+func ListUsersWithAllData() ([]*gmodel.UserWithAllData, error) {
+	if database.DB == nil {
+		return nil, errors.New("database not initialized")
+	}
+	var users []models.User
+	if err := database.DB.Preload("Teams").Preload("TimeTableEntries").Preload("TimeTables").Find(&users).Error; err != nil {
+		return nil, err
+	}
+	out := make([]*gmodel.UserWithAllData, 0, len(users))
+	for i := range users {
+		out = append(out, userMapper.DBUserToGraphWithAllData(&users[i]))
 	}
 	return out, nil
 }
@@ -37,7 +51,7 @@ func GetUserByEmail(email string) (*gmodel.User, error) {
 	if err := database.DB.First(&user, "email = ?", email).Error; err != nil {
 		return nil, err
 	}
-	return mappers.DBUserToGraph(&user), nil
+	return userMapper.DBUserToGraph(&user), nil
 }
 
 func GetUsersByGroup(inGroup bool) ([]*gmodel.User, error) {
@@ -61,7 +75,7 @@ func GetUsersByGroup(inGroup bool) ([]*gmodel.User, error) {
 
 	out := make([]*gmodel.User, 0, len(users))
 	for i := range users {
-		out = append(out, mappers.DBUserToGraph(&users[i]))
+		out = append(out, userMapper.DBUserToGraph(&users[i]))
 	}
 	return out, nil
 }
