@@ -127,7 +127,7 @@ input CreateTimeEntryInput {
   userID: ID!
   day: Date!
   arrival: Time!
-  departure: Time!
+  departure: Time
   status: Boolean!
 }
 
@@ -167,5 +167,8 @@ type Mutation {
   #time entry mutations
   createTimeEntry(input: CreateTimeEntryInput!): TimeTableEntry!
   updateTimeEntry(id: ID!, input: UpdateTimeEntryInput!): TimeTableEntry!
-  deleteTimeEntry(id: ID!): Boolean!
+
+  #pointage mutations
+  clockIn: TimeTableEntry!
+  clockOut: TimeTableEntry!
 }
