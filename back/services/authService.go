@@ -36,3 +36,11 @@ func (s *AuthService) Login(email, password string) (*model.UserLogged, error) {
 		Token: token,
 	}, nil
 }
+
+func (s *AuthService) Me(email string)(*model.User, error){
+	return s.AuthRepo.Me(email)
+}
+
+func (s *AuthService) UpdateProfile(email string, input model.UpdateProfileInput)(*model.User, error){
+	return s.AuthRepo.UpdateProfile(email, input)
+}

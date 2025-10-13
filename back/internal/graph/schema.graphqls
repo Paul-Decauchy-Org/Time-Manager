@@ -147,11 +147,21 @@ input SignUpInput {
   password: String!
 }
 
+input UpdateProfileInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  password: String
+}
+
 type Mutation {
   #auth mutations
   signUp(input: SignUpInput!): User!
   login(email: String!, password: String!): UserLogged!
   logout: String!
+  me: User!
+  updateProfile(input: UpdateProfileInput!): User!
 
   #user mutations
   createUser(input: CreateUserInput!): User!
