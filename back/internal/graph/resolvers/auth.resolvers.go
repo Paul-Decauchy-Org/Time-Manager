@@ -7,9 +7,8 @@ import (
 	"net/http"
 
 	"github.com/epitech/timemanager/internal/graph/model"
+	"github.com/epitech/timemanager/package/middlewares"
 )
-
-
 
 // signUp resolver
 func (r * mutationResolver) SignUp(ctx context.Context, input model.SignUpInput) (*model.User, error) {
@@ -50,4 +49,13 @@ func (r * mutationResolver) Logout(ctx context.Context) (string, error) {
 	})
 
 	return "Logged out successfully", nil
+}
+
+// Get profile resolver
+func (r * mutationResolver) Me(ctx context.Context) (*model.User, error) {
+	email, ok := ctx.Value(middlewares.ContextUserEmailKey).(string)
+	if !ok {
+		return nil, errors.New("could not find email in context")
+	}
+	return r.AuthService.Me(email)
 }

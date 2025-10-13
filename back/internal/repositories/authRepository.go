@@ -40,3 +40,11 @@ func (r *Repository) Login(email, password string) (*model.User, error) {
 	}
 	return userMapper.DBUserToGraph(&user), nil
 }
+
+func (r *Repository) Me(email string)(*model.User, error){
+	var user models.User
+	if err := r.DB.Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return userMapper.DBUserToGraph(&user), nil
+}

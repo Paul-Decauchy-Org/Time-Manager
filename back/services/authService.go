@@ -36,3 +36,7 @@ func (s *AuthService) Login(email, password string) (*model.UserLogged, error) {
 		Token: token,
 	}, nil
 }
+
+func (s *AuthService) Me(email string)(*model.User, error){
+	return s.AuthRepo.Me(email)
+}
