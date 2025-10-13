@@ -53,6 +53,7 @@ type ComplexityRoot struct {
 		CreateTeam         func(childComplexity int, input model.CreateTeamInput) int
 		CreateTimeEntry    func(childComplexity int, input model.CreateTimeEntryInput) int
 		CreateUser         func(childComplexity int, input model.CreateUserInput) int
+		DeleteProfile      func(childComplexity int) int
 		DeleteTeam         func(childComplexity int, id string) int
 		DeleteTimeEntry    func(childComplexity int, id string) int
 		DeleteUser         func(childComplexity int, id string) int
@@ -147,6 +148,7 @@ type MutationResolver interface {
 	Login(ctx context.Context, email string, password string) (*model.UserLogged, error)
 	Logout(ctx context.Context) (string, error)
 	UpdateProfile(ctx context.Context, input model.UpdateProfileInput) (*model.User, error)
+	DeleteProfile(ctx context.Context) (bool, error)
 	CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error)
 	CreateMassiveUsers(ctx context.Context, input model.CreateMassiveUsersInput) ([]*model.User, error)
 	UpdateUser(ctx context.Context, id string, input model.UpdateUserInput) (*model.User, error)
@@ -235,6 +237,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(model.CreateUserInput)), true
+	case "Mutation.deleteProfile":
+		if e.complexity.Mutation.DeleteProfile == nil {
+			break
+		}
+
+		return e.complexity.Mutation.DeleteProfile(childComplexity), true
 	case "Mutation.deleteTeam":
 		if e.complexity.Mutation.DeleteTeam == nil {
 			break
@@ -1262,6 +1270,35 @@ func (ec *executionContext) fieldContext_Mutation_updateProfile(ctx context.Cont
 	if fc.Args, err = ec.field_Mutation_updateProfile_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteProfile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteProfile,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Mutation().DeleteProfile(ctx)
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteProfile(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
 	}
 	return fc, nil
 }
@@ -5636,6 +5673,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "updateProfile":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateProfile(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteProfile":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteProfile(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++

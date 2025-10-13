@@ -162,6 +162,7 @@ type Mutation {
   login(email: String!, password: String!): UserLogged!
   logout: String!
   updateProfile(input: UpdateProfileInput!): User!
+  deleteProfile: Boolean!
 
   #user mutations
   createUser(input: CreateUserInput!): User!

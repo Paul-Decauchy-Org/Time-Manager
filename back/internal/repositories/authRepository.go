@@ -77,3 +77,14 @@ func (r *Repository) UpdateProfile(email string, input model.UpdateProfileInput)
 	}
 	return userMapper.DBUserToGraph(&user), nil
 }
+
+func (r *Repository) DeleteProfile(email string)(bool, error){
+	var user models.User
+	if err := r.DB.Where("email = ?", email).First(&user).Error; err != nil {
+		return false, errors.New("user not found")
+	}
+	if err := r.DB.Delete(&user).Error; err != nil {
+		return false, errors.New("failed to delete user")
+	}
+	return true, nil
+}
