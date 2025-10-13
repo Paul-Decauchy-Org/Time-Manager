@@ -49,6 +49,8 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
+		AddUserToTeam      func(childComplexity int, userID string, teamID string) int
+		AddUsersToTeam     func(childComplexity int, input model.AddUsersToTeamInput) int
 		ClockIn            func(childComplexity int) int
 		ClockOut           func(childComplexity int) int
 		CreateMassiveUsers func(childComplexity int, input model.CreateMassiveUsersInput) int
@@ -60,6 +62,7 @@ type ComplexityRoot struct {
 		DeleteUser         func(childComplexity int, id string) int
 		Login              func(childComplexity int, email string, password string) int
 		Logout             func(childComplexity int) int
+		RemoveUserFromTeam func(childComplexity int, userID string, teamID string) int
 		SignUp             func(childComplexity int, input model.SignUpInput) int
 		UpdateProfile      func(childComplexity int, input model.UpdateProfileInput) int
 		UpdateTeam         func(childComplexity int, id string, input model.UpdateTeamInput) int
@@ -157,6 +160,9 @@ type MutationResolver interface {
 	CreateTeam(ctx context.Context, input model.CreateTeamInput) (*model.Team, error)
 	UpdateTeam(ctx context.Context, id string, input model.UpdateTeamInput) (*model.Team, error)
 	DeleteTeam(ctx context.Context, id string) (bool, error)
+	AddUserToTeam(ctx context.Context, userID string, teamID string) (*model.TeamUser, error)
+	AddUsersToTeam(ctx context.Context, input model.AddUsersToTeamInput) ([]*model.TeamUser, error)
+	RemoveUserFromTeam(ctx context.Context, userID string, teamID string) (bool, error)
 	CreateTimeEntry(ctx context.Context, input model.CreateTimeEntryInput) (*model.TimeTableEntry, error)
 	UpdateTimeEntry(ctx context.Context, id string, input model.UpdateTimeEntryInput) (*model.TimeTableEntry, error)
 	ClockIn(ctx context.Context) (*model.TimeTableEntry, error)
@@ -195,6 +201,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	_ = ec
 	switch typeName + "." + field {
 
+	case "Mutation.addUserToTeam":
+		if e.complexity.Mutation.AddUserToTeam == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addUserToTeam_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddUserToTeam(childComplexity, args["userID"].(string), args["teamID"].(string)), true
+	case "Mutation.addUsersToTeam":
+		if e.complexity.Mutation.AddUsersToTeam == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addUsersToTeam_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddUsersToTeam(childComplexity, args["input"].(model.AddUsersToTeamInput)), true
 	case "Mutation.clockIn":
 		if e.complexity.Mutation.ClockIn == nil {
 			break
@@ -296,6 +324,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.Logout(childComplexity), true
+	case "Mutation.removeUserFromTeam":
+		if e.complexity.Mutation.RemoveUserFromTeam == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_removeUserFromTeam_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RemoveUserFromTeam(childComplexity, args["userID"].(string), args["teamID"].(string)), true
 	case "Mutation.signUp":
 		if e.complexity.Mutation.SignUp == nil {
 			break
@@ -695,6 +734,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputAddUsersToTeamInput,
 		ec.unmarshalInputCreateMassiveUsersInput,
 		ec.unmarshalInputCreateTeamInput,
 		ec.unmarshalInputCreateTimeEntryInput,
@@ -820,6 +860,33 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_Mutation_addUserToTeam_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "userID", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["userID"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "teamID", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["teamID"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_addUsersToTeam_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNAddUsersToTeamInput2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐAddUsersToTeamInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createMassiveUsers_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -899,6 +966,22 @@ func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawAr
 		return nil, err
 	}
 	args["password"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_removeUserFromTeam_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "userID", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["userID"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "teamID", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["teamID"] = arg1
 	return args, nil
 }
 
@@ -1644,6 +1727,145 @@ func (ec *executionContext) fieldContext_Mutation_deleteTeam(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteTeam_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_addUserToTeam(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_addUserToTeam,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().AddUserToTeam(ctx, fc.Args["userID"].(string), fc.Args["teamID"].(string))
+		},
+		nil,
+		ec.marshalNTeamUser2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamUser,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addUserToTeam(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TeamUser_id(ctx, field)
+			case "userID":
+				return ec.fieldContext_TeamUser_userID(ctx, field)
+			case "teamID":
+				return ec.fieldContext_TeamUser_teamID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TeamUser", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addUserToTeam_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_addUsersToTeam(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_addUsersToTeam,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().AddUsersToTeam(ctx, fc.Args["input"].(model.AddUsersToTeamInput))
+		},
+		nil,
+		ec.marshalNTeamUser2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamUserᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addUsersToTeam(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TeamUser_id(ctx, field)
+			case "userID":
+				return ec.fieldContext_TeamUser_userID(ctx, field)
+			case "teamID":
+				return ec.fieldContext_TeamUser_teamID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TeamUser", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addUsersToTeam_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_removeUserFromTeam(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_removeUserFromTeam,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().RemoveUserFromTeam(ctx, fc.Args["userID"].(string), fc.Args["teamID"].(string))
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_removeUserFromTeam(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_removeUserFromTeam_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -5206,6 +5428,40 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputAddUsersToTeamInput(ctx context.Context, obj any) (model.AddUsersToTeamInput, error) {
+	var it model.AddUsersToTeamInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"userIDs", "teamID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "userIDs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userIDs"))
+			data, err := ec.unmarshalNID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserIDs = data
+		case "teamID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("teamID"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TeamID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateMassiveUsersInput(ctx context.Context, obj any) (model.CreateMassiveUsersInput, error) {
 	var it model.CreateMassiveUsersInput
 	asMap := map[string]any{}
@@ -5311,7 +5567,7 @@ func (ec *executionContext) unmarshalInputCreateTimeEntryInput(ctx context.Conte
 			it.Arrival = data
 		case "departure":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("departure"))
-			data, err := ec.unmarshalNTime2timeᚐTime(ctx, v)
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5766,6 +6022,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteTeam":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteTeam(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "addUserToTeam":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addUserToTeam(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "addUsersToTeam":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addUsersToTeam(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "removeUserFromTeam":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_removeUserFromTeam(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -6882,6 +7159,11 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) unmarshalNAddUsersToTeamInput2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐAddUsersToTeamInput(ctx context.Context, v any) (model.AddUsersToTeamInput, error) {
+	res, err := ec.unmarshalInputAddUsersToTeamInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -6968,6 +7250,36 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNID2ᚕstringᚄ(ctx context.Context, v any) ([]string, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNID2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNID2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNID2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalNRole2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐRole(ctx context.Context, v any) (model.Role, error) {
@@ -7116,6 +7428,10 @@ func (ec *executionContext) marshalNTeam2ᚖgithubᚗcomᚋepitechᚋtimemanager
 		return graphql.Null
 	}
 	return ec._Team(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTeamUser2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamUser(ctx context.Context, sel ast.SelectionSet, v model.TeamUser) graphql.Marshaler {
+	return ec._TeamUser(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNTeamUser2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TeamUser) graphql.Marshaler {

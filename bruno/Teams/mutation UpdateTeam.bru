@@ -1,0 +1,44 @@
+meta {
+  name: mutation UpdateTeam
+  type: graphql
+  seq: 3
+}
+
+post {
+  url: http://localhost:8084/query
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  mutation UpdateTeam($id: ID!, $input: UpdateTeamInput!) {
+    updateTeam(id: $id, input: $input) {
+      id
+      name
+      description
+      managerID {
+        id
+        firstName
+        lastName
+        email
+        role
+      }
+    }
+  }
+  
+}
+
+body:graphql:vars {
+  {
+    "id": "92772cb0-52f4-409c-bae9-40c851f565fc",
+    "input": {
+      "name": "Updated Nemesis Group",
+      "description": "Ceci est un groupe de test de création de team",
+      "managerID": "4ffe4c09-a128-441a-8aa4-40b001485bd7"
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+}
