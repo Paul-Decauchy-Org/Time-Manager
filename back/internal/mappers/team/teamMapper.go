@@ -9,11 +9,15 @@ func DBTeamToGraph(t *gmodel.Team) *model.Team {
 	if t == nil {
 		return nil
 	}
+	var manager *model.User
+	if t.Manager != nil {
+		manager = &model.User{ID: t.Manager.ID.String()}
+	}
 	return &model.Team{
 		ID:          t.ID.String(),
 		Name:        t.Name,
 		Description: t.Description,
-		ManagerID:   &model.User{ID: t.Manager.ID.String()},
+		ManagerID:   manager,
 	}
 }
 

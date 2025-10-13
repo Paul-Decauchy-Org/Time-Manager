@@ -11,7 +11,6 @@ func DBTimeTableToGraph(t *gmodel.TimeTable) *model.TimeTable {
 	}
 	return &model.TimeTable{
 		ID:     t.ID.String(),
-		UserID: &model.User{ID: t.User.ID.String()},
 		Day:    t.Day,
 		Start:  t.Start,
 		End:    t.End,
