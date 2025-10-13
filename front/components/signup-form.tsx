@@ -20,7 +20,7 @@ export function SignupForm({
                                ...props
                            }: React.ComponentProps<"div">) {
     const { signUp, loading, error } = useSignUp();
-    const [passwordError, setPasswordError] = useState<string>("");
+    const [passwordError, setPasswordError] = useState("");
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
