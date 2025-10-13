@@ -161,6 +161,7 @@ type Mutation {
   login(email: String!, password: String!): UserLogged!
   logout: String!
   me: User!
+  updateProfile(input: UpdateProfileInput!): User!
 
   #user mutations
   createUser(input: CreateUserInput!): User!

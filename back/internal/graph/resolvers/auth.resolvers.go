@@ -59,3 +59,12 @@ func (r * mutationResolver) Me(ctx context.Context) (*model.User, error) {
 	}
 	return r.AuthService.Me(email)
 }
+
+// Update profile resolver
+func (r * mutationResolver) UpdateProfile(ctx context.Context, input model.UpdateProfileInput)(*model.User, error){
+	email, ok := ctx.Value(middlewares.ContextUserEmailKey).(string)
+	if !ok {
+		return nil, errors.New("could not find email in context")
+	}
+	return r.AuthService.UpdateProfile(email, input)
+}
