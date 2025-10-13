@@ -52,7 +52,7 @@ func (r * mutationResolver) Logout(ctx context.Context) (string, error) {
 }
 
 // Get profile resolver
-func (r * mutationResolver) Me(ctx context.Context) (*model.User, error) {
+func (r * queryResolver) Me(ctx context.Context) (*model.User, error) {
 	email, ok := ctx.Value(middlewares.ContextUserEmailKey).(string)
 	if !ok {
 		return nil, errors.New("could not find email in context")
