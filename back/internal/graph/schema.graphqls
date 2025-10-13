@@ -85,6 +85,7 @@ type Query {
   usersByGroup(inGroup: Boolean!): [User!]!
   userWithAllData(id: ID!): UserWithAllData
   UsersWithAllData: [UserWithAllData!]!
+  me: User!
 }
 
 
@@ -160,7 +161,6 @@ type Mutation {
   signUp(input: SignUpInput!): User!
   login(email: String!, password: String!): UserLogged!
   logout: String!
-  me: User!
   updateProfile(input: UpdateProfileInput!): User!
 
   #user mutations
