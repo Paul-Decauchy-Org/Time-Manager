@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input"
 import SignupLink from "./links/signup-link"
 import {useLogin} from "@/hooks/login";
+import {redirect, RedirectType} from "next/navigation";
 
 
 export function LoginForm({
@@ -43,8 +44,7 @@ export function LoginForm({
         );
 
             console.log("User logged:", user);
-            // TODO: Redirect to dashboard
-            // router.push("/login");
+            redirect("/dashboard", RedirectType.push)
         } catch (err) {
             console.error("Log in failed:", err);
         }
