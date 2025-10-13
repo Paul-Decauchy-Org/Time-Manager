@@ -14,6 +14,11 @@ import (
 
 
 func (r *Repository) SignUp(input model.SignUpInput) (*model.User, error) {
+	var existingUser models.User
+	if err := r.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
+		return nil, errors.New("email already in use")
+	}
+	
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
