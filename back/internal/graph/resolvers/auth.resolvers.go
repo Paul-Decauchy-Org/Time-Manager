@@ -68,3 +68,24 @@ func (r * mutationResolver) UpdateProfile(ctx context.Context, input model.Updat
 	}
 	return r.AuthService.UpdateProfile(email, input)
 }
+
+// Delete profile resolver
+func (r *mutationResolver) DeleteProfile(ctx context.Context)(bool, error){
+	email, ok := ctx.Value(middlewares.ContextUserEmailKey).(string)
+	if !ok{
+		return false, errors.New("could not find email in context")
+	}
+	w, ok := ctx.Value("ResponseWriter").(http.ResponseWriter)
+	if !ok {
+		return false, errors.New("could not find ResponseWriter in context")
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		MaxAge:   -1, 
+	})
+	return r.AuthService.DeleteProfile(email)
+}

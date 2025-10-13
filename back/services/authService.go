@@ -44,3 +44,7 @@ func (s *AuthService) Me(email string)(*model.User, error){
 func (s *AuthService) UpdateProfile(email string, input model.UpdateProfileInput)(*model.User, error){
 	return s.AuthRepo.UpdateProfile(email, input)
 }
+
+func (s *AuthService) DeleteProfile(email string)(bool, error){
+	return s.AuthRepo.DeleteProfile(email)
+}
