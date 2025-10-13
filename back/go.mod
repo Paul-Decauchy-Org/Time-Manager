@@ -4,10 +4,12 @@ go 1.25.1
 
 require (
 	github.com/99designs/gqlgen v0.17.81
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/google/uuid v1.6.0
+	github.com/rs/cors v1.11.1
 	github.com/spf13/viper v1.21.0
 	github.com/vektah/gqlparser/v2 v2.5.30
-	golang.org/x/crypto v0.31.0
+	golang.org/x/crypto v0.42.0
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.0
 )
@@ -16,6 +18,7 @@ require (
 	github.com/agnivade/levenshtein v1.2.1 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
@@ -12,7 +13,10 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/epitech/timemanager/internal/graph"
 	"github.com/epitech/timemanager/internal/graph/resolvers"
+	"github.com/epitech/timemanager/internal/repositories"
 	"github.com/epitech/timemanager/package/database"
+	"github.com/epitech/timemanager/services"
+	"github.com/rs/cors"
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
@@ -44,8 +48,16 @@ func main() {
 		}
 	}()
 
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &resolvers.Resolver{DB: db}}))
+	authRepo := repositories.NewRepository(db)
+	authService := services.NewAuthService(authRepo)
+	resolver := &resolvers.Resolver{
+		DB:          db,
+		AuthService: authService,
+	}
 
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{
+		Resolvers: resolver,
+	}))
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.POST{})
@@ -56,9 +68,19 @@ func main() {
 	srv.Use(extension.AutomaticPersistedQuery{
 		Cache: lru.New[string](100),
 	})
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:3001"}, // Add your Next.js ports
+		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization", "Accept"},
+		AllowCredentials: true,
+		Debug:            true, // Remove in production
+	})
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	http.Handle("/", c.Handler(playground.Handler("GraphQL playground", "/query")))
+	http.Handle("/query", c.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "ResponseWriter", w)
+		srv.ServeHTTP(w, r.WithContext(ctx))
+	})))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

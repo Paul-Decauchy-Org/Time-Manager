@@ -9,6 +9,7 @@ services:
       NODE_ENV: development
     networks:
       - Time-Manager-Network
+
   database:
     image: 'postgres:latest'
     ports:
@@ -17,18 +18,34 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=1234
       - POSTGRES_DB=timemanager
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - Time-Manager-Network
+
   back:
-    build:  
+    build:
       context: ./back
       dockerfile: Dockerfile
     depends_on:
-      - database
+      database:
+        condition: service_healthy
+    env_file:
+      - ./back/.env
     ports:
-      - "8084:8080"
+      - "8084:8084"
     networks:
       - Time-Manager-Network
+
 networks:
   Time-Manager-Network:
     driver: bridge
+
+volumes:
+  postgres_data:
