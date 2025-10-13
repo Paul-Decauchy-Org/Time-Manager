@@ -38,5 +38,5 @@ func (r *Repository) Login(email, password string) (*model.User, error) {
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
 		return nil, err
 	}
-	return mappers.DBUserToGraph(&user), nil
+	return userMapper.DBUserToGraph(&user), nil
 }
