@@ -36,12 +36,18 @@ func (r * mutationResolver) Login(ctx context.Context, email, password string) (
 
 // Logout resolver
 func (r * mutationResolver) Logout(ctx context.Context) (string, error) {
-	if w, ok := ctx.Value("ResponseWriter").(http.ResponseWriter); ok {
-		http.SetCookie(w, &http.Cookie{
-			Name:	 "token",
-			Value:	 "",
-		})  
-		return "Logged out successfully", nil
+	w, ok := ctx.Value("ResponseWriter").(http.ResponseWriter)
+	if !ok {
+		return "", errors.New("could not find ResponseWriter in context")
 	}
-	return "", errors.New("could not remove token cookie")
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		MaxAge:   -1, 
+	})
+
+	return "Logged out successfully", nil
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
 	"os"
@@ -18,6 +17,7 @@ import (
 	"github.com/epitech/timemanager/services"
 	"github.com/rs/cors"
 	"github.com/vektah/gqlparser/v2/ast"
+	"github.com/epitech/timemanager/package/middlewares"
 )
 
 const defaultPort = "8081"
@@ -76,11 +76,8 @@ func main() {
 		Debug:            true, // Remove in production
 	})
 
-	http.Handle("/", c.Handler(playground.Handler("GraphQL playground", "/query")))
-	http.Handle("/query", c.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), "ResponseWriter", w)
-		srv.ServeHTTP(w, r.WithContext(ctx))
-	})))
+	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	http.Handle("/query", middlewares.AuthRequired(srv))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
