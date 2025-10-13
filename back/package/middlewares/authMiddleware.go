@@ -5,67 +5,83 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"errors"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
 var JWTSecret = []byte(os.Getenv("JWT_SECRET"))
+
 type contextKey string
 
+const (
+	ContextUserIDKey    contextKey = "id"
+	ContextUserEmailKey contextKey = "email"
+)
+
 func GenerateToken(email string, id string) (string, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"email": email,
+		"id":    id,
+		"exp":   time.Now().Add(24 * time.Hour).Unix(),
+	})
 
-	claims := token.Claims.(jwt.MapClaims)
-
-	claims["email"] = email
-	claims["id"] = id
-	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
-	tokenString, err := token.SignedString(JWTSecret)
-
-	if err != nil {
-		return "", err
-	}
-	return tokenString, nil
-
+	return token.SignedString(JWTSecret)
 }
 
 func ValidateToken(tokenString string) (string, string, error) {
-	token, err := jwt.Parse(tokenString, func (token * jwt.Token) (any, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("invalid signing method")
+		}
 		return JWTSecret, nil
 	})
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		email := claims["email"].(string)
-		id := claims["id"].(string)
-		return email, id, nil
-	} else {
-		return "", "", err
+
+	if err != nil || !token.Valid {
+		return "", "", errors.New("invalid token")
 	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", "", errors.New("invalid claims")
+	}
+
+	email, _ := claims["email"].(string)
+	id, _ := claims["id"].(string)
+	return email, id, nil
 }
 
 
 func AuthRequired(next http.Handler) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        var tokenString string
-        cookie, err := r.Cookie("token")
-        if err == nil {
-            tokenString = cookie.Value
-        } else {
-            tokenString = r.Header.Get("Authorization")
-        }
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		
+		ctx := context.WithValue(r.Context(), "ResponseWriter", w)
 
-        if tokenString == "" {
-            http.Error(w, "Authorization header or cookie missing", http.StatusUnauthorized)
-            return
-        }
-        email, id, err := ValidateToken(tokenString)
-        if err != nil {
-            http.Error(w, "Invalid token", http.StatusUnauthorized)
-            return
-        }
-		ctx := context.WithValue(r.Context(), contextKey("email"), email)
-		ctx = context.WithValue(ctx, contextKey("id"), id)
-        r = r.WithContext(ctx)
-        next.ServeHTTP(w, r)
-    })
-}	
+		var tokenString string
+		authHeader := r.Header.Get("Authorization")
+
+		if after, ok :=strings.CutPrefix(authHeader, "Bearer "); ok  {
+			tokenString = after
+		} else if cookie, err := r.Cookie("token"); err == nil {
+			tokenString = cookie.Value
+		}
+
+		if tokenString == "" {
+			next.ServeHTTP(w, r.WithContext(ctx))
+			return
+		}
+
+		email, id, err := ValidateToken(tokenString)
+		if err != nil {
+			http.Error(w, "Unauthorized: invalid token", http.StatusUnauthorized)
+			return
+		}
+
+		ctx = context.WithValue(ctx, ContextUserEmailKey, email)
+		ctx = context.WithValue(ctx, ContextUserIDKey, id)
+
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
 
