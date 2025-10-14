@@ -14,9 +14,12 @@ jobs:
               uses: actions/setup-go@v5
               with: 
                 go-version: '1.25.x'
-            - name: Install dependencies
+            - name: copy env file
               run: |
-                cd back/cmd && go install . 
+                cd back/ && cp .env.example .env
+#            - name: Install dependencies
+#              run: |
+#                cd back/cmd && go install .
             - name: build docker-image
               uses: hoverkraft-tech/compose-action@v2.0.1
               with:
