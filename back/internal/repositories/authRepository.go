@@ -77,6 +77,9 @@ func (r *Repository) UpdateProfile(email string, input model.UpdateProfileInput)
 		}
 		user.Password = string(hashed)
 	}
+	if input.Phone != nil {
+		user.Phone = *input.Phone
+	}
 	if err := r.DB.Save(&user).Error; err != nil {
 		return nil, errors.New("failed to update user profile")
 	}
