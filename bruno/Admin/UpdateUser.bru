@@ -1,7 +1,7 @@
 meta {
-  name: update profile
+  name: UpdateUser
   type: graphql
-  seq: 5
+  seq: 2
 }
 
 post {
@@ -11,18 +11,20 @@ post {
 }
 
 body:graphql {
-  mutation updateProfile($input : UpdateProfileInput!){
-    updateProfile(input: $input){
+  mutation UpdateUser($id: ID!, $input: UpdateUserInput!){
+    updateUser(id:$id, input: $input){
       firstName
       lastName
+      role
     }
   }
 }
 
 body:graphql:vars {
   {
-    "input": {
-      "firstName": "UpdateFirstName"
+    "id": "azaha-...",
+    "input":{
+      "firstName": "test"   
     }
   }
 }

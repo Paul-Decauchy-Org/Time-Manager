@@ -1,0 +1,42 @@
+meta {
+  name: GetUser
+  type: graphql
+  seq: 4
+}
+
+post {
+  url: {{url}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query GetUser($id: ID!){
+    getUser(id: $id){
+      firstName
+      lastName
+      teams{
+        name
+      }
+      timeTables{
+        start
+        end
+      }
+      timeTableEntries{
+        arrival
+        departure
+        day
+      }
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "id": "ajeas-..."
+  }
+}
+
+settings {
+  encodeUrl: true
+}
