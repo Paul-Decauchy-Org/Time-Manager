@@ -1,0 +1,27 @@
+meta {
+  name: DeleteUser
+  type: graphql
+  seq: 3
+}
+
+post {
+  url: {{url}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  mutation DeleteUser($id: ID!){
+    deleteUser(id: $id)
+  }
+}
+
+body:graphql:vars {
+  {
+    "id": "aeka-..."
+  }
+}
+
+settings {
+  encodeUrl: true
+}
