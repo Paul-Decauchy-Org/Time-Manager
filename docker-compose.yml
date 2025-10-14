@@ -1,20 +1,4 @@
 services:
-  front:
-    build:
-      context: ./front
-      dockerfile: Dockerfile
-      args:
-        BACKEND_URL: http://back:8084/query  # Use service name, not localhost
-    ports:
-      - "3000:3000"
-    environment:
-      NODE_ENV: development
-    depends_on:
-      back:
-        condition: service_healthy  # Wait for backend to be healthy
-    networks:
-      - Time-Manager-Network
-
   database:
     image: 'postgres:latest'
     ports:
@@ -54,6 +38,21 @@ services:
     networks:
       - Time-Manager-Network
 
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+      args:
+        BACKEND_URL: http://back:8084/query  # Use service name, not localhost
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+    depends_on:
+      back:
+        condition: service_healthy  # Wait for backend to be healthy
+    networks:
+      - Time-Manager-Network
 networks:
   Time-Manager-Network:
     driver: bridge
