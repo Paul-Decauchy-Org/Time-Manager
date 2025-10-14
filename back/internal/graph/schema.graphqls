@@ -42,6 +42,7 @@ type Team {
   name: String!
   description: String!
   managerID: User!
+  users: [UserWithAllData!]!
 }
 
 type TeamUser {
@@ -91,6 +92,7 @@ type Query {
   usersByGroup(inGroup: Boolean!): [User!]!
   userWithAllData(id: ID!): UserWithAllData
   UsersWithAllData: [UserWithAllData!]!
+  usersByTeam(teamID: ID!): [UserWithAllData!]!
   me: User!
 
   # queries for admin

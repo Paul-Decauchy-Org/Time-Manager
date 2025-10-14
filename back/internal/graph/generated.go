@@ -83,6 +83,7 @@ type ComplexityRoot struct {
 		UserWithAllData  func(childComplexity int, id string) int
 		Users            func(childComplexity int) int
 		UsersByGroup     func(childComplexity int, inGroup bool) int
+		UsersByTeam      func(childComplexity int, teamID string) int
 		UsersWithAllData func(childComplexity int) int
 	}
 
@@ -91,6 +92,7 @@ type ComplexityRoot struct {
 		ID          func(childComplexity int) int
 		ManagerID   func(childComplexity int) int
 		Name        func(childComplexity int) int
+		Users       func(childComplexity int) int
 	}
 
 	TeamUser struct {
@@ -181,6 +183,7 @@ type QueryResolver interface {
 	UsersByGroup(ctx context.Context, inGroup bool) ([]*model.User, error)
 	UserWithAllData(ctx context.Context, id string) (*model.UserWithAllData, error)
 	UsersWithAllData(ctx context.Context) ([]*model.UserWithAllData, error)
+	UsersByTeam(ctx context.Context, teamID string) ([]*model.UserWithAllData, error)
 	Me(ctx context.Context) (*model.User, error)
 	Users(ctx context.Context) ([]*model.User, error)
 	GetUser(ctx context.Context, id string) (*model.UserWithAllData, error)
@@ -487,6 +490,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.UsersByGroup(childComplexity, args["inGroup"].(bool)), true
+	case "Query.usersByTeam":
+		if e.complexity.Query.UsersByTeam == nil {
+			break
+		}
+
+		args, err := ec.field_Query_usersByTeam_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.UsersByTeam(childComplexity, args["teamID"].(string)), true
 	case "Query.UsersWithAllData":
 		if e.complexity.Query.UsersWithAllData == nil {
 			break
@@ -518,6 +532,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Team.Name(childComplexity), true
+	case "Team.users":
+		if e.complexity.Team.Users == nil {
+			break
+		}
+
+		return e.complexity.Team.Users(childComplexity), true
 
 	case "TeamUser.id":
 		if e.complexity.TeamUser.ID == nil {
@@ -1131,6 +1151,17 @@ func (ec *executionContext) field_Query_usersByGroup_args(ctx context.Context, r
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_usersByTeam_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "teamID", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["teamID"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field___Directive_args_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1700,6 +1731,8 @@ func (ec *executionContext) fieldContext_Mutation_createTeam(ctx context.Context
 				return ec.fieldContext_Team_description(ctx, field)
 			case "managerID":
 				return ec.fieldContext_Team_managerID(ctx, field)
+			case "users":
+				return ec.fieldContext_Team_users(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Team", field.Name)
 		},
@@ -1751,6 +1784,8 @@ func (ec *executionContext) fieldContext_Mutation_updateTeam(ctx context.Context
 				return ec.fieldContext_Team_description(ctx, field)
 			case "managerID":
 				return ec.fieldContext_Team_managerID(ctx, field)
+			case "users":
+				return ec.fieldContext_Team_users(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Team", field.Name)
 		},
@@ -2177,6 +2212,8 @@ func (ec *executionContext) fieldContext_Query_teams(_ context.Context, field gr
 				return ec.fieldContext_Team_description(ctx, field)
 			case "managerID":
 				return ec.fieldContext_Team_managerID(ctx, field)
+			case "users":
+				return ec.fieldContext_Team_users(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Team", field.Name)
 		},
@@ -2558,6 +2595,69 @@ func (ec *executionContext) fieldContext_Query_UsersWithAllData(_ context.Contex
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserWithAllData", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_usersByTeam(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_usersByTeam,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().UsersByTeam(ctx, fc.Args["teamID"].(string))
+		},
+		nil,
+		ec.marshalNUserWithAllData2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserWithAllDataᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_usersByTeam(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_UserWithAllData_id(ctx, field)
+			case "firstName":
+				return ec.fieldContext_UserWithAllData_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_UserWithAllData_lastName(ctx, field)
+			case "email":
+				return ec.fieldContext_UserWithAllData_email(ctx, field)
+			case "phone":
+				return ec.fieldContext_UserWithAllData_phone(ctx, field)
+			case "password":
+				return ec.fieldContext_UserWithAllData_password(ctx, field)
+			case "role":
+				return ec.fieldContext_UserWithAllData_role(ctx, field)
+			case "teams":
+				return ec.fieldContext_UserWithAllData_teams(ctx, field)
+			case "timeTableEntries":
+				return ec.fieldContext_UserWithAllData_timeTableEntries(ctx, field)
+			case "timeTables":
+				return ec.fieldContext_UserWithAllData_timeTables(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserWithAllData", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_usersByTeam_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -2955,6 +3055,57 @@ func (ec *executionContext) fieldContext_Team_managerID(_ context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _Team_users(ctx context.Context, field graphql.CollectedField, obj *model.Team) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Team_users,
+		func(ctx context.Context) (any, error) {
+			return obj.Users, nil
+		},
+		nil,
+		ec.marshalNUserWithAllData2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserWithAllDataᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Team_users(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Team",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_UserWithAllData_id(ctx, field)
+			case "firstName":
+				return ec.fieldContext_UserWithAllData_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_UserWithAllData_lastName(ctx, field)
+			case "email":
+				return ec.fieldContext_UserWithAllData_email(ctx, field)
+			case "phone":
+				return ec.fieldContext_UserWithAllData_phone(ctx, field)
+			case "password":
+				return ec.fieldContext_UserWithAllData_password(ctx, field)
+			case "role":
+				return ec.fieldContext_UserWithAllData_role(ctx, field)
+			case "teams":
+				return ec.fieldContext_UserWithAllData_teams(ctx, field)
+			case "timeTableEntries":
+				return ec.fieldContext_UserWithAllData_timeTableEntries(ctx, field)
+			case "timeTables":
+				return ec.fieldContext_UserWithAllData_timeTables(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserWithAllData", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _TeamUser_id(ctx context.Context, field graphql.CollectedField, obj *model.TeamUser) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -3061,6 +3212,8 @@ func (ec *executionContext) fieldContext_TeamUser_teamID(_ context.Context, fiel
 				return ec.fieldContext_Team_description(ctx, field)
 			case "managerID":
 				return ec.fieldContext_Team_managerID(ctx, field)
+			case "users":
+				return ec.fieldContext_Team_users(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Team", field.Name)
 		},
@@ -4031,6 +4184,8 @@ func (ec *executionContext) fieldContext_UserWithAllData_teams(_ context.Context
 				return ec.fieldContext_Team_description(ctx, field)
 			case "managerID":
 				return ec.fieldContext_Team_managerID(ctx, field)
+			case "users":
+				return ec.fieldContext_Team_users(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Team", field.Name)
 		},
@@ -6456,6 +6611,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "usersByTeam":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_usersByTeam(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "me":
 			field := field
 
@@ -6578,6 +6755,11 @@ func (ec *executionContext) _Team(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "managerID":
 			out.Values[i] = ec._Team_managerID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "users":
+			out.Values[i] = ec._Team_users(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

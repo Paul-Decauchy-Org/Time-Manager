@@ -57,10 +57,11 @@ type SignUpInput struct {
 }
 
 type Team struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	ManagerID   *User  `json:"managerID"`
+	ID          string             `json:"id"`
+	Name        string             `json:"name"`
+	Description string             `json:"description"`
+	ManagerID   *User              `json:"managerID"`
+	Users       []*UserWithAllData `json:"users"`
 }
 
 type TeamUser struct {
