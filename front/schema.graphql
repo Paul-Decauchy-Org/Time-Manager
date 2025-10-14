@@ -1,0 +1,177 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+scalar Date
+scalar Time
+type Mutation {
+  signUp(input: SignUpInput!): User!
+  login(email: String!, password: String!): UserLogged!
+  logout: String!
+  updateProfile(input: UpdateProfileInput!): User!
+  deleteProfile: Boolean!
+  createUser(input: CreateUserInput!): User!
+  createMassiveUsers(input: CreateMassiveUsersInput!): [User!]!
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+  deleteUser(id: ID!): Boolean!
+  createThreeUsers: [User!]!
+  createTeam(input: CreateTeamInput!): Team!
+  updateTeam(id: ID!, input: UpdateTeamInput!): Team!
+  deleteTeam(id: ID!): Boolean!
+  addUserToTeam(userID: ID!, teamID: ID!): TeamUser!
+  addUsersToTeam(input: AddUsersToTeamInput!): [TeamUser!]!
+  removeUserFromTeam(userID: ID!, teamID: ID!): Boolean!
+  createTimeEntry(input: CreateTimeEntryInput!): TimeTableEntry!
+  updateTimeEntry(id: ID!, input: UpdateTimeEntryInput!): TimeTableEntry!
+  clockIn: TimeTableEntry!
+  clockOut: TimeTableEntry!
+}
+type Query {
+  users: [User!]!
+  teams: [Team!]!
+  teamUsers: [TeamUser!]!
+  roles: [Role!]!
+  timeTableEntries: [TimeTableEntry!]!
+  timeTables: [TimeTable!]!
+  userByEmail(email: String!): User
+  usersByGroup(inGroup: Boolean!): [User!]!
+  userWithAllData(id: ID!): UserWithAllData
+  UsersWithAllData: [UserWithAllData!]!
+  me: User!
+}
+type Team {
+  id: ID!
+  name: String!
+  description: String!
+  managerID: User!
+}
+type TeamUser {
+  id: ID!
+  userID: User!
+  teamID: Team!
+}
+type TimeTable {
+  id: ID!
+  userID: User!
+  day: Date!
+  start: Time!
+  end: Time!
+}
+type TimeTableEntry {
+  id: ID!
+  userID: User!
+  day: Date!
+  arrival: Time!
+  departure: Time
+  status: Boolean!
+}
+type User {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  password: String!
+  role: Role!
+}
+type UserLogged {
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  role: Role!
+  token: String!
+}
+type UserWithAllData {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  password: String!
+  role: Role!
+  teams: [Team!]!
+  timeTableEntries: [TimeTableEntry!]!
+  timeTables: [TimeTable!]!
+}
+enum Role {
+  USER
+  ADMIN
+  MANAGER
+}
+input AddUsersToTeamInput {
+  userIDs: [ID!]!
+  teamID: ID!
+}
+input CreateMassiveUsersInput {
+  users: [CreateUserInput!]!
+}
+input CreateTeamInput {
+  name: String!
+  description: String!
+  managerID: ID!
+}
+input CreateTimeEntryInput {
+  userID: ID!
+  day: Date!
+  arrival: Time!
+  departure: Time
+  status: Boolean!
+}
+input CreateUserInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  password: String!
+  role: Role!
+}
+input SignUpInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  password: String!
+}
+input UpdateProfileInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  password: String
+}
+input UpdateTeamInput {
+  name: String
+  description: String
+  managerID: ID
+}
+input UpdateTimeEntryInput {
+  userID: ID
+  day: Date
+  arrival: Time
+  departure: Time
+  status: Boolean
+}
+input UpdateUserInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  password: String
+  role: Role
+}
+"Directs the executor to defer this fragment when the `if` argument is true or undefined."
+directive @defer(
+    "Deferred when true or undefined."
+    if: Boolean = true,
+    "Unique name"
+    label: String
+  ) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+"Indicates exactly one field must be supplied and this field must not be `null`."
+directive @oneOf on INPUT_OBJECT
+"Exposes a URL that specifies the behavior of this scalar."
+directive @specifiedBy(
+    "The URL that specifies the behavior of this scalar."
+    url: String!
+  ) on SCALAR
+
