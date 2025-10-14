@@ -15,6 +15,7 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
+RUN npm run codegen
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -26,7 +27,6 @@ COPY . .
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run codegen
 
 RUN \
   if [ -f package-lock.json ]; then npm run build; \
