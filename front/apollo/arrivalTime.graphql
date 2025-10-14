@@ -1,6 +1,0 @@
-mutation updateTimeEntry($id : ID!, $input: UpdateTimeEntryInput!){
-  updateTimeEntry(id : $id, input : $input){
-  day,
-  arrival,
-  }
-  }
