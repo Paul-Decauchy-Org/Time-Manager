@@ -169,8 +169,11 @@ type Mutation {
   updateProfile(input: UpdateProfileInput!): User!
   deleteProfile: Boolean!
 
-  #user mutations
+  # admin mutations
   createUser(input: CreateUserInput!): User!
+
+  #user mutations
+  
   createMassiveUsers(input: CreateMassiveUsersInput!): [User!]!
   updateUser(id: ID!, input: UpdateUserInput!): User!
   deleteUser(id: ID!): Boolean!
