@@ -17,3 +17,15 @@ func NewAdminService(repo *repositories.Repository)*AdminService{
 func (s *AdminService) CreateUser(input model.CreateUserInput)(*model.User, error){
 	return s.AdminRepo.CreateUser(input)
 }
+
+func (s *AdminService) UpdateUser(id string, input model.UpdateUserInput)(*model.User, error){
+	return s.AdminRepo.UpdateUser(id, input)
+}
+
+func (s *AdminService) DeleteUser(id string)(bool, error){
+	return s.AdminRepo.DeleteUser(id)
+}
+
+func (s *AdminService) GetUser(id string)(*model.UserWithAllData, error){
+	return s.AdminRepo.GetUser(id)
+}

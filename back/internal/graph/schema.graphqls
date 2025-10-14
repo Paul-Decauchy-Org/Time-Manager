@@ -30,7 +30,13 @@ enum Role {
   ADMIN
   MANAGER
 }
-
+enum Jour {
+  MONDAY
+  THUSDAY 
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+}
 type Team {
   id: ID!
   name: String!
@@ -61,7 +67,7 @@ type TimeTableEntry {
 type TimeTable {
   id: ID!
   userID: User!
-  day: Date!
+  day: Jour!
   start: Time!
   end: Time!
 }
@@ -76,7 +82,7 @@ type UserLogged {
 }
 
 type Query {
-  users: [User!]!
+
   teams: [Team!]!
   teamUsers: [TeamUser!]!
   roles: [Role!]!
@@ -88,6 +94,10 @@ type Query {
   UsersWithAllData: [UserWithAllData!]!
   usersByTeam(teamID: ID!): [UserWithAllData!]!
   me: User!
+
+  # queries for admin
+  users: [User!]!
+  getUser(id: ID!): UserWithAllData
 }
 
 
@@ -171,14 +181,16 @@ type Mutation {
   updateProfile(input: UpdateProfileInput!): User!
   deleteProfile: Boolean!
 
-  # admin mutations
+  # mutations for admin
   createUser(input: CreateUserInput!): User!
-
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+  deleteUser(id: ID!): Boolean!
+  
+  
   #user mutations
   
   createMassiveUsers(input: CreateMassiveUsersInput!): [User!]!
-  updateUser(id: ID!, input: UpdateUserInput!): User!
-  deleteUser(id: ID!): Boolean!
+  
 
   # create 3 users
   createThreeUsers: [User!]!

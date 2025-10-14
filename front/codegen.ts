@@ -1,9 +1,9 @@
-
+import './env-config.ts'
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
   overwrite: true,
-  schema: "http://localhost:8084/query",
+  schema: "./schema.graphql",
   documents: "apollo/**/*.graphql",
   generates: {
     "generated/": {
