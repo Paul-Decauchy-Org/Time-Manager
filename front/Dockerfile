@@ -21,18 +21,18 @@ FROM base AS builder
 WORKDIR /app
 
 # Accept backend URL as build argument
-ARG BACKEND_URL=http://back:8084/query
+#ARG BACKEND_URL=http://back:8084/query
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-#COPY .env.example .env
+COPY .env.example .env
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED=1
 
 # Set environment variable for codegen
-ENV SCHEMA_URL=${BACKEND_URL}
+#ENV SCHEMA_URL=${BACKEND_URL}
 RUN npm run codegen
 
 RUN \
