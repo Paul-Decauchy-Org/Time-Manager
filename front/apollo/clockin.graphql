@@ -1,5 +1,5 @@
-mutation clockin {
-  clockIn{
-    userID{id}
+mutation clockIn{
+  clockIn {
+    id
   }
 }

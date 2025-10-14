@@ -1,16 +1,13 @@
 "use client";
 
 import {useMutation} from "@apollo/client/react";
-import {ClockinDocument, Role} from "@/generated/graphql";
+import {ClockInDocument, Role} from "@/generated/graphql";
 
 export function useClockIn(){
-    const [clockInMutation, {  data, loading, error }] = useMutation(ClockinDocument)
-    const clockIn = async( input: {
-        userId: number
-
-    }) => {
+    const [clockInMutation, {  data, loading, error }] = useMutation(ClockInDocument)
+    const clockIn = async() => {
         const result = await clockInMutation()
-        return result.data?
+        return result.data
     }
  return {
     clockIn,

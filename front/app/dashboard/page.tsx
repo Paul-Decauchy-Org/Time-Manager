@@ -1,10 +1,15 @@
+import { UserDashboard } from "@/components/user-clock";
+
 
 
 export default function Page() {
 
     return (
-        <div>
-            Hello
+        <div style ={{
+            display: 'flex',
+            }}>
+            <UserDashboard></UserDashboard>
+
         </div>
     )
 }

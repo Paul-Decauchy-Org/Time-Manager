@@ -21,13 +21,14 @@ import {
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
 import React, { ButtonHTMLAttributes, use } from "react"
 import { useClockIn} from "@/hooks/clockin";
-
+import { useClockOut} from "@/hooks/clockout"
 export function UserDashboard(
     {
     className,
     ...props
          }: React.ComponentProps<"div">) {
   const {clockIn, loading, error} = useClockIn()
+  const { clockOut} = useClockOut()
    const chartDataArrival = [
   { date: "10/11/2026", arrival: 20},
   { date: "11/11/2026", arrival: 15 },
@@ -48,13 +49,22 @@ const chartConfig = {
     color: "var(--chart-1)",
   },
 } satisfies ChartConfig
-const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) =>{
-  const userId = 1 //TODO dynamically get the userID
+const handleClockIn =async (e: React.MouseEvent<HTMLButtonElement>) =>{
   try {
-    const clocking = await clockIn( {userId})
+  await clockIn()
+  console.log("clock in success")
   }
   catch (err){
     console.log("clockin failed", err)
+  }
+}
+const handleClockOut =async (e: React.MouseEvent<HTMLButtonElement>) =>{
+  try {
+  await clockOut()
+  console.log("clockout success")
+  }
+  catch (err){
+    console.log("clockout failed", err)
   }
 }
   return (
@@ -69,7 +79,7 @@ const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) =>{
       </CardHeader>
       <CardContent>
             <Field>
-                <Button style={{color: 'white'}} onClick={handleClick} >clocking in</Button>
+                <Button style={{color: 'white'}} onClick={handleClockIn} >clocking in</Button>
             </Field>
       </CardContent>
       </Card>
@@ -82,7 +92,7 @@ const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) =>{
       </CardHeader>
       <CardContent>
             <Field>
-                <Button style={{color: 'white' }} >clocking out</Button>
+                <Button style={{color: 'white' }} onClick={handleClockOut} >clocking out</Button>
             </Field>
       </CardContent>
     </Card>
@@ -166,3 +176,7 @@ const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) =>{
     </div>
   )
 }
+function clockOut() {
+  throw new Error("Function not implemented.")
+}
+
