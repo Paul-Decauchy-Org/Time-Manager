@@ -69,7 +69,7 @@ func main() {
 		Cache: lru.New[string](100),
 	})
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:3001"}, // Add your Next.js ports
+		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:3001", "http://localhost:8084"}, // Add your Next.js ports
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type", "Authorization", "Accept"},
 		AllowCredentials: true,
