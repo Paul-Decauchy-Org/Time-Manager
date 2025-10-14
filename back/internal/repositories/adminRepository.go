@@ -23,6 +23,7 @@ func (r *Repository) CreateUser(input model.CreateUserInput)(*model.User, error)
 	user := &dbmodels.User{
 		FirstName: input.FirstName,
 		LastName: input.LastName,
+		Phone: input.Phone,
 		Email: input.Email,
 		Password: string(hashedPassword),
 		Role: dbmodels.Role(input.Role),

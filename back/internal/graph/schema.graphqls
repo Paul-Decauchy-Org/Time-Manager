@@ -178,6 +178,9 @@ type Mutation {
   updateUser(id: ID!, input: UpdateUserInput!): User!
   deleteUser(id: ID!): Boolean!
 
+  # create 3 users
+  createThreeUsers: [User!]!
+
   #team mutations
   createTeam(input: CreateTeamInput!): Team!
   updateTeam(id: ID!, input: UpdateTeamInput!): Team!
