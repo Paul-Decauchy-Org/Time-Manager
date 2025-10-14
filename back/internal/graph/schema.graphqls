@@ -53,7 +53,7 @@ type TimeTableEntry {
   userID: User!
   day: Date!
   arrival: Time!
-  departure: Time!
+  departure: Time
   status: Boolean!  # true pour entrée, false pour sortie
 }
 
@@ -156,6 +156,11 @@ input UpdateProfileInput {
   password: String
 }
 
+input AddUsersToTeamInput {
+  userIDs: [ID!]!
+  teamID: ID!
+}
+
 type Mutation {
   #auth mutations
   signUp(input: SignUpInput!): User!
@@ -164,16 +169,25 @@ type Mutation {
   updateProfile(input: UpdateProfileInput!): User!
   deleteProfile: Boolean!
 
-  #user mutations
+  # admin mutations
   createUser(input: CreateUserInput!): User!
+
+  #user mutations
+  
   createMassiveUsers(input: CreateMassiveUsersInput!): [User!]!
   updateUser(id: ID!, input: UpdateUserInput!): User!
   deleteUser(id: ID!): Boolean!
+
+  # create 3 users
+  createThreeUsers: [User!]!
 
   #team mutations
   createTeam(input: CreateTeamInput!): Team!
   updateTeam(id: ID!, input: UpdateTeamInput!): Team!
   deleteTeam(id: ID!): Boolean!
+  addUserToTeam(userID: ID!, teamID: ID!): TeamUser!
+  addUsersToTeam(input: AddUsersToTeamInput!): [TeamUser!]!
+  removeUserFromTeam(userID: ID!, teamID: ID!): Boolean!
 
   #time entry mutations
   createTimeEntry(input: CreateTimeEntryInput!): TimeTableEntry!

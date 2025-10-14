@@ -49,10 +49,13 @@ func main() {
 	}()
 
 	authRepo := repositories.NewRepository(db)
+	adminRepo := repositories.NewRepository(db)
 	authService := services.NewAuthService(authRepo)
+	adminService := services.NewAdminService(adminRepo)
 	resolver := &resolvers.Resolver{
 		DB:          db,
 		AuthService: authService,
+		AdminService: adminService,
 	}
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{
@@ -69,7 +72,7 @@ func main() {
 		Cache: lru.New[string](100),
 	})
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:3001"}, // Add your Next.js ports
+		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:3001", "http://localhost:8084"}, // Add your Next.js ports
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type", "Authorization", "Accept"},
 		AllowCredentials: true,

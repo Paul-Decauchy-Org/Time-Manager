@@ -1,0 +1,29 @@
+meta {
+  name: query Users
+  type: graphql
+  seq: 5
+}
+
+post {
+  url: http://localhost:8084/
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query Users{
+    users {
+      id
+      firstName
+      lastName
+      email
+      phone
+      password
+      role
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+}

@@ -10,6 +10,11 @@ import (
 	"time"
 )
 
+type AddUsersToTeamInput struct {
+	UserIDs []string `json:"userIDs"`
+	TeamID  string   `json:"teamID"`
+}
+
 type CreateMassiveUsersInput struct {
 	Users []*CreateUserInput `json:"users"`
 }
@@ -21,11 +26,11 @@ type CreateTeamInput struct {
 }
 
 type CreateTimeEntryInput struct {
-	UserID    string    `json:"userID"`
-	Day       string    `json:"day"`
-	Arrival   time.Time `json:"arrival"`
-	Departure time.Time `json:"departure"`
-	Status    bool      `json:"status"`
+	UserID    string     `json:"userID"`
+	Day       string     `json:"day"`
+	Arrival   time.Time  `json:"arrival"`
+	Departure *time.Time `json:"departure,omitempty"`
+	Status    bool       `json:"status"`
 }
 
 type CreateUserInput struct {

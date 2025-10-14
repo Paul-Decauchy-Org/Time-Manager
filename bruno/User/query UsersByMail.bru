@@ -1,0 +1,25 @@
+meta {
+  name: query UsersByMail
+  type: graphql
+  seq: 4
+}
+
+post {
+  url: http://localhost:8084/
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query UsersByGroup($input: Boolean!){
+    usersByGroup(inGroup: $input){
+      lastName
+      firstName
+      role
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+}

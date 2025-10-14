@@ -23,7 +23,7 @@ func (s *AuthService) Login(email, password string) (*model.UserLogged, error) {
 	if err != nil {
 		return nil, err
 	}
-	token, err := middlewares.GenerateToken(user.Email, user.ID)
+	token, err := middlewares.GenerateToken(user.Email, user.ID, string(user.Role))
 	if err != nil {
 		return nil, err
 	}

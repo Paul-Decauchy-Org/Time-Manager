@@ -1,0 +1,42 @@
+meta {
+  name: query ListUsersWithAllData
+  type: graphql
+  seq: 6
+}
+
+post {
+  url: http://localhost:8084/
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query ListUsersWithAllData{
+    UsersWithAllData {
+      id
+      firstName
+      lastName
+      phone
+      teams{
+        id
+        name
+        description
+      }
+      timeTableEntries {
+        day
+        arrival
+        departure
+        status
+      }
+      timeTables {
+        day
+        start
+        end
+      }
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+}

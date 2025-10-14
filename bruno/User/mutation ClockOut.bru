@@ -1,0 +1,45 @@
+meta {
+  name: mutation ClockOut
+  type: graphql
+  seq: 8
+}
+
+post {
+  url: http://localhost:8084/
+  body: graphql
+  auth: bearer
+}
+
+headers {
+  : 
+}
+
+auth:bearer {
+  token: Token
+}
+
+body:graphql {
+  mutation clockIn {
+      clockIn {
+          id
+          arrival
+          departure
+          status
+          userID{
+              id
+              email
+              firstName
+              lastName
+              role
+          }
+      }
+  }
+}
+
+body:graphql:vars {
+  {"Bearer" :"token"}
+}
+
+settings {
+  encodeUrl: true
+}

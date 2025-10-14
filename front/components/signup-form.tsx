@@ -1,19 +1,15 @@
 "use client";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import {
-    Field,
-    FieldDescription,
-    FieldGroup,
-    FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+import {cn} from "@/lib/utils"
+import {Button} from "@/components/ui/button"
+import {Card, CardContent} from "@/components/ui/card"
+import {Field, FieldDescription, FieldGroup, FieldLabel,} from "@/components/ui/field"
+import {Input} from "@/components/ui/input"
 import LoginLink from "./links/login-link"
-import React, { useState } from "react";
-import { useSignUp} from "@/hooks/signup";
-import { Role } from "@/generated/graphql";
+import React, {useState} from "react";
+import {useSignUp} from "@/hooks/signup";
+import {Role} from "@/generated/graphql";
+import {useRouter} from "next/navigation";
 
 export function SignupForm({
                                className,
@@ -21,7 +17,7 @@ export function SignupForm({
                            }: React.ComponentProps<"div">) {
     const { signUp, loading, error } = useSignUp();
     const [passwordError, setPasswordError] = useState("");
-
+    const router = useRouter()
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setPasswordError("");
@@ -53,8 +49,7 @@ export function SignupForm({
             });
 
             console.log("User created:", user);
-            // TODO: Redirect to login or dashboard
-            // router.push("/login");
+            router.push("/login")
         } catch (err) {
             console.error("Sign up failed:", err);
         }
