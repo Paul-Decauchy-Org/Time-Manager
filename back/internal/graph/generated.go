@@ -55,6 +55,7 @@ type ComplexityRoot struct {
 		ClockOut           func(childComplexity int) int
 		CreateMassiveUsers func(childComplexity int, input model.CreateMassiveUsersInput) int
 		CreateTeam         func(childComplexity int, input model.CreateTeamInput) int
+		CreateThreeUsers   func(childComplexity int) int
 		CreateTimeEntry    func(childComplexity int, input model.CreateTimeEntryInput) int
 		CreateUser         func(childComplexity int, input model.CreateUserInput) int
 		DeleteProfile      func(childComplexity int) int
@@ -157,6 +158,7 @@ type MutationResolver interface {
 	CreateMassiveUsers(ctx context.Context, input model.CreateMassiveUsersInput) ([]*model.User, error)
 	UpdateUser(ctx context.Context, id string, input model.UpdateUserInput) (*model.User, error)
 	DeleteUser(ctx context.Context, id string) (bool, error)
+	CreateThreeUsers(ctx context.Context) ([]*model.User, error)
 	CreateTeam(ctx context.Context, input model.CreateTeamInput) (*model.Team, error)
 	UpdateTeam(ctx context.Context, id string, input model.UpdateTeamInput) (*model.Team, error)
 	DeleteTeam(ctx context.Context, id string) (bool, error)
@@ -257,6 +259,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CreateTeam(childComplexity, args["input"].(model.CreateTeamInput)), true
+	case "Mutation.createThreeUsers":
+		if e.complexity.Mutation.CreateThreeUsers == nil {
+			break
+		}
+
+		return e.complexity.Mutation.CreateThreeUsers(childComplexity), true
 	case "Mutation.createTimeEntry":
 		if e.complexity.Mutation.CreateTimeEntry == nil {
 			break
@@ -1586,6 +1594,51 @@ func (ec *executionContext) fieldContext_Mutation_deleteUser(ctx context.Context
 	if fc.Args, err = ec.field_Mutation_deleteUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createThreeUsers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createThreeUsers,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Mutation().CreateThreeUsers(ctx)
+		},
+		nil,
+		ec.marshalNUser2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createThreeUsers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "firstName":
+				return ec.fieldContext_User_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_User_lastName(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -6001,6 +6054,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteUser":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteUser(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createThreeUsers":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createThreeUsers(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
