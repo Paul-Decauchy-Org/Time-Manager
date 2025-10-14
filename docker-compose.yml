@@ -3,10 +3,15 @@ services:
     build:
       context: ./front
       dockerfile: Dockerfile
+      args:
+        BACKEND_URL: http://back:8084/query  # Use service name, not localhost
     ports:
       - "3000:3000"
     environment:
       NODE_ENV: development
+    depends_on:
+      back:
+        condition: service_healthy  # Wait for backend to be healthy
     networks:
       - Time-Manager-Network
 
@@ -40,6 +45,12 @@ services:
       - ./back/.env
     ports:
       - "8084:8084"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8084/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
     networks:
       - Time-Manager-Network
 

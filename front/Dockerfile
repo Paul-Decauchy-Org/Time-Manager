@@ -19,6 +19,10 @@ RUN \
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
+
+# Accept backend URL as build argument
+ARG BACKEND_URL=http://back:8084/query
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
@@ -27,6 +31,8 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED=1
 
+# Set environment variable for codegen
+ENV CODEGEN_SCHEMA_URL=${BACKEND_URL}
 RUN npm run codegen
 
 RUN \
