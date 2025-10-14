@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import {ApolloWrapper} from "@/apollo/client/ApolloWrapper";
 import {AuthProvider} from "@/contexts/AuthContext";
+import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
+import {AppSidebar} from "@/components/app-sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +33,7 @@ export default function RootLayout({
       >
       <ApolloWrapper>
           <AuthProvider>
-          {children}
+              {children}
           </AuthProvider>
       </ApolloWrapper>
       </body>

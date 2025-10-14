@@ -9,7 +9,7 @@ import LoginLink from "./links/login-link"
 import React, {useState} from "react";
 import {useSignUp} from "@/hooks/signup";
 import {Role} from "@/generated/graphql";
-import {redirect, RedirectType} from "next/navigation";
+import {useRouter} from "next/navigation";
 
 export function SignupForm({
                                className,
@@ -17,7 +17,7 @@ export function SignupForm({
                            }: React.ComponentProps<"div">) {
     const { signUp, loading, error } = useSignUp();
     const [passwordError, setPasswordError] = useState("");
-
+    const router = useRouter()
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setPasswordError("");
@@ -49,7 +49,7 @@ export function SignupForm({
             });
 
             console.log("User created:", user);
-            redirect("/login", RedirectType.push)
+            router.push("/login")
         } catch (err) {
             console.error("Sign up failed:", err);
         }

@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input"
 import SignupLink from "./links/signup-link"
 import {useLogin} from "@/hooks/login";
-import {redirect, RedirectType} from "next/navigation";
+import {useRouter} from "next/navigation";
 
 
 export function LoginForm({
@@ -23,6 +23,7 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
     const { login, loading, error } = useLogin();
     const [passwordError, setPasswordError] = useState("");
+    const router = useRouter()
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -44,7 +45,7 @@ export function LoginForm({
         );
 
             console.log("User logged:", user);
-            redirect("/dashboard", RedirectType.push)
+            router.push("/dashboard")
         } catch (err) {
             console.error("Log in failed:", err);
         }
