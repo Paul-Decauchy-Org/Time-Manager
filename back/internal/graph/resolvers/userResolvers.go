@@ -34,9 +34,7 @@ func (r *queryResolver) UsersWithAllData(ctx context.Context) ([]*model.UserWith
 	return userQueries.ListUsersWithAllData()
 }
 
-func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
-	return userMutations.CreateUserInput(input)
-}
+
 
 func (r *mutationResolver) CreateMassiveUsers(ctx context.Context, input model.CreateMassiveUsersInput) ([]*model.User, error) {
 	users := make([]model.CreateUserInput, len(input.Users))

@@ -49,10 +49,13 @@ func main() {
 	}()
 
 	authRepo := repositories.NewRepository(db)
+	adminRepo := repositories.NewRepository(db)
 	authService := services.NewAuthService(authRepo)
+	adminService := services.NewAdminService(adminRepo)
 	resolver := &resolvers.Resolver{
 		DB:          db,
 		AuthService: authService,
+		AdminService: adminService,
 	}
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{
