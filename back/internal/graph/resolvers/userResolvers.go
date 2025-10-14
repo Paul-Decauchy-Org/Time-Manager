@@ -8,10 +8,14 @@ import (
 	timetableEntryMutation "github.com/epitech/timemanager/internal/repositories/mutationRepository/timeTableEntryMutations"
 	"github.com/epitech/timemanager/internal/repositories/mutationRepository/userMutations"
 	"github.com/epitech/timemanager/internal/repositories/queryRepository/userQueries"
+	"github.com/epitech/timemanager/package/middlewares"
 )
 
 // Users resolver
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	if err := middlewares.VerifyAdmin(ctx); err != nil {
+		return nil, err
+	}
 	return userQueries.ListUsers()
 }
 

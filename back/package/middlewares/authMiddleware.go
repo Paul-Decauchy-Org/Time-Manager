@@ -18,19 +18,21 @@ type contextKey string
 const (
 	ContextUserIDKey    contextKey = "id"
 	ContextUserEmailKey contextKey = "email"
+	ContextUserERoleKey contextKey = "role"
 )
 
-func GenerateToken(email string, id string) (string, error) {
+func GenerateToken(email string, id string, role string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": email,
 		"id":    id,
+		"role": role,
 		"exp":   time.Now().Add(24 * time.Hour).Unix(),
 	})
 
 	return token.SignedString(JWTSecret)
 }
 
-func ValidateToken(tokenString string) (string, string, error) {
+func ValidateToken(tokenString string) (string, string, string, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
@@ -39,17 +41,18 @@ func ValidateToken(tokenString string) (string, string, error) {
 	})
 
 	if err != nil || !token.Valid {
-		return "", "", errors.New("invalid token")
+		return "", "", "", errors.New("invalid token")
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		return "", "", errors.New("invalid claims")
+		return "", "", "", errors.New("invalid claims")
 	}
 
 	email, _ := claims["email"].(string)
 	id, _ := claims["id"].(string)
-	return email, id, nil
+	role, _ := claims["role"].(string)
+	return email, id, role, nil
 }
 
 
@@ -72,7 +75,7 @@ func AuthRequired(next http.Handler) http.Handler {
 			return
 		}
 
-		email, id, err := ValidateToken(tokenString)
+		email, id, role, err := ValidateToken(tokenString)
 		if err != nil {
 			http.Error(w, "Unauthorized: invalid token", http.StatusUnauthorized)
 			return
@@ -80,6 +83,7 @@ func AuthRequired(next http.Handler) http.Handler {
 
 		ctx = context.WithValue(ctx, ContextUserEmailKey, email)
 		ctx = context.WithValue(ctx, ContextUserIDKey, id)
+		ctx = context.WithValue(ctx, ContextUserERoleKey, role)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
