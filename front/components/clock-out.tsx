@@ -24,10 +24,10 @@ export function ClockOut(
             const handleClockOut =async (e: React.MouseEvent<HTMLButtonElement>) =>{
                 try {
                     await clockOut()
-                    console.log("clock in success")
+                    console.log("clockout in success")
                 }
                 catch (err){
-                    console.log("clockin failed", err)
+                    console.log("clockout failed", err)
                 }
             }
             return (

@@ -20,8 +20,8 @@ export function Clock({
   }
   setInterval(UpdateTime)
     return(
-        <Card className='text-primary text-center ' style={{textAlign:'center', maxHeight:'150'}} >
-            <b style={{ fontSize:39 }}>{ctime}</b>
+        <Card className='text-center text-primary max-h-150px'  >
+            <b style={{ fontSize:36 }}>{ctime}</b>
             {cdate}
         </Card>
     )
