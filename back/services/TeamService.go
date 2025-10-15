@@ -16,3 +16,7 @@ func NewTeamService(repo *repositories.Repository) *TeamService{
 func (s *TeamService) CreateTeam(input model.CreateTeamInput)(*model.Team, error){
 	return s.TeamRepo.CreateTeam(input)
 }
+
+func (s *TeamService) UpdateTeam(id string, input model.UpdateTeamInput)(*model.Team, error){
+	return s.TeamRepo.UpdateTeam(id, input)
+}

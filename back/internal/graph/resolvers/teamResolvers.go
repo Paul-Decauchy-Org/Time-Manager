@@ -10,6 +10,9 @@ import (
 )
 
 func (r *queryResolver) Teams(ctx context.Context) ([]*model.Team, error) {
+	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
+		return nil, err
+	}
 	return teamQueries.ListTeams()
 }
 
@@ -21,7 +24,10 @@ func (r *mutationResolver) CreateTeam(ctx context.Context, input model.CreateTea
 }
 
 func (r *mutationResolver) UpdateTeam(ctx context.Context, id string, input model.UpdateTeamInput) (*model.Team, error) {
-	return teamMutations.UpdateTeam(id, input)
+	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
+		return nil, err
+	}
+	return r.TeamService.UpdateTeam(id, input)
 }
 
 func (r *mutationResolver) DeleteTeam(ctx context.Context, id string) (bool, error) {

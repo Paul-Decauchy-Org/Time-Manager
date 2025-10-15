@@ -36,3 +36,31 @@ func (r *Repository) CreateTeam(input model.CreateTeamInput)(*model.Team, error)
 	}
 	return teamMapper.DBTeamToGraph(team), nil
 }
+
+func (r *Repository) UpdateTeam(id string, input model.UpdateTeamInput)(*model.Team, error){
+	teamID, ok := uuid.Parse(id)
+	if ok != nil {
+		return nil, errors.New("error while parsing team id")
+	}
+	var existingTeam *dbmodels.Team
+	if err := r.DB.Where("id = ?", teamID).First(&existingTeam).Error; err != nil {
+		return nil, errors.New("team not found")
+	}
+	if input.Name != nil {
+		existingTeam.Name = *input.Name
+	}
+	if input.Description != nil {
+		existingTeam.Description = *input.Description
+	}
+	if input.ManagerID != nil {
+		managerID, ok := uuid.Parse(*input.ManagerID)
+		if ok != nil {
+			return nil, errors.New("error while parsing manager id")
+		}
+		existingTeam.ManagerID = managerID
+	}
+	if err := r.DB.Save(existingTeam).Error; err != nil {
+		return nil, errors.New("error while updating team")
+	}
+	return teamMapper.DBTeamToGraph(existingTeam), nil
+}
