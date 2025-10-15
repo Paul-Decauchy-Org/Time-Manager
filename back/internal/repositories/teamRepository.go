@@ -64,3 +64,18 @@ func (r *Repository) UpdateTeam(id string, input model.UpdateTeamInput)(*model.T
 	}
 	return teamMapper.DBTeamToGraph(existingTeam), nil
 }
+
+func (r *Repository) DeleteTeam(id string)(bool, error){
+	teamID, ok := uuid.Parse(id)
+	if ok != nil {
+		return false, errors.New("error while parsing team id")
+	}
+	var existingTeam *dbmodels.Team
+	if err := r.DB.Where("id = ?", teamID).First(&existingTeam).Error; err != nil {
+		return false, errors.New("team not found")
+	}
+	if err := r.DB.Delete(&existingTeam).Error; err != nil {
+		return false, errors.New("error while deleting team id")
+	}
+	return true, nil
+}
