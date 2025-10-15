@@ -1,6 +1,7 @@
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
 import {Separator} from "@/components/ui/separator";
+
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -41,6 +42,7 @@ export default function DashboardLayout({
                     </Breadcrumb>
                 </header>
                 <main>
+                    
                     {children}
                 </main>
 

@@ -15,7 +15,7 @@ import (
 
 func (r *Repository) SignUp(input model.SignUpInput) (*model.User, error) {
 	var existingUser models.User
-	if err := r.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
+	if err := r.DB.Where("email = ?", input.Email).First(&existingUser).Error; err != nil {
 		return nil, errors.New("email already in use")
 	}
 	
@@ -76,6 +76,9 @@ func (r *Repository) UpdateProfile(email string, input model.UpdateProfileInput)
 			return nil, errors.New("failed to hash password")
 		}
 		user.Password = string(hashed)
+	}
+	if input.Phone != nil {
+		user.Phone = *input.Phone
 	}
 	if err := r.DB.Save(&user).Error; err != nil {
 		return nil, errors.New("failed to update user profile")

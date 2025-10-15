@@ -1,0 +1,34 @@
+meta {
+  name: UpdateUser
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: {{url}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  mutation UpdateUser($id: ID!, $input: UpdateUserInput!){
+    updateUser(id:$id, input: $input){
+      firstName
+      lastName
+      role
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "id": "azaha-...",
+    "input":{
+      "firstName": "test"   
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+}

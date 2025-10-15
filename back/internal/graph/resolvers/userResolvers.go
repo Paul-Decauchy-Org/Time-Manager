@@ -2,7 +2,6 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/epitech/timemanager/internal/graph/model"
 	timetableEntryMutation "github.com/epitech/timemanager/internal/repositories/mutationRepository/timeTableEntryMutations"
@@ -12,7 +11,7 @@ import (
 )
 
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	if err := middlewares.VerifyAdmin(ctx); err != nil {
+	if err := middlewares.VerifyRole(ctx, "ADMIN"); err != nil {
 		return nil, err
 	}
 	return userQueries.ListUsers()
@@ -46,13 +45,6 @@ func (r *mutationResolver) CreateMassiveUsers(ctx context.Context, input model.C
 	return userMutations.CreateMassiveUsers(users)
 }
 
-func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input model.UpdateUserInput) (*model.User, error) {
-	return nil, fmt.Errorf("UpdateUser not implemented in repositories")
-}
-
-func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, error) {
-	return false, fmt.Errorf("DeleteUser not implemented in repositories")
-}
 
 func (r *mutationResolver) ClockIn(ctx context.Context) (*model.TimeTableEntry, error) {
 	return timetableEntryMutation.ClockIn(ctx, r.DB)

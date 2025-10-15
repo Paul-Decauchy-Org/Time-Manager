@@ -1,28 +1,18 @@
 package middlewares
 
 import (
+	"slices"
 	"context"
 	"errors"
 )
 
-func VerifyAdmin(ctx context.Context) error {
+func VerifyRole(ctx context.Context, allowedRoles ...string) error {
 	role, ok := ctx.Value(ContextUserERoleKey).(string)
 	if !ok {
-		return errors.New("failed to get role")
+		return errors.New("failed to get role from context")
 	}
-	if role != "ADMIN" {
-		return errors.New("forbidden: admin access required")
+	if slices.Contains(allowedRoles, role) {
+			return nil 
 	}
-	return nil
-}
-
-func VerifyManager(ctx context.Context) error {
-	role, ok := ctx.Value(ContextUserERoleKey).(string)
-	if !ok {
-		return errors.New("failed to get role")
-	}
-	if role != "MANAGER" {
-		return errors.New("forbidden: admin access required")
-	}
-	return nil
+	return errors.New("forbidden: you don't have access")
 }
