@@ -6,6 +6,7 @@ import (
 	"github.com/epitech/timemanager/internal/graph/model"
 	"github.com/epitech/timemanager/internal/repositories/mutationRepository/teamMutations"
 	"github.com/epitech/timemanager/internal/repositories/queryRepository/teamQueries"
+	"github.com/epitech/timemanager/package/middlewares"
 )
 
 func (r *queryResolver) Teams(ctx context.Context) ([]*model.Team, error) {
@@ -13,7 +14,10 @@ func (r *queryResolver) Teams(ctx context.Context) ([]*model.Team, error) {
 }
 
 func (r *mutationResolver) CreateTeam(ctx context.Context, input model.CreateTeamInput) (*model.Team, error) {
-	return teamMutations.CreateTeam(input)
+	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
+		return nil, err
+	}
+	return r.TeamService.CreateTeam(input)
 }
 
 func (r *mutationResolver) UpdateTeam(ctx context.Context, id string, input model.UpdateTeamInput) (*model.Team, error) {
