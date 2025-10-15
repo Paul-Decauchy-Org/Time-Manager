@@ -31,7 +31,10 @@ func (r *mutationResolver) UpdateTeam(ctx context.Context, id string, input mode
 }
 
 func (r *mutationResolver) DeleteTeam(ctx context.Context, id string) (bool, error) {
-	return teamMutations.DeleteTeam(id)
+	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
+		return false, err
+	}
+	return r.TeamService.DeleteTeam(id)
 }
 
 func (r *mutationResolver) AddUserToTeam(ctx context.Context, userID string, teamID string) (*model.TeamUser, error) {

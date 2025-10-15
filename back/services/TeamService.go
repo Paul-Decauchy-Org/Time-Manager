@@ -20,3 +20,7 @@ func (s *TeamService) CreateTeam(input model.CreateTeamInput)(*model.Team, error
 func (s *TeamService) UpdateTeam(id string, input model.UpdateTeamInput)(*model.Team, error){
 	return s.TeamRepo.UpdateTeam(id, input)
 }
+
+func (s *TeamService) DeleteTeam(id string)(bool, error){
+	return s.TeamRepo.DeleteTeam(id)
+}
