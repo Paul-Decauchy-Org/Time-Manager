@@ -18,7 +18,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
 import React, { ButtonHTMLAttributes, use } from "react"
 import { useClockIn} from "@/hooks/clockin";
 import { useClockOut} from "@/hooks/clockout"
