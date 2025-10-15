@@ -1,0 +1,7 @@
+ {
+  timeTables {
+    day
+    start
+    end
+  } 
+}
