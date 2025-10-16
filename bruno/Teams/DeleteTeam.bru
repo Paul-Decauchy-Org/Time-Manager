@@ -1,0 +1,28 @@
+meta {
+  name: DeleteTeam
+  type: graphql
+  seq: 11
+}
+
+post {
+  url: {{url}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  mutation DeleteTeam($id: ID!){
+    deleteTeam(id: $id)
+  }
+}
+
+body:graphql:vars {
+  {
+    "id": "akjedaknd-..."
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

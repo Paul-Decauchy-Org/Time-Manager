@@ -1,0 +1,35 @@
+meta {
+  name: CreateTeam
+  type: graphql
+  seq: 9
+}
+
+post {
+  url: {{url}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  mutation CreateTeam($input: CreateTeamInput!){
+    createTeam(input: $input){
+      name
+      description
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "input": {
+      "name": "Devops Team",
+      "description": "It's a team for devops",
+      "managerID": "aejaj-..."
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
