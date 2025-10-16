@@ -11,7 +11,7 @@ import (
 )
 
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	if err := middlewares.VerifyAdmin(ctx); err != nil {
+	if err := middlewares.VerifyRole(ctx, "ADMIN"); err != nil {
 		return nil, err
 	}
 	return userQueries.ListUsers()

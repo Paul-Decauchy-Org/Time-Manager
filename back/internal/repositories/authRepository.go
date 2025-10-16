@@ -15,7 +15,7 @@ import (
 
 func (r *Repository) SignUp(input model.SignUpInput) (*model.User, error) {
 	var existingUser models.User
-	if err := r.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
+	if err := r.DB.Where("email = ?", input.Email).First(&existingUser).Error; err != nil {
 		return nil, errors.New("email already in use")
 	}
 	
