@@ -1,0 +1,14 @@
+mutation UpdateTeam($id: ID!, $input: UpdateTeamInput!) {
+  updateTeam(id: $id, input: $input) {
+    id
+    name
+    description
+    managerID {
+      id
+      firstName
+      lastName
+      email
+      role
+    }
+  }
+}
