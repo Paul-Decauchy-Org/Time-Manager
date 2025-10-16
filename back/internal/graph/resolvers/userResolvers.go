@@ -33,7 +33,7 @@ func (r *queryResolver) UsersWithAllData(ctx context.Context) ([]*model.UserWith
 	return userQueries.ListUsersWithAllData()
 }
 
-func (r *mutationResolver) CreateThreeUsers(ctx context.Context)([]*model.User, error){
+func (r *mutationResolver) CreateThreeUsers(ctx context.Context) ([]*model.User, error) {
 	return userMutations.CreateThreeUsers()
 }
 
@@ -44,7 +44,6 @@ func (r *mutationResolver) CreateMassiveUsers(ctx context.Context, input model.C
 	}
 	return userMutations.CreateMassiveUsers(users)
 }
-
 
 func (r *mutationResolver) ClockIn(ctx context.Context) (*model.TimeTableEntry, error) {
 	return timetableEntryMutation.ClockIn(ctx, r.DB)

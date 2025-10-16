@@ -75,7 +75,7 @@ type TimeTable struct {
 	UserID *User     `json:"userID"`
 	Day    Jour      `json:"day"`
 	Start  time.Time `json:"start"`
-	End    time.Time `json:"end"`
+	Ends   time.Time `json:"ends"`
 }
 
 type TimeTableEntry struct {

@@ -103,7 +103,7 @@ type ComplexityRoot struct {
 
 	TimeTable struct {
 		Day    func(childComplexity int) int
-		End    func(childComplexity int) int
+		Ends   func(childComplexity int) int
 		ID     func(childComplexity int) int
 		Start  func(childComplexity int) int
 		UserID func(childComplexity int) int
@@ -564,12 +564,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.TimeTable.Day(childComplexity), true
-	case "TimeTable.end":
-		if e.complexity.TimeTable.End == nil {
+	case "TimeTable.ends":
+		if e.complexity.TimeTable.Ends == nil {
 			break
 		}
 
-		return e.complexity.TimeTable.End(childComplexity), true
+		return e.complexity.TimeTable.Ends(childComplexity), true
 	case "TimeTable.id":
 		if e.complexity.TimeTable.ID == nil {
 			break
@@ -2362,8 +2362,8 @@ func (ec *executionContext) fieldContext_Query_timeTables(_ context.Context, fie
 				return ec.fieldContext_TimeTable_day(ctx, field)
 			case "start":
 				return ec.fieldContext_TimeTable_start(ctx, field)
-			case "end":
-				return ec.fieldContext_TimeTable_end(ctx, field)
+			case "ends":
+				return ec.fieldContext_TimeTable_ends(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TimeTable", field.Name)
 		},
@@ -3353,14 +3353,14 @@ func (ec *executionContext) fieldContext_TimeTable_start(_ context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _TimeTable_end(ctx context.Context, field graphql.CollectedField, obj *model.TimeTable) (ret graphql.Marshaler) {
+func (ec *executionContext) _TimeTable_ends(ctx context.Context, field graphql.CollectedField, obj *model.TimeTable) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_TimeTable_end,
+		ec.fieldContext_TimeTable_ends,
 		func(ctx context.Context) (any, error) {
-			return obj.End, nil
+			return obj.Ends, nil
 		},
 		nil,
 		ec.marshalNTime2timeᚐTime,
@@ -3369,7 +3369,7 @@ func (ec *executionContext) _TimeTable_end(ctx context.Context, field graphql.Co
 	)
 }
 
-func (ec *executionContext) fieldContext_TimeTable_end(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_TimeTable_ends(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "TimeTable",
 		Field:      field,
@@ -4268,8 +4268,8 @@ func (ec *executionContext) fieldContext_UserWithAllData_timeTables(_ context.Co
 				return ec.fieldContext_TimeTable_day(ctx, field)
 			case "start":
 				return ec.fieldContext_TimeTable_start(ctx, field)
-			case "end":
-				return ec.fieldContext_TimeTable_end(ctx, field)
+			case "ends":
+				return ec.fieldContext_TimeTable_ends(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TimeTable", field.Name)
 		},
@@ -6866,8 +6866,8 @@ func (ec *executionContext) _TimeTable(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "end":
-			out.Values[i] = ec._TimeTable_end(ctx, field, obj)
+		case "ends":
+			out.Values[i] = ec._TimeTable_ends(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

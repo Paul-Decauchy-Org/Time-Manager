@@ -15,6 +15,16 @@ const (
 	RoleManager Role = "MANAGER"
 )
 
+type DAY string
+
+const (
+	Monday    DAY = "MONDAY"
+	Tuesday   DAY = "TUESDAY"
+	Wednesday DAY = "WEDNESDAY"
+	Thursday  DAY = "THURSDAY"
+	Friday    DAY = "FRIDAY"
+)
+
 type User struct {
 	ID               uuid.UUID        `gorm:"primaryKey;type:uuid"`
 	FirstName        string           `gorm:"type:text"`
@@ -61,9 +71,9 @@ type TimeTable struct {
 	ID     uuid.UUID `gorm:"primaryKey;type:uuid"`
 	UserID uuid.UUID `gorm:"type:uuid;index"`
 	User   *User     `gorm:"foreignKey:UserID;references:ID"`
-	Day    string    `gorm:"type:text"`
+	Day    DAY       `gorm:"type:text"`
 	Start  time.Time
-	End    time.Time
+	Ends   time.Time
 }
 
 // Avant les hooks générer les UUIDs s'ils ne sont pas fournis

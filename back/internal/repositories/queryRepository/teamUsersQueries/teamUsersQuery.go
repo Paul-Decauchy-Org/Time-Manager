@@ -121,7 +121,7 @@ func ListUsersWithAllDataByTeam(teamID string) ([]*gmodel.UserWithAllData, error
 				},
 				Day:   gmodel.Jour(tt.Day),
 				Start: tt.Start,
-				End:   tt.End,
+				Ends:   tt.Ends,
 			})
 		}
 

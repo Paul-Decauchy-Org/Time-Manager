@@ -232,9 +232,9 @@ func createTestTimeTables(users []*dbmodels.User) error {
 					timeTable := &dbmodels.TimeTable{
 						ID:     uuid.New(),
 						UserID: user.ID,
-						Day:    dayStr,
+						Day:    dbmodels.DAY(dayStr),
 						Start:  start,
-						End:    end,
+						Ends:   end,
 					}
 					if err := DB.Create(timeTable).Error; err != nil {
 						return err
