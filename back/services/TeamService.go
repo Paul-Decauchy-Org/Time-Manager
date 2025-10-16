@@ -32,3 +32,7 @@ func (s *TeamService) GetTeam(id string)(*model.Team, error){
 func (s *TeamService) GetTeams()([]*model.Team, error){
 	return s.TeamRepo.GetTeams()
 }
+
+func (s *TeamService) AddUserToTeam(id string, teamID string)(*model.TeamUser, error){
+	return s.TeamRepo.AddUserToTeam(id, teamID)
+}

@@ -5,6 +5,7 @@ import (
 
 	"github.com/epitech/timemanager/internal/graph/model"
 	teamMapper "github.com/epitech/timemanager/internal/mappers/team"
+	teamUserMapper "github.com/epitech/timemanager/internal/mappers/teamUser"
 	dbmodels "github.com/epitech/timemanager/internal/models"
 	"github.com/google/uuid"
 )
@@ -98,4 +99,36 @@ func (r *Repository) GetTeams()([]*model.Team, error){
 		return nil, errors.New("can't find teams")
 	}
 	return teamMapper.DBTeamsToGraph(teams), nil
+}
+
+
+func (r *Repository) AddUserToTeam(id string, teamID string)(*model.TeamUser, error){
+	userID, ok := uuid.Parse(id)
+	if ok != nil {
+		return nil, errors.New("error while parsing userID")
+	}
+	idTeam, ok := uuid.Parse(teamID)
+	if ok != nil {
+		return nil, errors.New("error while parsing teamID")
+	}
+	var existingUser *dbmodels.User
+	if err := r.DB.Where("id = ?", userID).First(&existingUser).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+	var existingTeam *dbmodels.Team
+	if err := r.DB.Where("id = ?", idTeam).First(&existingTeam).Error; err != nil {
+		return nil, errors.New("team not found")
+	}
+	var existingTeamUser *dbmodels.TeamUser
+	if err := r.DB.Where(&dbmodels.TeamUser{UserID: userID, TeamID: idTeam}).First(&existingTeamUser).Error; err == nil {
+		return nil, errors.New("user is already in the team")
+	}
+	teamUser := &dbmodels.TeamUser{
+		UserID: userID,
+		TeamID: idTeam,
+	}
+	if err := r.DB.Create(teamUser).Error; err != nil {
+		return nil, errors.New("error while adding user to the team")
+	}
+	return teamUserMapper.DBTeamUserToGraph(teamUser), nil
 }

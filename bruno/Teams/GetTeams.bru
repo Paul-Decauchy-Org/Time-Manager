@@ -1,0 +1,25 @@
+meta {
+  name: GetTeams
+  type: graphql
+  seq: 13
+}
+
+post {
+  url: {{url}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query GetTeams{
+    getTeams{
+      name
+      description
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
