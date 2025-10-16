@@ -11,8 +11,8 @@ post {
 }
 
 body:graphql {
-  mutation SignUp($input: CreateUserInput!) {
-    createUser(input: $input) {
+  mutation SignUp($input: SignUpInput!) {
+    signUp(input: $input) {
       id
       firstName
       lastName
