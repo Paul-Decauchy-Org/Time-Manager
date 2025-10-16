@@ -1,9 +1,9 @@
-mutation updateProfile($input : UpdateProfileInput!){
-    updateProfile(input: $input){
-        firstName
-        lastName
-        email
-        phone
-        password
-    }
+mutation updateProfile($input: UpdateProfileInput!) {
+  updateProfile(input: $input) {
+    firstName
+    lastName
+    email
+    phone
+    password
+  }
 }

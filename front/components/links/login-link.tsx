@@ -6,5 +6,5 @@ export default function LoginLink() {
     >
       Connexion
     </a>
-  )
+  );
 }
