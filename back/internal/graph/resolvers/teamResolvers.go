@@ -44,7 +44,10 @@ func (r *queryResolver) GetTeam(ctx context.Context, id string)(*model.Team, err
 }
 
 func (r *mutationResolver) AddUserToTeam(ctx context.Context, userID string, teamID string) (*model.TeamUser, error) {
-	return teamMutations.AddUserToTeam(userID, teamID)
+	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
+		return nil, err
+	}
+	return r.TeamService.AddUserToTeam(userID, teamID)
 }
 
 func (r *mutationResolver) AddUsersToTeam(ctx context.Context, input model.AddUsersToTeamInput) ([]*model.TeamUser, error) {

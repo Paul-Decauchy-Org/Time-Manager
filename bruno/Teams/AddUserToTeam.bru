@@ -1,0 +1,31 @@
+meta {
+  name: AddUserToTeam
+  type: graphql
+  seq: 14
+}
+
+post {
+  url: {{url}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  mutation AddUserToTeam($userID: ID!, $teamID: ID!){
+    addUserToTeam(userID: $userID, teamID: $teamID){
+      id
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "userID": "arkdhz-...",
+    "teamID": "akjkfs-..."
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
