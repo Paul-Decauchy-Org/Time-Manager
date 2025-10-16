@@ -1,11 +1,11 @@
 meta {
-  name: mutation DeleteTeam
+  name: DeleteTeam
   type: graphql
-  seq: 4
+  seq: 11
 }
 
 post {
-  url: http://localhost:8084/query
+  url: {{url}}
   body: graphql
   auth: inherit
 }
@@ -18,10 +18,11 @@ body:graphql {
 
 body:graphql:vars {
   {
-    "id": "6d346156-0c19-4a7e-be84-518a0684c102"
+    "id": "akjedaknd-..."
   }
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }
