@@ -79,3 +79,23 @@ func (r *Repository) DeleteTeam(id string)(bool, error){
 	}
 	return true, nil
 }
+
+func (r *Repository) GetTeam(id string)(*model.Team, error){
+	teamID, ok := uuid.Parse(id)
+	if ok != nil {
+		return nil, errors.New("error while parsing team id")
+	}
+	var existingTeam *dbmodels.Team
+	if err := r.DB.Where("id = ?", teamID).First(&existingTeam).Error; err != nil {
+		return nil, errors.New("team not found")
+	}
+	return teamMapper.DBTeamToGraph(existingTeam), nil
+}
+
+func (r *Repository) GetTeams()([]*model.Team, error){
+	var teams []*dbmodels.Team
+	if err := r.DB.Find(&teams).Error; err != nil {
+		return nil, errors.New("can't find teams")
+	}
+	return teamMapper.DBTeamsToGraph(teams), nil
+}

@@ -83,7 +83,6 @@ type UserLogged {
 
 type Query {
 
-  teams: [Team!]!
   teamUsers: [TeamUser!]!
   roles: [Role!]!
   timeTableEntries: [TimeTableEntry!]!
@@ -98,6 +97,11 @@ type Query {
   # queries for admin
   users: [User!]!
   getUser(id: ID!): UserWithAllData
+
+  # queries for team
+  getTeams: [Team!]!
+  getTeam(id: ID!): Team!
+
 }
 
 

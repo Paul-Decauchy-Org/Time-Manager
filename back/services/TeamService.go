@@ -24,3 +24,11 @@ func (s *TeamService) UpdateTeam(id string, input model.UpdateTeamInput)(*model.
 func (s *TeamService) DeleteTeam(id string)(bool, error){
 	return s.TeamRepo.DeleteTeam(id)
 }
+
+func (s *TeamService) GetTeam(id string)(*model.Team, error){
+	return s.TeamRepo.GetTeam(id)
+}
+
+func (s *TeamService) GetTeams()([]*model.Team, error){
+	return s.TeamRepo.GetTeams()
+}
