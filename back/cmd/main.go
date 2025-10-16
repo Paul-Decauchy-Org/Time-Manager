@@ -14,10 +14,10 @@ import (
 	"github.com/epitech/timemanager/internal/graph/resolvers"
 	"github.com/epitech/timemanager/internal/repositories"
 	"github.com/epitech/timemanager/package/database"
+	"github.com/epitech/timemanager/package/middlewares"
 	"github.com/epitech/timemanager/services"
 	"github.com/rs/cors"
 	"github.com/vektah/gqlparser/v2/ast"
-	"github.com/epitech/timemanager/package/middlewares"
 )
 
 const defaultPort = "8084"
@@ -53,8 +53,8 @@ func main() {
 	authService := services.NewAuthService(authRepo)
 	adminService := services.NewAdminService(adminRepo)
 	resolver := &resolvers.Resolver{
-		DB:          db,
-		AuthService: authService,
+		DB:           db,
+		AuthService:  authService,
 		AdminService: adminService,
 	}
 
@@ -72,9 +72,10 @@ func main() {
 		Cache: lru.New[string](100),
 	})
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:3001", "http://localhost:8084"}, // Add your Next.js ports
+		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:3001", "http://localhost:8084"},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
-		AllowedHeaders:   []string{"Content-Type", "Authorization", "Accept"},
+		AllowedHeaders:   []string{"Origin", "Content-Type", "Authorization", "Accept"},
+		ExposedHeaders:   []string{"Content-Length"},
 		AllowCredentials: true,
 		Debug:            true, // Remove in production
 	})
