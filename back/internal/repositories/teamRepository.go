@@ -171,3 +171,30 @@ func (r *Repository) AddUsersToTeam(input model.AddUsersToTeamInput)([]*model.Te
 	}
 	return addedUsers, nil
 }
+
+func (r *Repository) RemoveUserFromTeam(id string, teamID string)(bool, error){
+	userID, ok := uuid.Parse(id)
+	if ok != nil {
+		return false, errors.New("error while parsing user id")
+	}
+	var existingUser *dbmodels.User
+	if err := r.DB.Where("id = ?", userID).First(&existingUser).Error; err != nil {
+		return false, errors.New("user not found")
+	}
+	idTeam, ok := uuid.Parse(id)
+	if ok != nil {
+		return false, errors.New("error while parsing team id")
+	}
+	var existingTeam *dbmodels.Team
+	if err := r.DB.Where("id = ?", idTeam).First(&existingTeam).Error; err != nil {
+		return false, errors.New("team not found")
+	}
+	var existingTeamUser *dbmodels.TeamUser
+	if err := r.DB.Where(&dbmodels.TeamUser{UserID: userID, TeamID: idTeam}).First(&existingTeamUser).Error; err != nil {
+		return false, errors.New("user not in team")
+	}
+	if err := r.DB.Delete(&existingTeamUser).Error; err != nil {
+		return false, errors.New("error while removing user from team")
+	}
+	return true, nil
+}

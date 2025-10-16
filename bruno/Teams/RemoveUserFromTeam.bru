@@ -1,0 +1,29 @@
+meta {
+  name: RemoveUserFromTeam
+  type: graphql
+  seq: 8
+}
+
+post {
+  url: {{url}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  mutation RemoveUserFromTeam($userID: ID!, $teamID: ID!){
+    removeUserFromTeam(userID: $userID, teamID: $teamID)
+  }
+}
+
+body:graphql:vars {
+  {
+    "userID": "djjdqwxn-...",
+    "teamID": "sfhsfs-..."
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
