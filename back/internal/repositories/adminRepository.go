@@ -13,7 +13,7 @@ import (
 func (r *Repository) CreateUser(input model.CreateUserInput)(*model.User, error){
 	var existingUser *dbmodels.User
 
-	if err := r.DB.Where("email = ?", input.Email).First(&existingUser).Error; err != nil {
+	if err := r.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
 		return nil, errors.New("email already in use")
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password),bcrypt.DefaultCost)

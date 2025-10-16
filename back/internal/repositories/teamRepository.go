@@ -12,7 +12,7 @@ import (
 func (r *Repository) CreateTeam(input model.CreateTeamInput)(*model.Team, error){
 	var existingTeam *dbmodels.Team
 
-	if err := r.DB.Where("name = ?", input.Name).First(&existingTeam).Error; err != nil {
+	if err := r.DB.Where("name = ?", input.Name).First(&existingTeam).Error; err == nil {
 		return nil, errors.New("team's name is already in use")
 	}
 
