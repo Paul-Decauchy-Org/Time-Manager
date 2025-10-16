@@ -132,3 +132,42 @@ func (r *Repository) AddUserToTeam(id string, teamID string)(*model.TeamUser, er
 	}
 	return teamUserMapper.DBTeamUserToGraph(teamUser), nil
 }
+
+func (r *Repository) AddUsersToTeam(input model.AddUsersToTeamInput)([]*model.TeamUser, error){
+	idTeam, ok := uuid.Parse(input.TeamID)
+	if ok != nil {
+		return nil, errors.New("error while parsing teamID")
+	}
+	var existingTeam *dbmodels.Team
+	if err := r.DB.Where("id = ?", idTeam).First(&existingTeam).Error; err != nil {
+		return nil, errors.New("team not found")
+	}
+	var addedUsers []*model.TeamUser
+	for _, userIDStr := range input.UserIDs {
+		userID, err := uuid.Parse(userIDStr)
+		if err != nil {
+			return nil, errors.New("error while parsing a user id")
+		}
+
+		var existingUser *dbmodels.User
+		if err := r.DB.Where("id = ?", userID).First(&existingUser).Error; err != nil {
+			return nil, errors.New("error: a user not found")
+		}
+		var existingTeamUser *dbmodels.TeamUser
+		if err := r.DB.Where(&dbmodels.TeamUser{UserID: userID, TeamID: idTeam}).First(&existingTeamUser).Error; err == nil {
+			continue
+		}
+
+		teamUser := &dbmodels.TeamUser{
+			UserID: userID,
+			TeamID: idTeam,
+		}
+
+		if err := r.DB.Create(teamUser).Error; err != nil {
+			return nil, errors.New("error while adding a user to the team")
+		}
+
+		addedUsers = append(addedUsers, teamUserMapper.DBTeamUserToGraph(teamUser))
+	}
+	return addedUsers, nil
+}

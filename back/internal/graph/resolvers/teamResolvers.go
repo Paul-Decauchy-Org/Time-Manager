@@ -51,7 +51,10 @@ func (r *mutationResolver) AddUserToTeam(ctx context.Context, userID string, tea
 }
 
 func (r *mutationResolver) AddUsersToTeam(ctx context.Context, input model.AddUsersToTeamInput) ([]*model.TeamUser, error) {
-	return teamMutations.AddUsersToTeam(input)
+	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
+		return nil, err
+	}
+	return r.TeamService.AddUsersToTeam(input)
 }
 
 func (r *mutationResolver) RemoveUserFromTeam(ctx context.Context, userID string, teamID string) (bool, error) {
