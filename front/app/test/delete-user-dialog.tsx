@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { IconPlus } from "@tabler/icons-react";
 import React from "react";
 
-export function CreateUserDialog() {
+export function DeleteUserDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>

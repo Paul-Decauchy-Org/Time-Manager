@@ -24,6 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import Link from "next/link";
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -106,7 +107,16 @@ export const columns: ColumnDef<User>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-32">
-              <DropdownMenuItem>Edit</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  className="card"
+                  key={user.id}
+                  href={`/test/${user.id}`}
+                  passHref
+                >
+                  Edit
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem>Make a copy</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DialogTrigger asChild>

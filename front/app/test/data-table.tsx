@@ -37,7 +37,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { CreateUserDialog } from "@/app/test/create-user-dialog";
+import { DeleteUserDialog} from "@/app/test/delete-user-dialog";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -77,7 +77,7 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-36"
         />
-        <CreateUserDialog />
+        <DeleteUserDialog/>
       </div>
 
       <div className="overflow-hidden rounded-md border">
