@@ -44,3 +44,7 @@ func (s *TeamService) AddUsersToTeam(userID string, input model.AddUsersToTeamIn
 func (s *TeamService) RemoveUserFromTeam(managerID string, userID string, teamID string)(bool, error){
 	return s.TeamRepo.RemoveUserFromTeam(managerID, userID, teamID)
 }
+
+func (s *TeamService) GetUsersInTeam(teamID string)([]*model.User, error){
+	return s.TeamRepo.GetUsersInTeam(teamID)
+}

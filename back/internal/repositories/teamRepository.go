@@ -6,6 +6,7 @@ import (
 	"github.com/epitech/timemanager/internal/graph/model"
 	teamMapper "github.com/epitech/timemanager/internal/mappers/team"
 	teamUserMapper "github.com/epitech/timemanager/internal/mappers/teamUser"
+	userMapper "github.com/epitech/timemanager/internal/mappers/user"
 	dbmodels "github.com/epitech/timemanager/internal/models"
 	"github.com/google/uuid"
 )
@@ -252,4 +253,30 @@ func (r *Repository) RemoveUserFromTeam(managerID string, id string, teamID stri
 		return false, errors.New("error while removing user from team")
 	}
 	return true, nil
+}
+
+func (r *Repository) GetUsersInTeam(teamID string)([]*model.User, error){
+	idTeam, ok := uuid.Parse(teamID)
+	if ok != nil {
+		return nil, errors.New("error while parsing teamID")
+	}
+	var existingTeam *dbmodels.Team
+	if err := r.DB.Where("id = ?", idTeam).First(&existingTeam).Error; err != nil {
+		return nil, errors.New("team not found")
+	}
+	var users *[]dbmodels.User
+	if err := r.DB.
+		Joins("JOIN team_users ON team_users.user_id = users.id").
+		Where("team_users.team_id = ?", idTeam).
+		Find(&users).Error; err != nil {
+		return nil, errors.New("error while fetching users in team")
+	}
+	if len(*users) == 0 {
+		return []*model.User{}, nil
+	}
+	result := make([]*model.User, len(*users))
+	for i, u := range *users {
+		result[i] = userMapper.DBUserToGraph(&u)
+	}
+	return result, nil
 }

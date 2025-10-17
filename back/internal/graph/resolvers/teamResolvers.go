@@ -82,3 +82,10 @@ func (r *mutationResolver) RemoveUserFromTeam(ctx context.Context, userID string
 	}
 	return r.TeamService.RemoveUserFromTeam(managerID, userID, teamID)
 }
+
+func (r *queryResolver) GetUsersInTeam(ctx context.Context, teamID string)([]*model.User, error){
+	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
+		return nil, err
+	}
+	return r.TeamService.GetUsersInTeam(teamID)
+}

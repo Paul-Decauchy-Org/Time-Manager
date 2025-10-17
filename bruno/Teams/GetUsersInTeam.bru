@@ -1,0 +1,31 @@
+meta {
+  name: GetUsersInTeam
+  type: graphql
+  seq: 9
+}
+
+post {
+  url: {{url}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query GetUsersInTeam($teamID: ID!){
+    getUsersInTeam(teamID: $teamID){
+      firstName
+      lastName
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "teamID": "zfhdv-..."
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

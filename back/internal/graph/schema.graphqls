@@ -101,6 +101,7 @@ type Query {
   # queries for team
   getTeams: [Team!]!
   getTeam(id: ID!): Team!
+  getUsersInTeam(teamID: ID!): [User!]!
 
 }
 
