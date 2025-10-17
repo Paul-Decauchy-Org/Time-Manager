@@ -38,3 +38,11 @@ func (r *queryResolver) GetUser(ctx context.Context, id string)(*model.UserWithA
 	}
 	return r.AdminService.GetUser(id)
 }
+
+// set or change manager team
+func (r *mutationResolver) SetManagerTeam(ctx context.Context, userID string, teamID string)(*model.Team, error){
+	if err := middlewares.VerifyRole(ctx, "ADMIN"); err != nil {
+		return nil, err
+	}
+	return r.AdminService.SetManagerTeam(userID, teamID)
+}

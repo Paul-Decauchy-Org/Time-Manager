@@ -29,3 +29,7 @@ func (s *AdminService) DeleteUser(id string)(bool, error){
 func (s *AdminService) GetUser(id string)(*model.UserWithAllData, error){
 	return s.AdminRepo.GetUser(id)
 }
+
+func (s *AdminService) SetManagerTeam(userID string, teamID string)(*model.Team, error){
+	return s.AdminRepo.SetManagerTeam(userID, teamID)
+}

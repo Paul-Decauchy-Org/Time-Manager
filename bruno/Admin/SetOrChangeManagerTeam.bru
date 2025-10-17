@@ -1,0 +1,33 @@
+meta {
+  name: SetOrChangeManagerTeam
+  type: graphql
+  seq: 5
+}
+
+post {
+  url: {{url}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  mutation SetManagerTeam($userID: ID!, $teamID: ID!){
+    setManagerTeam(userID: $userID, teamID: $teamID){
+      name
+      description
+      managerID
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "userID": "jhada-...",
+    "teamID": "zkhfsk-..."
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
