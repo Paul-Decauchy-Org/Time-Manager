@@ -38,14 +38,25 @@ func (r *Repository) CreateTeam(input model.CreateTeamInput)(*model.Team, error)
 	return teamMapper.DBTeamToGraph(team), nil
 }
 
-func (r *Repository) UpdateTeam(id string, input model.UpdateTeamInput)(*model.Team, error){
-	teamID, ok := uuid.Parse(id)
+func (r *Repository) UpdateTeam(managerID string, idTeam string, input model.UpdateTeamInput)(*model.Team, error){
+	teamID, ok := uuid.Parse(idTeam)
 	if ok != nil {
 		return nil, errors.New("error while parsing team id")
 	}
 	var existingTeam *dbmodels.Team
 	if err := r.DB.Where("id = ?", teamID).First(&existingTeam).Error; err != nil {
 		return nil, errors.New("team not found")
+	}
+	idUser, ok := uuid.Parse(managerID)
+	if ok != nil {
+		return nil, errors.New("error while parsing user id")
+	}
+	var existingUser *dbmodels.User
+	if err := r.DB.Where("id = ?", idUser).First(&existingUser).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+	if existingTeam.ManagerID != existingUser.ID && existingUser.Role != dbmodels.RoleAdmin {
+		return nil, errors.New("user has not access to this team")
 	}
 	if input.Name != nil {
 		existingTeam.Name = *input.Name
@@ -66,7 +77,7 @@ func (r *Repository) UpdateTeam(id string, input model.UpdateTeamInput)(*model.T
 	return teamMapper.DBTeamToGraph(existingTeam), nil
 }
 
-func (r *Repository) DeleteTeam(id string)(bool, error){
+func (r *Repository) DeleteTeam(managerID string, id string)(bool, error){
 	teamID, ok := uuid.Parse(id)
 	if ok != nil {
 		return false, errors.New("error while parsing team id")
@@ -74,6 +85,17 @@ func (r *Repository) DeleteTeam(id string)(bool, error){
 	var existingTeam *dbmodels.Team
 	if err := r.DB.Where("id = ?", teamID).First(&existingTeam).Error; err != nil {
 		return false, errors.New("team not found")
+	}
+	idUser, ok := uuid.Parse(managerID)
+	if ok != nil {
+		return false, errors.New("error while parsing user id")
+	}
+	var existingUser *dbmodels.User
+	if err := r.DB.Where("id = ?", idUser).First(&existingUser).Error; err != nil {
+		return false, errors.New("user not found")
+	}
+	if existingTeam.ManagerID != existingUser.ID && existingUser.Role != dbmodels.RoleAdmin {
+		return false, errors.New("user has not access to this team")
 	}
 	if err := r.DB.Delete(&existingTeam).Error; err != nil {
 		return false, errors.New("error while deleting team id")
@@ -102,7 +124,7 @@ func (r *Repository) GetTeams()([]*model.Team, error){
 }
 
 
-func (r *Repository) AddUserToTeam(id string, teamID string)(*model.TeamUser, error){
+func (r *Repository) AddUserToTeam(managerID string, id string, teamID string)(*model.TeamUser, error){
 	userID, ok := uuid.Parse(id)
 	if ok != nil {
 		return nil, errors.New("error while parsing userID")
@@ -123,6 +145,17 @@ func (r *Repository) AddUserToTeam(id string, teamID string)(*model.TeamUser, er
 	if err := r.DB.Where(&dbmodels.TeamUser{UserID: userID, TeamID: idTeam}).First(&existingTeamUser).Error; err == nil {
 		return nil, errors.New("user is already in the team")
 	}
+	idUser, ok := uuid.Parse(managerID)
+	if ok != nil {
+		return nil, errors.New("error while parsing user id")
+	}
+	var existingManager *dbmodels.User
+	if err := r.DB.Where("id = ?", idUser).First(&existingManager).Error; err != nil {
+		return nil, errors.New("manager id not found")
+	}
+	if existingTeam.ManagerID != existingManager.ID && existingManager.Role != dbmodels.RoleAdmin {
+		return nil, errors.New("user has not access to this team")
+	}
 	teamUser := &dbmodels.TeamUser{
 		UserID: userID,
 		TeamID: idTeam,
@@ -133,7 +166,7 @@ func (r *Repository) AddUserToTeam(id string, teamID string)(*model.TeamUser, er
 	return teamUserMapper.DBTeamUserToGraph(teamUser), nil
 }
 
-func (r *Repository) AddUsersToTeam(input model.AddUsersToTeamInput)([]*model.TeamUser, error){
+func (r *Repository) AddUsersToTeam(managerID string, input model.AddUsersToTeamInput)([]*model.TeamUser, error){
 	idTeam, ok := uuid.Parse(input.TeamID)
 	if ok != nil {
 		return nil, errors.New("error while parsing teamID")
@@ -141,6 +174,17 @@ func (r *Repository) AddUsersToTeam(input model.AddUsersToTeamInput)([]*model.Te
 	var existingTeam *dbmodels.Team
 	if err := r.DB.Where("id = ?", idTeam).First(&existingTeam).Error; err != nil {
 		return nil, errors.New("team not found")
+	}
+	idUser, ok := uuid.Parse(managerID)
+	if ok != nil {
+		return nil, errors.New("error while parsing user id")
+	}
+	var existingManager *dbmodels.User
+	if err := r.DB.Where("id = ?", idUser).First(&existingManager).Error; err != nil {
+		return nil, errors.New("manager id not found")
+	}
+	if existingTeam.ManagerID != existingManager.ID && existingManager.Role != dbmodels.RoleAdmin {
+		return nil, errors.New("user has not access to this team")
 	}
 	var addedUsers []*model.TeamUser
 	for _, userIDStr := range input.UserIDs {
@@ -172,7 +216,7 @@ func (r *Repository) AddUsersToTeam(input model.AddUsersToTeamInput)([]*model.Te
 	return addedUsers, nil
 }
 
-func (r *Repository) RemoveUserFromTeam(id string, teamID string)(bool, error){
+func (r *Repository) RemoveUserFromTeam(managerID string, id string, teamID string)(bool, error){
 	userID, ok := uuid.Parse(id)
 	if ok != nil {
 		return false, errors.New("error while parsing user id")
@@ -192,6 +236,17 @@ func (r *Repository) RemoveUserFromTeam(id string, teamID string)(bool, error){
 	var existingTeamUser *dbmodels.TeamUser
 	if err := r.DB.Where(&dbmodels.TeamUser{UserID: userID, TeamID: idTeam}).First(&existingTeamUser).Error; err != nil {
 		return false, errors.New("user not in team")
+	}
+	idUser, ok := uuid.Parse(managerID)
+	if ok != nil {
+		return false, errors.New("error while parsing user id")
+	}
+	var existingManager *dbmodels.User
+	if err := r.DB.Where("id = ?", idUser).First(&existingManager).Error; err != nil {
+		return false, errors.New("manager id not found")
+	}
+	if existingTeam.ManagerID != existingManager.ID && existingManager.Role != dbmodels.RoleAdmin {
+		return false, errors.New("user has not access to this team")
 	}
 	if err := r.DB.Delete(&existingTeamUser).Error; err != nil {
 		return false, errors.New("error while removing user from team")
