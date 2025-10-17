@@ -1,0 +1,33 @@
+meta {
+  name: SetRole
+  type: graphql
+  seq: 6
+}
+
+post {
+  url: {{url}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  mutation SetRole($userID: ID!, $role: Role!){
+    setRole(userID: $userID, role: $role){
+      firstName
+      lastName
+      role
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "userID": "shfjskdj-...",
+    "role": "MANAGER"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

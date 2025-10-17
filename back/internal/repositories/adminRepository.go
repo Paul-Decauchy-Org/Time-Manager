@@ -136,3 +136,20 @@ func (r *Repository) SetManagerTeam(userID string, teamID string)(*model.Team, e
 	}
 	return teamMapper.DBTeamToGraph(existingTeam), nil
 }
+
+func (r *Repository) SetRole(userID string, role model.Role)(*model.User, error){
+	id, ok := uuid.Parse(userID)
+	if ok != nil {
+		return nil, errors.New("error while parsing user id")
+	}
+	var existingUser *dbmodels.User
+
+	if err := r.DB.Where("id = ?", id).First(&existingUser).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+	existingUser.Role = dbmodels.Role(role)
+	if err := r.DB.Save(&existingUser).Error; err != nil {
+		return nil, errors.New("error while setting user role")
+	}
+	return userMapper.DBUserToGraph(existingUser), nil
+}
