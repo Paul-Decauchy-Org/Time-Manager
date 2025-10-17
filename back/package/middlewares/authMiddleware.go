@@ -89,3 +89,10 @@ func AuthRequired(next http.Handler) http.Handler {
 	})
 }
 
+func GetUserID(ctx context.Context)(string, error){
+	id, ok := ctx.Value(ContextUserIDKey).(string)
+	if !ok {
+		return "", errors.New("id not found in context")
+	}
+	return id, nil
+}

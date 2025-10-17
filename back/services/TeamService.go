@@ -17,12 +17,12 @@ func (s *TeamService) CreateTeam(input model.CreateTeamInput)(*model.Team, error
 	return s.TeamRepo.CreateTeam(input)
 }
 
-func (s *TeamService) UpdateTeam(id string, input model.UpdateTeamInput)(*model.Team, error){
-	return s.TeamRepo.UpdateTeam(id, input)
+func (s *TeamService) UpdateTeam(userID string, id string, input model.UpdateTeamInput)(*model.Team, error){
+	return s.TeamRepo.UpdateTeam(userID, id, input)
 }
 
-func (s *TeamService) DeleteTeam(id string)(bool, error){
-	return s.TeamRepo.DeleteTeam(id)
+func (s *TeamService) DeleteTeam(userID string, id string)(bool, error){
+	return s.TeamRepo.DeleteTeam(userID, id)
 }
 
 func (s *TeamService) GetTeam(id string)(*model.Team, error){
@@ -33,14 +33,14 @@ func (s *TeamService) GetTeams()([]*model.Team, error){
 	return s.TeamRepo.GetTeams()
 }
 
-func (s *TeamService) AddUserToTeam(id string, teamID string)(*model.TeamUser, error){
-	return s.TeamRepo.AddUserToTeam(id, teamID)
+func (s *TeamService) AddUserToTeam(userID string, id string, teamID string)(*model.TeamUser, error){
+	return s.TeamRepo.AddUserToTeam(userID, id, teamID)
 }
 
-func (s *TeamService) AddUsersToTeam(input model.AddUsersToTeamInput)([]*model.TeamUser, error){
-	return s.TeamRepo.AddUsersToTeam(input)
+func (s *TeamService) AddUsersToTeam(userID string, input model.AddUsersToTeamInput)([]*model.TeamUser, error){
+	return s.TeamRepo.AddUsersToTeam(userID, input)
 }
 
-func (s *TeamService) RemoveUserFromTeam(userID string, teamID string)(bool, error){
-	return s.TeamRepo.RemoveUserFromTeam(userID, teamID)
+func (s *TeamService) RemoveUserFromTeam(managerID string, userID string, teamID string)(bool, error){
+	return s.TeamRepo.RemoveUserFromTeam(managerID, userID, teamID)
 }

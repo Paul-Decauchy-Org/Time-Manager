@@ -25,14 +25,22 @@ func (r *mutationResolver) UpdateTeam(ctx context.Context, id string, input mode
 	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
 		return nil, err
 	}
-	return r.TeamService.UpdateTeam(id, input)
+	userID, err := middlewares.GetUserID(ctx);
+	if err != nil {
+		return nil, err
+	}
+	return r.TeamService.UpdateTeam(userID, id, input)
 }
 
 func (r *mutationResolver) DeleteTeam(ctx context.Context, id string) (bool, error) {
 	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
 		return false, err
 	}
-	return r.TeamService.DeleteTeam(id)
+	userID, err := middlewares.GetUserID(ctx);
+	if err != nil {
+		return false, err
+	}
+	return r.TeamService.DeleteTeam(userID, id)
 }
 
 func (r *queryResolver) GetTeam(ctx context.Context, id string)(*model.Team, error){
@@ -46,19 +54,31 @@ func (r *mutationResolver) AddUserToTeam(ctx context.Context, userID string, tea
 	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
 		return nil, err
 	}
-	return r.TeamService.AddUserToTeam(userID, teamID)
+	managerID, err := middlewares.GetUserID(ctx);
+	if err != nil {
+		return nil, err
+	}
+	return r.TeamService.AddUserToTeam(managerID, userID, teamID)
 }
 
 func (r *mutationResolver) AddUsersToTeam(ctx context.Context, input model.AddUsersToTeamInput) ([]*model.TeamUser, error) {
 	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
 		return nil, err
 	}
-	return r.TeamService.AddUsersToTeam(input)
+	managerID, err := middlewares.GetUserID(ctx);
+	if err != nil {
+		return nil, err
+	}
+	return r.TeamService.AddUsersToTeam(managerID, input)
 }
 
 func (r *mutationResolver) RemoveUserFromTeam(ctx context.Context, userID string, teamID string) (bool, error) {
 	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
 		return false, err
 	}
-	return r.TeamService.RemoveUserFromTeam(userID, teamID)
+	managerID, err := middlewares.GetUserID(ctx);
+	if err != nil {
+		return false, err
+	}
+	return r.TeamService.RemoveUserFromTeam(managerID, userID, teamID)
 }
