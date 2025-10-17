@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/epitech/timemanager/internal/graph/model"
+	teamMapper "github.com/epitech/timemanager/internal/mappers/team"
 	userMapper "github.com/epitech/timemanager/internal/mappers/user"
 	dbmodels "github.com/epitech/timemanager/internal/models"
 	"github.com/google/uuid"
@@ -102,4 +103,36 @@ func (r *Repository) GetUser(id string)(*model.UserWithAllData, error){
 		return nil, errors.New("user not found")
 	}
 	return userMapper.DBUserToGraphWithAllData(&existingUser), nil
+}
+
+
+func (r *Repository) SetManagerTeam(userID string, teamID string)(*model.Team, error){
+	id, ok := uuid.Parse(userID)
+	if ok != nil {
+		return nil, errors.New("error while parsing user id")
+	}
+	var existingUser *dbmodels.User
+
+	if err := r.DB.Where("id = ?", id).First(&existingUser).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+	idTeam, ok := uuid.Parse(teamID)
+	if ok != nil {
+		return nil, errors.New("error while parsing team id")
+	}
+	var existingTeam *dbmodels.Team
+	if err := r.DB.Where("id = ?", idTeam).First(&existingTeam).Error; err != nil {
+		return nil, errors.New("team not found")
+	}
+	if existingUser.Role != "MANAGER" {
+		existingUser.Role = dbmodels.RoleManager
+	}
+	if err := r.DB.Save(&existingUser).Error; err != nil {
+		return nil, errors.New("error while setting user role")
+	}
+	existingTeam.ManagerID = id
+	if err := r.DB.Where(&existingTeam).Error; err != nil {
+		return nil, errors.New("failed to update manager id for team")
+	}
+	return teamMapper.DBTeamToGraph(existingTeam), nil
 }
