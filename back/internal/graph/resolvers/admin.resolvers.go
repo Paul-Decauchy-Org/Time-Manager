@@ -46,3 +46,11 @@ func (r *mutationResolver) SetManagerTeam(ctx context.Context, userID string, te
 	}
 	return r.AdminService.SetManagerTeam(userID, teamID)
 }
+
+// set role for a user
+func (r *mutationResolver) SetRole(ctx context.Context, userID string, role model.Role)(*model.User, error){
+	if err := middlewares.VerifyRole(ctx, "ADMIN"); err != nil {
+		return nil, err
+	}
+	return r.AdminService.SetRole(userID, role)
+}

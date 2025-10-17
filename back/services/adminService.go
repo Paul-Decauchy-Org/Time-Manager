@@ -33,3 +33,7 @@ func (s *AdminService) GetUser(id string)(*model.UserWithAllData, error){
 func (s *AdminService) SetManagerTeam(userID string, teamID string)(*model.Team, error){
 	return s.AdminRepo.SetManagerTeam(userID, teamID)
 }
+
+func (s *AdminService) SetRole(userID string, role model.Role)(*model.User, error){
+	return s.AdminRepo.SetRole(userID, role)
+}
