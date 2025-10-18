@@ -40,13 +40,14 @@ export function middleware(request: NextRequest) {
         if (hasAccessToken) {
             // Already logged in - redirect to dashboard
             console.log('Already logged in, redirecting to dashboard');
-            return NextResponse.redirect(new URL('/', request.url));
+            return NextResponse.redirect(new URL('/dashboard', request.url));
         }
         return NextResponse.next()
-    } else {
-        if (!hasAccessToken) {
-            return NextResponse.redirect(new URL('/login', request.url));
-        }
+    }
+
+    // Allow access to home page for everyone
+    if (pathname === '/') {
+        return NextResponse.next();
     }
 
     return NextResponse.next();
