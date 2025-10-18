@@ -1,7 +1,7 @@
 meta {
-  name: GetTeam
+  name: SetOrChangeManagerTeam
   type: graphql
-  seq: 4
+  seq: 5
 }
 
 post {
@@ -11,8 +11,8 @@ post {
 }
 
 body:graphql {
-  query GetTeam($id: ID!){
-    getTeam(id: $id){
+  mutation SetManagerTeam($userID: ID!, $teamID: ID!){
+    setManagerTeam(userID: $userID, teamID: $teamID){
       name
       description
     }
@@ -21,7 +21,8 @@ body:graphql {
 
 body:graphql:vars {
   {
-    "id": "dzjdhz-..."
+    "userID": "jhada-...",
+    "teamID": "zkhfsk-..."
   }
 }
 

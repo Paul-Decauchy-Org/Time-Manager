@@ -87,6 +87,13 @@ func (r *Repository) DeleteTeam(id string) (bool, error) {
 	if err := r.DB.Where("id = ?", teamID).First(&existingTeam).Error; err != nil {
 		return false, errors.New("team not found")
 	}
+	
+	// Supprimer d'abord toutes les associations dans team_users
+	if err := r.DB.Where("team_id = ?", teamID).Delete(&dbmodels.TeamUser{}).Error; err != nil {
+		return false, errors.New("error while deleting team members")
+	}
+	
+	// Ensuite supprimer l'équipe
 	if err := r.DB.Delete(&existingTeam).Error; err != nil {
 		return false, errors.New("error while deleting team id")
 	}
@@ -150,4 +157,73 @@ func (r *Repository) AddUserToTeam(id string, teamID string) (*model.TeamUser, e
 	}
 
 	return teamUserMapper.DBTeamUserToGraph(teamUser), nil
+}
+
+func (r *Repository) AddUsersToTeam(input model.AddUsersToTeamInput) ([]*model.TeamUser, error) {
+	idTeam, ok := uuid.Parse(input.TeamID)
+	if ok != nil {
+		return nil, errors.New("error while parsing teamID")
+	}
+	var existingTeam *dbmodels.Team
+	if err := r.DB.Where("id = ?", idTeam).First(&existingTeam).Error; err != nil {
+		return nil, errors.New("team not found")
+	}
+	if ok != nil {
+		return nil, errors.New("error while parsing user id")
+	}
+	var addedUsers []*model.TeamUser
+	for _, userIDStr := range input.UserIDs {
+		userID, err := uuid.Parse(userIDStr)
+		if err != nil {
+			return nil, errors.New("error while parsing a user id")
+		}
+
+		var existingUser *dbmodels.User
+		if err := r.DB.Where("id = ?", userID).First(&existingUser).Error; err != nil {
+			return nil, errors.New("error: a user not found")
+		}
+		var existingTeamUser *dbmodels.TeamUser
+		if err := r.DB.Where(&dbmodels.TeamUser{UserID: userID, TeamID: idTeam}).First(&existingTeamUser).Error; err == nil {
+			continue
+		}
+
+		teamUser := &dbmodels.TeamUser{
+			UserID: userID,
+			TeamID: idTeam,
+		}
+
+		if err := r.DB.Create(teamUser).Error; err != nil {
+			return nil, errors.New("error while adding a user to the team")
+		}
+
+		addedUsers = append(addedUsers, teamUserMapper.DBTeamUserToGraph(teamUser))
+	}
+	return addedUsers, nil
+}
+
+func (r *Repository) RemoveUserFromTeam(id string, teamID string) (bool, error) {
+	userID, ok := uuid.Parse(id)
+	if ok != nil {
+		return false, errors.New("error while parsing user id")
+	}
+	var existingUser *dbmodels.User
+	if err := r.DB.Where("id = ?", userID).First(&existingUser).Error; err != nil {
+		return false, errors.New("user not found")
+	}
+	idTeam, ok := uuid.Parse(teamID)
+	if ok != nil {
+		return false, errors.New("error while parsing team id")
+	}
+	var existingTeam *dbmodels.Team
+	if err := r.DB.Where("id = ?", idTeam).First(&existingTeam).Error; err != nil {
+		return false, errors.New("team not found")
+	}
+	var existingTeamUser *dbmodels.TeamUser
+	if err := r.DB.Where(&dbmodels.TeamUser{UserID: userID, TeamID: idTeam}).First(&existingTeamUser).Error; err != nil {
+		return false, errors.New("user not in team")
+	}
+	if err := r.DB.Delete(&existingTeamUser).Error; err != nil {
+		return false, errors.New("error while removing user from team")
+	}
+	return true, nil
 }
