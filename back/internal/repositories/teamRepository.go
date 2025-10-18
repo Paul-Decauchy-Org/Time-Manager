@@ -87,12 +87,12 @@ func (r *Repository) DeleteTeam(id string) (bool, error) {
 	if err := r.DB.Where("id = ?", teamID).First(&existingTeam).Error; err != nil {
 		return false, errors.New("team not found")
 	}
-	
+
 	// Supprimer d'abord toutes les associations dans team_users
 	if err := r.DB.Where("team_id = ?", teamID).Delete(&dbmodels.TeamUser{}).Error; err != nil {
 		return false, errors.New("error while deleting team members")
 	}
-	
+
 	// Ensuite supprimer l'équipe
 	if err := r.DB.Delete(&existingTeam).Error; err != nil {
 		return false, errors.New("error while deleting team id")
@@ -167,9 +167,6 @@ func (r *Repository) AddUsersToTeam(input model.AddUsersToTeamInput) ([]*model.T
 	var existingTeam *dbmodels.Team
 	if err := r.DB.Where("id = ?", idTeam).First(&existingTeam).Error; err != nil {
 		return nil, errors.New("team not found")
-	}
-	if ok != nil {
-		return nil, errors.New("error while parsing user id")
 	}
 	var addedUsers []*model.TeamUser
 	for _, userIDStr := range input.UserIDs {
