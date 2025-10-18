@@ -65,9 +65,8 @@ type Team struct {
 }
 
 type TeamUser struct {
-	ID     string `json:"id"`
-	UserID *User  `json:"userID"`
-	TeamID *Team  `json:"teamID"`
+	UserID *User `json:"userID"`
+	TeamID *Team `json:"teamID"`
 }
 
 type TimeTable struct {

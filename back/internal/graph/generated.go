@@ -72,12 +72,12 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetTeam          func(childComplexity int, id string) int
-		GetTeams         func(childComplexity int) int
 		GetUser          func(childComplexity int, id string) int
 		Me               func(childComplexity int) int
 		Roles            func(childComplexity int) int
+		Team             func(childComplexity int, id string) int
 		TeamUsers        func(childComplexity int) int
+		Teams            func(childComplexity int) int
 		TimeTableEntries func(childComplexity int) int
 		TimeTables       func(childComplexity int) int
 		UserByEmail      func(childComplexity int, email string) int
@@ -97,7 +97,6 @@ type ComplexityRoot struct {
 	}
 
 	TeamUser struct {
-		ID     func(childComplexity int) int
 		TeamID func(childComplexity int) int
 		UserID func(childComplexity int) int
 	}
@@ -187,8 +186,8 @@ type QueryResolver interface {
 	Me(ctx context.Context) (*model.User, error)
 	Users(ctx context.Context) ([]*model.User, error)
 	GetUser(ctx context.Context, id string) (*model.UserWithAllData, error)
-	GetTeams(ctx context.Context) ([]*model.Team, error)
-	GetTeam(ctx context.Context, id string) (*model.Team, error)
+	Teams(ctx context.Context) ([]*model.Team, error)
+	Team(ctx context.Context, id string) (*model.Team, error)
 }
 
 type executableSchema struct {
@@ -406,23 +405,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["id"].(string), args["input"].(model.UpdateUserInput)), true
 
-	case "Query.getTeam":
-		if e.complexity.Query.GetTeam == nil {
-			break
-		}
-
-		args, err := ec.field_Query_getTeam_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetTeam(childComplexity, args["id"].(string)), true
-	case "Query.getTeams":
-		if e.complexity.Query.GetTeams == nil {
-			break
-		}
-
-		return e.complexity.Query.GetTeams(childComplexity), true
 	case "Query.getUser":
 		if e.complexity.Query.GetUser == nil {
 			break
@@ -446,12 +428,29 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.Roles(childComplexity), true
+	case "Query.team":
+		if e.complexity.Query.Team == nil {
+			break
+		}
+
+		args, err := ec.field_Query_team_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Team(childComplexity, args["id"].(string)), true
 	case "Query.teamUsers":
 		if e.complexity.Query.TeamUsers == nil {
 			break
 		}
 
 		return e.complexity.Query.TeamUsers(childComplexity), true
+	case "Query.teams":
+		if e.complexity.Query.Teams == nil {
+			break
+		}
+
+		return e.complexity.Query.Teams(childComplexity), true
 	case "Query.timeTableEntries":
 		if e.complexity.Query.TimeTableEntries == nil {
 			break
@@ -552,12 +551,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Team.Users(childComplexity), true
 
-	case "TeamUser.id":
-		if e.complexity.TeamUser.ID == nil {
-			break
-		}
-
-		return e.complexity.TeamUser.ID(childComplexity), true
 	case "TeamUser.teamID":
 		if e.complexity.TeamUser.TeamID == nil {
 			break
@@ -1120,7 +1113,7 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_getTeam_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_Query_getUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
@@ -1131,7 +1124,7 @@ func (ec *executionContext) field_Query_getTeam_args(ctx context.Context, rawArg
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_getUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_Query_team_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
@@ -1894,8 +1887,6 @@ func (ec *executionContext) fieldContext_Mutation_addUserToTeam(ctx context.Cont
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_TeamUser_id(ctx, field)
 			case "userID":
 				return ec.fieldContext_TeamUser_userID(ctx, field)
 			case "teamID":
@@ -1943,8 +1934,6 @@ func (ec *executionContext) fieldContext_Mutation_addUsersToTeam(ctx context.Con
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_TeamUser_id(ctx, field)
 			case "userID":
 				return ec.fieldContext_TeamUser_userID(ctx, field)
 			case "teamID":
@@ -2228,8 +2217,6 @@ func (ec *executionContext) fieldContext_Query_teamUsers(_ context.Context, fiel
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_TeamUser_id(ctx, field)
 			case "userID":
 				return ec.fieldContext_TeamUser_userID(ctx, field)
 			case "teamID":
@@ -2798,14 +2785,14 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_getTeams(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_teams(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Query_getTeams,
+		ec.fieldContext_Query_teams,
 		func(ctx context.Context) (any, error) {
-			return ec.resolvers.Query().GetTeams(ctx)
+			return ec.resolvers.Query().Teams(ctx)
 		},
 		nil,
 		ec.marshalNTeam2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamᚄ,
@@ -2814,7 +2801,7 @@ func (ec *executionContext) _Query_getTeams(ctx context.Context, field graphql.C
 	)
 }
 
-func (ec *executionContext) fieldContext_Query_getTeams(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_teams(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -2839,15 +2826,15 @@ func (ec *executionContext) fieldContext_Query_getTeams(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_getTeam(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_team(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Query_getTeam,
+		ec.fieldContext_Query_team,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.resolvers.Query().GetTeam(ctx, fc.Args["id"].(string))
+			return ec.resolvers.Query().Team(ctx, fc.Args["id"].(string))
 		},
 		nil,
 		ec.marshalNTeam2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeam,
@@ -2856,7 +2843,7 @@ func (ec *executionContext) _Query_getTeam(ctx context.Context, field graphql.Co
 	)
 }
 
-func (ec *executionContext) fieldContext_Query_getTeam(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_team(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -2885,7 +2872,7 @@ func (ec *executionContext) fieldContext_Query_getTeam(ctx context.Context, fiel
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_getTeam_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_team_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3178,35 +3165,6 @@ func (ec *executionContext) fieldContext_Team_users(_ context.Context, field gra
 				return ec.fieldContext_UserWithAllData_timeTables(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserWithAllData", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TeamUser_id(ctx context.Context, field graphql.CollectedField, obj *model.TeamUser) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_TeamUser_id,
-		func(ctx context.Context) (any, error) {
-			return obj.ID, nil
-		},
-		nil,
-		ec.marshalNID2string,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_TeamUser_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TeamUser",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -6751,7 +6709,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "getTeams":
+		case "teams":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -6760,7 +6718,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_getTeams(ctx, field)
+				res = ec._Query_teams(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -6773,7 +6731,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "getTeam":
+		case "team":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -6782,7 +6740,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_getTeam(ctx, field)
+				res = ec._Query_team(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -6896,11 +6854,6 @@ func (ec *executionContext) _TeamUser(ctx context.Context, sel ast.SelectionSet,
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("TeamUser")
-		case "id":
-			out.Values[i] = ec._TeamUser_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "userID":
 			out.Values[i] = ec._TeamUser_userID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

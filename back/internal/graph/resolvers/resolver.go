@@ -14,4 +14,5 @@ type Resolver struct{
 	AuthService *services.AuthService
 	AdminService *services.AdminService
 	TeamService *services.TeamService
+	TimeTableService *services.TimeTableService
 }

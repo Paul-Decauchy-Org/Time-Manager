@@ -33,27 +33,24 @@ type User struct {
 	Phone            string           `gorm:"type:text"`
 	Password         string           `gorm:"type:text"`
 	Role             Role             `gorm:"type:text"`
-	TeamUsers        []TeamUser       `gorm:"foreignKey:UserID"`
 	Teams            []*Team          `gorm:"many2many:team_users;"`
 	TimeTableEntries []TimeTableEntry `gorm:"foreignKey:UserID"`
 	TimeTables       []TimeTable      `gorm:"foreignKey:UserID"`
 }
 
 type Team struct {
-	ID          uuid.UUID  `gorm:"primaryKey;type:uuid"`
-	Name        string     `gorm:"type:text"`
-	Description string     `gorm:"type:text"`
-	ManagerID   uuid.UUID  `gorm:"type:uuid;index"`
-	Manager     *User      `gorm:"foreignKey:ManagerID;references:ID"`
-	TeamUsers   []TeamUser `gorm:"foreignKey:TeamID"`
-	Users       []*User    `gorm:"many2many:team_users;"`
+	ID          uuid.UUID `gorm:"primaryKey;type:uuid"`
+	Name        string    `gorm:"type:text"`
+	Description string    `gorm:"type:text"`
+	ManagerID   uuid.UUID `gorm:"type:uuid;index"`
+	Manager     *User     `gorm:"foreignKey:ManagerID;references:ID"`
+	Users       []*User   `gorm:"many2many:team_users;"`
 }
 
 type TeamUser struct {
-	ID     uuid.UUID `gorm:"primaryKey;type:uuid"`
-	UserID uuid.UUID `gorm:"type:uuid;index"`
+	UserID uuid.UUID `gorm:"primaryKey;type:uuid"`
 	User   *User     `gorm:"foreignKey:UserID;references:ID"`
-	TeamID uuid.UUID `gorm:"type:uuid;index"`
+	TeamID uuid.UUID `gorm:"primaryKey;type:uuid"`
 	Team   *Team     `gorm:"foreignKey:TeamID;references:ID"`
 }
 
@@ -87,13 +84,6 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 func (t *Team) BeforeCreate(tx *gorm.DB) (err error) {
 	if t.ID == uuid.Nil {
 		t.ID = uuid.New()
-	}
-	return
-}
-
-func (tu *TeamUser) BeforeCreate(tx *gorm.DB) (err error) {
-	if tu.ID == uuid.Nil {
-		tu.ID = uuid.New()
 	}
 	return
 }

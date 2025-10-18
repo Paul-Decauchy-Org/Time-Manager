@@ -51,14 +51,17 @@ func main() {
 	authRepo := repositories.NewRepository(db)
 	adminRepo := repositories.NewRepository(db)
 	teamRepo := repositories.NewRepository(db)
+	timeTableRepo := repositories.NewRepository(db)
 	authService := services.NewAuthService(authRepo)
 	adminService := services.NewAdminService(adminRepo)
 	teamService := services.NewTeamService(teamRepo)
+	timeTableService := services.NewTimeTableService(timeTableRepo)
 	resolver := &resolvers.Resolver{
-		DB:           db,
-		AuthService:  authService,
-		AdminService: adminService,
-		TeamService: teamService,
+		DB:              db,
+		AuthService:     authService,
+		AdminService:    adminService,
+		TeamService:     teamService,
+		TimeTableService: timeTableService,
 	}
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{
@@ -75,7 +78,7 @@ func main() {
 		Cache: lru.New[string](100),
 	})
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:3001", "http://localhost:8084"},
+		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Origin", "Content-Type", "Authorization", "Accept"},
 		ExposedHeaders:   []string{"Content-Length"},

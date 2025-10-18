@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (r *Repository) CreateTeam(input model.CreateTeamInput)(*model.Team, error){
+func (r *Repository) CreateTeam(input model.CreateTeamInput) (*model.Team, error) {
 	var existingTeam *dbmodels.Team
 
 	if err := r.DB.Where("name = ?", input.Name).First(&existingTeam).Error; err == nil {
@@ -27,24 +27,30 @@ func (r *Repository) CreateTeam(input model.CreateTeamInput)(*model.Team, error)
 		return nil, errors.New("manager not found")
 	}
 	team := &dbmodels.Team{
-		Name: input.Name,
+		Name:        input.Name,
 		Description: input.Description,
-		ManagerID: managerID,
+		ManagerID:   managerID,
 	}
-	
+
 	if err := r.DB.Create(team).Error; err != nil {
 		return nil, errors.New("error while creating team")
 	}
+
+	// Reload with Manager preloaded
+	if err := r.DB.Preload("Manager").Where("id = ?", team.ID).First(team).Error; err != nil {
+		return nil, errors.New("error while reloading team")
+	}
+
 	return teamMapper.DBTeamToGraph(team), nil
 }
 
-func (r *Repository) UpdateTeam(id string, input model.UpdateTeamInput)(*model.Team, error){
+func (r *Repository) UpdateTeam(id string, input model.UpdateTeamInput) (*model.Team, error) {
 	teamID, ok := uuid.Parse(id)
 	if ok != nil {
 		return nil, errors.New("error while parsing team id")
 	}
 	var existingTeam *dbmodels.Team
-	if err := r.DB.Where("id = ?", teamID).First(&existingTeam).Error; err != nil {
+	if err := r.DB.Preload("Manager").Where("id = ?", teamID).First(&existingTeam).Error; err != nil {
 		return nil, errors.New("team not found")
 	}
 	if input.Name != nil {
@@ -63,10 +69,16 @@ func (r *Repository) UpdateTeam(id string, input model.UpdateTeamInput)(*model.T
 	if err := r.DB.Save(existingTeam).Error; err != nil {
 		return nil, errors.New("error while updating team")
 	}
+
+	// Reload with Manager preloaded
+	if err := r.DB.Preload("Manager").Where("id = ?", existingTeam.ID).First(existingTeam).Error; err != nil {
+		return nil, errors.New("error while reloading team")
+	}
+
 	return teamMapper.DBTeamToGraph(existingTeam), nil
 }
 
-func (r *Repository) DeleteTeam(id string)(bool, error){
+func (r *Repository) DeleteTeam(id string) (bool, error) {
 	teamID, ok := uuid.Parse(id)
 	if ok != nil {
 		return false, errors.New("error while parsing team id")
@@ -81,28 +93,27 @@ func (r *Repository) DeleteTeam(id string)(bool, error){
 	return true, nil
 }
 
-func (r *Repository) GetTeam(id string)(*model.Team, error){
+func (r *Repository) GetTeam(id string) (*model.Team, error) {
 	teamID, ok := uuid.Parse(id)
 	if ok != nil {
 		return nil, errors.New("error while parsing team id")
 	}
 	var existingTeam *dbmodels.Team
-	if err := r.DB.Where("id = ?", teamID).First(&existingTeam).Error; err != nil {
+	if err := r.DB.Preload("Manager").Where("id = ?", teamID).First(&existingTeam).Error; err != nil {
 		return nil, errors.New("team not found")
 	}
 	return teamMapper.DBTeamToGraph(existingTeam), nil
 }
 
-func (r *Repository) GetTeams()([]*model.Team, error){
+func (r *Repository) GetTeams() ([]*model.Team, error) {
 	var teams []*dbmodels.Team
-	if err := r.DB.Find(&teams).Error; err != nil {
+	if err := r.DB.Preload("Manager").Find(&teams).Error; err != nil {
 		return nil, errors.New("can't find teams")
 	}
 	return teamMapper.DBTeamsToGraph(teams), nil
 }
 
-
-func (r *Repository) AddUserToTeam(id string, teamID string)(*model.TeamUser, error){
+func (r *Repository) AddUserToTeam(id string, teamID string) (*model.TeamUser, error) {
 	userID, ok := uuid.Parse(id)
 	if ok != nil {
 		return nil, errors.New("error while parsing userID")
@@ -130,5 +141,13 @@ func (r *Repository) AddUserToTeam(id string, teamID string)(*model.TeamUser, er
 	if err := r.DB.Create(teamUser).Error; err != nil {
 		return nil, errors.New("error while adding user to the team")
 	}
+
+	// Reload with User and Team preloaded using composite key
+	if err := r.DB.Preload("User").Preload("Team").Preload("Team.Manager").
+		Where("user_id = ? AND team_id = ?", userID, idTeam).
+		First(teamUser).Error; err != nil {
+		return nil, errors.New("error while reloading team user")
+	}
+
 	return teamUserMapper.DBTeamUserToGraph(teamUser), nil
 }

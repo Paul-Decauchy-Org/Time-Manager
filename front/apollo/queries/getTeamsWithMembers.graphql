@@ -1,4 +1,4 @@
-query Teams {
+query GetTeamsWithMembers {
   teams {
     id
     name
@@ -8,9 +8,6 @@ query Teams {
       firstName
       lastName
       email
-      phone
-      role
-      password
     }
   }
 }

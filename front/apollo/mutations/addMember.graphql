@@ -1,6 +1,5 @@
 mutation AddUserToTeam($teamID: ID!, $userID: ID!) {
   addUserToTeam(teamID: $teamID, userID: $userID) {
-    id
     userID {
       id
       firstName
@@ -17,7 +16,6 @@ mutation AddUserToTeam($teamID: ID!, $userID: ID!) {
 
 mutation AddUsersToTeam($input: AddUsersToTeamInput!) {
   addUsersToTeam(input: $input) {
-    id
     userID {
       id
       firstName

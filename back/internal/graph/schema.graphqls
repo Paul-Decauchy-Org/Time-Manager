@@ -46,7 +46,6 @@ type Team {
 }
 
 type TeamUser {
-  id: ID!
   userID: User!
   teamID: Team!
 }
@@ -99,8 +98,8 @@ type Query {
   getUser(id: ID!): UserWithAllData
 
   # queries for team
-  getTeams: [Team!]!
-  getTeam(id: ID!): Team!
+  teams: [Team!]!
+  team(id: ID!): Team!
 
 }
 
