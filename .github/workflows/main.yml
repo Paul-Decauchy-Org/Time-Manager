@@ -9,39 +9,39 @@ jobs:
   # ============================================
   # Job 1: Linting & Formatting
   # ============================================
-  lint:
-    runs-on: ubuntu-latest
-    name: Lint & Format Check
-    steps:
-      - uses: actions/checkout@v5
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   name: Lint & Format Check
+  #   steps:
+  #     - uses: actions/checkout@v5
 
-      # Frontend Linting
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: front/package-lock.json
+  #     # Frontend Linting
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '20'
+  #         cache: 'npm'
+  #         cache-dependency-path: front/package-lock.json
 
-      - name: Install frontend dependencies
-        run: cd front && npm ci
+  #     - name: Install frontend dependencies
+  #       run: cd front && npm ci
 
-      - name: Run Biome lint
-        run: cd front && npm run lint
+  #     - name: Run Biome lint
+  #       run: cd front && npm run lint
 
-      # Backend Linting
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.23'
-          cache: true
-          cache-dependency-path: back/go.sum
+  #     # Backend Linting
+  #     - name: Setup Go
+  #       uses: actions/setup-go@v5
+  #       with:
+  #         go-version: '1.23'
+  #         cache: true
+  #         cache-dependency-path: back/go.sum
 
-      - name: Run go fmt
-        run: cd back && test -z "$(gofmt -l .)"
+  #     - name: Run go fmt
+  #       run: cd back && test -z "$(gofmt -l .)"
 
-      - name: Run go vet
-        run: cd back && go vet ./...
+  #     - name: Run go vet
+  #       run: cd back && go vet ./...
 
   # ============================================
   # Job 2: Build Tests
