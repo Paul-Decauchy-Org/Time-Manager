@@ -53,6 +53,15 @@ services:
         condition: service_healthy  # Wait for backend to be healthy
     networks:
       - Time-Manager-Network
+  
+  sonarQube:
+    image: sonarqube:latest
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    networks:
+      - Time-Manager-Network
 
   nginx:
     image: nginx:latest

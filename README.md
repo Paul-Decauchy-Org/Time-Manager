@@ -1,0 +1,8 @@
+![CI](https://github.com/PaulDecauchy/Time-Manager/workflows/CI/badge.svg)
+![CI](https://github.com/PaulDecauchy/Time-Manager/actions/workflows/main.yml/badge.svg?branch=main)
+![Release](https://img.shields.io/github/v/release/PaulDecauchy/Time-Manager)
+![Coverage](https://img.shields.io/codecov/c/github/PaulDecauchy/Time-Manager)
+![GitHub Actions Documentation](https://docs.github.com/en/actions)
+![SonarQube Documentation](https://docs.sonarqube.org/)
+![Docker Build Push Action](https://github.com/docker/build-push-action)
+![golangci-lint](https://golangci-lint.run/)
