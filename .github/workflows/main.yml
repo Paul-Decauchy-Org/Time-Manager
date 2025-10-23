@@ -79,8 +79,8 @@ jobs:
           cache: "npm"
           cache-dependency-path: front/package-lock.json
 
-      - name: Install frontend dependencies
-        run: cd front && npm ci
+      - name: Install frontend dependencies && generate GraphQL types
+        run: cd front && npm ci && npm run codegen
 
       - name: Build Next.js frontend
         run: cd front && npm run build
