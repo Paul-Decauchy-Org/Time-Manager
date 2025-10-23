@@ -29,21 +29,9 @@ func (r *mutationResolver) DeleteTimeEntry(ctx context.Context, id string) (bool
 	panic(fmt.Errorf("not implemented: DeleteTimeEntry - deleteTimeEntry"))
 }
 
-// Users resolver is implemented in userResolvers.go
-
-// TeamUsers is the resolver for the teamUsers field.
-func (r *queryResolver) TeamUsers(ctx context.Context) ([]*model.TeamUser, error) {
-	panic(fmt.Errorf("not implemented: TeamUsers - teamUsers"))
-}
-
 // Roles is the resolver for the roles field.
 func (r *queryResolver) Roles(ctx context.Context) ([]model.Role, error) {
 	panic(fmt.Errorf("not implemented: Roles - roles"))
-}
-
-// TimeTableEntries is the resolver for the timeTableEntries field.
-func (r *queryResolver) TimeTableEntries(ctx context.Context) ([]*model.TimeTableEntry, error) {
-	panic(fmt.Errorf("not implemented: TimeTableEntries - timeTableEntries"))
 }
 
 // TimeTables is the resolver for the timeTables field.
@@ -51,7 +39,6 @@ func (r *queryResolver) TimeTables(ctx context.Context) ([]*model.TimeTable, err
 	panic(fmt.Errorf("not implemented: TimeTables - timeTables"))
 }
 
-// Mutation returns graph.MutationResolver implementation.
 // Mutation returns graph.MutationResolver implementation.
 func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{r} }
 

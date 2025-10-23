@@ -1,0 +1,31 @@
+mutation AddUserToTeam($teamID: ID!, $userID: ID!) {
+  addUserToTeam(teamID: $teamID, userID: $userID) {
+    userID {
+      id
+      firstName
+      lastName
+      email
+    }
+    teamID {
+      id
+      name
+      description
+    }
+  }
+}
+
+mutation AddUsersToTeam($input: AddUsersToTeamInput!) {
+  addUsersToTeam(input: $input) {
+    userID {
+      id
+      firstName
+      lastName
+      email
+    }
+    teamID {
+      id
+      name
+      description
+    }
+  }
+}

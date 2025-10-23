@@ -37,6 +37,7 @@ type Query {
   usersByGroup(inGroup: Boolean!): [User!]!
   userWithAllData(id: ID!): UserWithAllData
   UsersWithAllData: [UserWithAllData!]!
+  usersByTeam(teamID: ID!): [UserWithAllData!]!
   me: User!
 }
 type Team {
@@ -55,7 +56,7 @@ type TimeTable {
   userID: User!
   day: Date!
   start: Time!
-  end: Time!
+  ends: Time!
 }
 type TimeTableEntry {
   id: ID!

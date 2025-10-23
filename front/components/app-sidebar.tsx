@@ -1,5 +1,5 @@
 "use client";
-import { Calendar, Home, Settings, Search, CircleUserRoundIcon } from "lucide-react"
+import { Calendar, Home, Settings, Search, CircleUserRoundIcon, UsersRound } from "lucide-react"
 
 import {
     Sidebar,
@@ -36,7 +36,7 @@ const managerItems: links = {
         {
             title: "Teams",
             url: "/dashboard/teams",
-            icon: Calendar,
+            icon: UsersRound,
         },
         {
             title: "KPIs",
@@ -58,12 +58,21 @@ const adminItems: links = {
 }
 
 export function AppSidebar() {
-    const {user, isManager, isAdmin} = useAuth()
+    const {user, isManager, isAdmin, loading} = useAuth()
     const {logout} = useLogout()
     const router = useRouter()
     async function handleLogout() {
         await logout()
         router.push("/login")
+    }
+    if (loading) {
+        return (
+            <Sidebar>
+                <SidebarContent>
+                    {/* Loader ou rien pendant le chargement */}
+                </SidebarContent>
+            </Sidebar>
+        )
     }
     return (
         <Sidebar>

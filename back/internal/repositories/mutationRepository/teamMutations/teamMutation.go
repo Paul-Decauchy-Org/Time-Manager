@@ -215,7 +215,6 @@ func AddUserToTeam(userID string, teamID string) (*gmodel.TeamUser, error) {
 	}
 
 	teamUser := dbmodels.TeamUser{
-		ID:     uuid.New(),
 		UserID: userUUID,
 		TeamID: teamUUID,
 	}
@@ -224,7 +223,10 @@ func AddUserToTeam(userID string, teamID string) (*gmodel.TeamUser, error) {
 		return nil, errors.New("failed to add user to team: " + err.Error())
 	}
 
-	if err := db.Preload("User").Preload("Team").Where("id = ?", teamUser.ID).First(&teamUser).Error; err != nil {
+	// Reload with composite key
+	if err := db.Preload("User").Preload("Team").Preload("Team.Manager").
+		Where("user_id = ? AND team_id = ?", userUUID, teamUUID).
+		First(&teamUser).Error; err != nil {
 		return nil, errors.New("failed to load team user data: " + err.Error())
 	}
 
@@ -278,7 +280,6 @@ func AddUsersToTeam(input gmodel.AddUsersToTeamInput) ([]*gmodel.TeamUser, error
 		}
 
 		teamUser := dbmodels.TeamUser{
-			ID:     uuid.New(),
 			UserID: userUUID,
 			TeamID: teamUUID,
 		}
@@ -288,7 +289,10 @@ func AddUsersToTeam(input gmodel.AddUsersToTeamInput) ([]*gmodel.TeamUser, error
 			continue
 		}
 
-		if err := tx.Preload("User").Preload("Team").First(&teamUser, teamUser.ID).Error; err != nil {
+		// Reload with composite key
+		if err := tx.Preload("User").Preload("Team").Preload("Team.Manager").
+			Where("user_id = ? AND team_id = ?", userUUID, teamUUID).
+			First(&teamUser).Error; err != nil {
 			failedUsers = append(failedUsers, fmt.Sprintf("%s (load error)", userIDStr))
 			continue
 		}
@@ -313,29 +317,29 @@ func AddUsersToTeam(input gmodel.AddUsersToTeamInput) ([]*gmodel.TeamUser, error
 }
 
 func RemoveUserFromTeam(userID string, teamID string) (bool, error) {
-    if database.DB == nil {
-        return false, errors.New("database not initialized")
-    }
-    db := database.DB
-    
-    userUUID, err := uuid.Parse(userID)
-    if err != nil {
-        return false, errors.New("invalid user ID format")
-    }
-    
-    teamUUID, err := uuid.Parse(teamID)
-    if err != nil {
-        return false, errors.New("invalid team ID format")
-    }
-    
-    result := db.Where("user_id = ? AND team_id = ?", userUUID, teamUUID).Delete(&dbmodels.TeamUser{})
-    if result.Error != nil {
-        return false, errors.New("failed to remove user from team: " + result.Error.Error())
-    }
-    
-    if result.RowsAffected == 0 {
-        return false, errors.New("user is not in this team")
-    }
-    
-    return true, nil
+	if database.DB == nil {
+		return false, errors.New("database not initialized")
+	}
+	db := database.DB
+
+	userUUID, err := uuid.Parse(userID)
+	if err != nil {
+		return false, errors.New("invalid user ID format")
+	}
+
+	teamUUID, err := uuid.Parse(teamID)
+	if err != nil {
+		return false, errors.New("invalid team ID format")
+	}
+
+	result := db.Where("user_id = ? AND team_id = ?", userUUID, teamUUID).Delete(&dbmodels.TeamUser{})
+	if result.Error != nil {
+		return false, errors.New("failed to remove user from team: " + result.Error.Error())
+	}
+
+	if result.RowsAffected == 0 {
+		return false, errors.New("user is not in this team")
+	}
+
+	return true, nil
 }

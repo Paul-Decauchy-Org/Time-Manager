@@ -1,0 +1,9 @@
+query GetUsersWithoutGroup($input: Boolean!){
+  usersByGroup(inGroup: $input){
+    id
+    lastName
+    firstName
+    email
+    role
+  }
+}

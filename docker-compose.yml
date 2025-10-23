@@ -53,6 +53,19 @@ services:
         condition: service_healthy  # Wait for backend to be healthy
     networks:
       - Time-Manager-Network
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      back:
+        condition: service_healthy
+    networks:
+      - Time-Manager-Network
+      
 networks:
   Time-Manager-Network:
     driver: bridge
