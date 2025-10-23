@@ -11,24 +11,24 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (r *Repository) CreateUser(input model.CreateUserInput)(*model.User, error){
+func (r *Repository) CreateUser(input model.CreateUserInput) (*model.User, error) {
 	var existingUser *dbmodels.User
 
 	if err := r.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
 		return nil, errors.New("email already in use")
 	}
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password),bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, errors.New("error while hashing password")
 	}
 
 	user := &dbmodels.User{
 		FirstName: input.FirstName,
-		LastName: input.LastName,
-		Phone: input.Phone,
-		Email: input.Email,
-		Password: string(hashedPassword),
-		Role: dbmodels.Role(input.Role),
+		LastName:  input.LastName,
+		Phone:     input.Phone,
+		Email:     input.Email,
+		Password:  string(hashedPassword),
+		Role:      dbmodels.Role(input.Role),
 	}
 	if err := r.DB.Create(user).Error; err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (r *Repository) CreateUser(input model.CreateUserInput)(*model.User, error)
 	return userMapper.DBUserToGraph(user), nil
 }
 
-func (r *Repository) UpdateUser(id string, input model.UpdateUserInput)(*model.User, error){
+func (r *Repository) UpdateUser(id string, input model.UpdateUserInput) (*model.User, error) {
 	var existingUser dbmodels.User
 	uID, ok := uuid.Parse(id)
 	if ok != nil {
@@ -74,13 +74,13 @@ func (r *Repository) UpdateUser(id string, input model.UpdateUserInput)(*model.U
 	return userMapper.DBUserToGraph(&existingUser), nil
 }
 
-func (r *Repository) DeleteUser(id string)(bool, error){
+func (r *Repository) DeleteUser(id string) (bool, error) {
 	var existingUser dbmodels.User
 	uID, ok := uuid.Parse(id)
 	if ok != nil {
 		return false, errors.New("error while parsing id")
 	}
-	if err := r.DB.Where("id = ?",uID).First(&existingUser).Error; err != nil {
+	if err := r.DB.Where("id = ?", uID).First(&existingUser).Error; err != nil {
 		return false, errors.New("user not found")
 	}
 	if err := r.DB.Delete(&existingUser).Error; err != nil {
@@ -89,7 +89,7 @@ func (r *Repository) DeleteUser(id string)(bool, error){
 	return true, nil
 }
 
-func (r *Repository) GetUser(id string)(*model.UserWithAllData, error){
+func (r *Repository) GetUser(id string) (*model.UserWithAllData, error) {
 	var existingUser dbmodels.User
 	uID, ok := uuid.Parse(id)
 	if ok != nil {
@@ -105,8 +105,7 @@ func (r *Repository) GetUser(id string)(*model.UserWithAllData, error){
 	return userMapper.DBUserToGraphWithAllData(&existingUser), nil
 }
 
-
-func (r *Repository) SetManagerTeam(userID string, teamID string)(*model.Team, error){
+func (r *Repository) SetManagerTeam(userID string, teamID string) (*model.Team, error) {
 	id, ok := uuid.Parse(userID)
 	if ok != nil {
 		return nil, errors.New("error while parsing user id")
@@ -137,7 +136,7 @@ func (r *Repository) SetManagerTeam(userID string, teamID string)(*model.Team, e
 	return teamMapper.DBTeamToGraph(existingTeam), nil
 }
 
-func (r *Repository) SetRole(userID string, role model.Role)(*model.User, error){
+func (r *Repository) SetRole(userID string, role model.Role) (*model.User, error) {
 	id, ok := uuid.Parse(userID)
 	if ok != nil {
 		return nil, errors.New("error while parsing user id")

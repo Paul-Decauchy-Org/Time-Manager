@@ -67,6 +67,10 @@ jobs:
       - name: Build Go backend
         run: cd back && go build -v ./cmd/main.go
 
+      # Run tests
+      - name: Run Go tests
+        run: cd back && go test ./... -v -coverprofile=coverage.out
+
       # Frontend Build
       - name: Setup Node.js
         uses: actions/setup-node@v4
