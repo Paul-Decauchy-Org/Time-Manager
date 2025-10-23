@@ -49,7 +49,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: Build Check
-    needs: [lint]
+    # needs: [lint]
     steps:
       - uses: actions/checkout@v5
 
