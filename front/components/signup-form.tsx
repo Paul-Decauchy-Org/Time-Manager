@@ -99,7 +99,7 @@ export function SignupForm({
 
     return (
         <div className= { cn("flex flex-col gap-6", className) } {...props }>
-            <Card className="overflow-hidden border-0 shadow-2xl backdrop-blur-sm bg-background/95" >
+            <Card className="overflow-hidden border-0 shadow-2xl backdrop-blur-sm bg-background/95 py-0" >
                 <CardContent className="grid p-0 lg:grid-cols-2" >
                     <form className="p-8 md:p-12 space-y-2" onSubmit = { handleSubmit } >
                         <div className="space-y-2" >

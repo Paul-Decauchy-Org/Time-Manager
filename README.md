@@ -15,6 +15,30 @@
 
 </div>
 
+## � Sommaire
+
+- [🚀 Présentation](#-présentation)
+- [📁 Structure du projet](#-structure-du-projet)
+  - [🔧 Technologies utilisées](#-technologies-utilisées)
+- [🚀 Quickstart](#-quickstart)
+  - [Prérequis](#prérequis)
+  - [Option 1: Docker Compose](#option-1-docker-compose-recommandé)
+  - [Option 2: Développement local](#option-2-développement-local)
+- [✨ Fonctionnalités principales](#-fonctionnalités-principales)
+  - [Gestion du temps](#gestion-du-temps)
+  - [Gestion d'équipes](#gestion-déquipes)
+  - [Administration](#administration)
+- [🧪 Tests et qualité de code](#-tests-et-qualité-de-code)
+  - [Tests Backend](#tests-backend-go)
+  - [Tests Frontend](#tests-frontend-nextjs)
+  - [SonarQube](#sonarqube-analyse-statique)
+- [🔄 CI/CD avec GitHub Actions](#-cicd-avec-github-actions)
+- [🛠️ Conseils pour le développement](#-conseils-pour-le-développement)
+  - [Tests unitaires du backend](#tests-unitaires-du-backend)
+  - [GraphQL Codegen](#graphql-codegen)
+- [👥 Contribution](#-contribution)
+- [📄 License](#-license)
+
 ## 🚀 Présentation
 
 Time-Manager est une application complète de gestion du temps et des équipes. Elle permet aux utilisateurs de :
