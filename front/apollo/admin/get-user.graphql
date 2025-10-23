@@ -1,0 +1,18 @@
+query GetUser($id: ID!){
+    getUser(id: $id){
+        firstName
+        lastName
+        teams{
+            name
+        }
+        timeTables{
+            start
+            end
+        }
+        timeTableEntries{
+            arrival
+            departure
+            day
+        }
+    }
+}
