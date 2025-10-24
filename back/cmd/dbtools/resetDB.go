@@ -15,7 +15,7 @@ func main() {
 		testData  bool
 		migrateDB bool
 	)
-	
+
 	flag.BoolVar(&resetDB, "reset", false, "Reset database by dropping all tables before migration")
 	flag.BoolVar(&seedDB, "seed", false, "Seed database with default data")
 	flag.BoolVar(&testData, "test-data", false, "Seed database with test data (5 users, 1 team, time entries, etc)")
@@ -43,7 +43,7 @@ func main() {
 		}
 		log.Println("Migration completed successfully")
 	}
-	
+
 	// Seed de données par défaut si demandé
 	if seedDB {
 		log.Println("Starting database seeding...")
@@ -52,7 +52,7 @@ func main() {
 		}
 		log.Println("Seeding completed successfully")
 	}
-	
+
 	// Seed de données de test si demandé
 	if testData {
 		log.Println("Starting test data seeding...")
@@ -61,7 +61,7 @@ func main() {
 		}
 		log.Println("Test data seeding completed successfully")
 	}
-	
+
 	log.Println("Database operations completed")
 }
 
@@ -73,16 +73,16 @@ func dropAllTables() error {
 	}
 
 	log.Println("Dropping all tables...")
-	
+
 	// Désactiver temporairement les contraintes de clés étrangères pour PostgreSQL
 	db.Exec("SET session_replication_role = 'replica';")
-	
+
 	// Liste des tables à supprimer dans l'ordre (des enfants aux parents)
 	tablesToDrop := []string{
-		"time_tables", 
-		"time_table_entries", 
-		"team_users", 
-		"teams", 
+		"time_tables",
+		"time_table_entries",
+		"team_users",
+		"teams",
 		"users",
 	}
 
@@ -92,7 +92,7 @@ func dropAllTables() error {
 			return err
 		}
 	}
-	
+
 	// Réactiver les contraintes
 	db.Exec("SET session_replication_role = 'origin';")
 

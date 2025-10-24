@@ -2,11 +2,11 @@ package middlewares
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"os"
-	"time"
-	"errors"
 	"strings"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -25,7 +25,7 @@ func GenerateToken(email string, id string, role string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": email,
 		"id":    id,
-		"role": role,
+		"role":  role,
 		"exp":   time.Now().Add(24 * time.Hour).Unix(),
 	})
 
@@ -55,16 +55,15 @@ func ValidateToken(tokenString string) (string, string, string, error) {
 	return email, id, role, nil
 }
 
-
 func AuthRequired(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		
+
 		ctx := context.WithValue(r.Context(), "ResponseWriter", w)
 
 		var tokenString string
 		authHeader := r.Header.Get("Authorization")
 
-		if after, ok :=strings.CutPrefix(authHeader, "Bearer "); ok  {
+		if after, ok := strings.CutPrefix(authHeader, "Bearer "); ok {
 			tokenString = after
 		} else if cookie, err := r.Cookie("token"); err == nil {
 			tokenString = cookie.Value
@@ -89,7 +88,7 @@ func AuthRequired(next http.Handler) http.Handler {
 	})
 }
 
-func GetUserID(ctx context.Context)(string, error){
+func GetUserID(ctx context.Context) (string, error) {
 	id, ok := ctx.Value(ContextUserIDKey).(string)
 	if !ok {
 		return "", errors.New("id not found in context")

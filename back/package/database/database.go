@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/google/uuid"
 	dbmodels "github.com/epitech/timemanager/internal/models"
+	"github.com/google/uuid"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -127,7 +127,7 @@ func SeedDB() error {
 	}
 
 	// Ajouter d'autres données initiales ici si nécessaire
-	
+
 	log.Println("Database seeding completed successfully")
 	return nil
 }

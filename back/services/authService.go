@@ -6,10 +6,10 @@ import (
 	"github.com/epitech/timemanager/package/middlewares"
 )
 
-
 type AuthService struct {
 	AuthRepo *repositories.Repository
 }
+
 func NewAuthService(repo *repositories.Repository) *AuthService {
 	return &AuthService{AuthRepo: repo}
 }
@@ -29,22 +29,22 @@ func (s *AuthService) Login(email, password string) (*model.UserLogged, error) {
 	}
 	return &model.UserLogged{
 		FirstName: user.FirstName,
-		LastName: user.LastName,
-		Email: user.Email,
-		Phone: user.Phone,
-		Role: user.Role,
-		Token: token,
+		LastName:  user.LastName,
+		Email:     user.Email,
+		Phone:     user.Phone,
+		Role:      user.Role,
+		Token:     token,
 	}, nil
 }
 
-func (s *AuthService) Me(email string)(*model.User, error){
+func (s *AuthService) Me(email string) (*model.User, error) {
 	return s.AuthRepo.Me(email)
 }
 
-func (s *AuthService) UpdateProfile(email string, input model.UpdateProfileInput)(*model.User, error){
+func (s *AuthService) UpdateProfile(email string, input model.UpdateProfileInput) (*model.User, error) {
 	return s.AuthRepo.UpdateProfile(email, input)
 }
 
-func (s *AuthService) DeleteProfile(email string)(bool, error){
+func (s *AuthService) DeleteProfile(email string) (bool, error) {
 	return s.AuthRepo.DeleteProfile(email)
 }
