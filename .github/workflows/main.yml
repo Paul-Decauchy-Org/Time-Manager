@@ -85,9 +85,17 @@ jobs:
   generate-graphql:
     runs-on: ubuntu-latest
     name: "Generation GraphQL Artifacts"
+    needs: [setup]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+      
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          cache: true
+          cache-dependency-path: back/go.sum
 
       - name: Generate backend GraphQL
         working-directory: back
