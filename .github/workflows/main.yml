@@ -70,7 +70,7 @@ jobs:
         run: cd back && go test ./... -v -coverprofile=coverage.out
 
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: backend-coverage
           path: back/coverage.out
@@ -103,7 +103,7 @@ jobs:
         run: cd front && npm run build
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: frontend-build
           path: front/.next
