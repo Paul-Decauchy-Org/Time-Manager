@@ -103,6 +103,15 @@ jobs:
           # run gqlgen via go run to avoid requiring a global binary
           go run github.com/99designs/gqlgen@v0.17.81 generate
 
+      - name: Setup Node.js (for codegen)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install frontend deps (needed for codegen)
+        working-directory: front
+        run: npm ci
+
       - name: Generate frontend GraphQL
         working-directory: front
         run: npm run codegen
