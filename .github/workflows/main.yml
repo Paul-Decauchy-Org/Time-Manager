@@ -7,84 +7,119 @@ on:
 
 jobs:
   # ============================================
-  # Job 1: Code Quality
+  # Block 1: Qualité du code (lint back, lint front commented)
   # ============================================
-  code-quality:
+  quality-check:
     runs-on: ubuntu-latest
-    name: Code Quality Check
+    name: Qualité du code
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
-      # Frontend Linting
-      # - name: Setup Node.js
+      # Backend lint (active)
+      - name: Setup Go (for lint)
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          cache: true
+          cache-dependency-path: back/go.sum
+
+      - name: Check gofmt & go vet
+        run: |
+          cd back
+          test -z "$(gofmt -l .)" || (echo "gofmt found issues" && exit 1)
+          go vet ./...
+
+      # Frontend lint (commented for now)
+      # - name: Setup Node.js (for frontend lint)
       #   uses: actions/setup-node@v4
       #   with:
       #     node-version: "20"
       #     cache: "npm"
       #     cache-dependency-path: front/package-lock.json
-
-      # - name: Lint Frontend Code
+      #
+      # - name: Lint frontend
       #   run: |
       #     cd front
       #     npm ci
       #     npm run lint
 
-      # Backend Linting
-      - name: Setup Go
+  # ============================================
+  # Block 2: Setup (backend & frontend)
+  # ============================================
+  setup:
+    runs-on: ubuntu-latest
+    name: Setup environments (back & front)
+    needs: [quality-check]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Go (backend)
         uses: actions/setup-go@v5
         with:
           go-version: "1.25"
           cache: true
           cache-dependency-path: back/go.sum
 
-      - name: Lint Go Code
+      - name: Install backend deps
         run: |
           cd back
-          test -z "$(gofmt -l .)"
-          go vet ./...
+          go mod download
 
-  # ============================================
-  # Job 2: Backend Tests
-  # ============================================
-  backend-tests:
-    runs-on: ubuntu-latest
-    name: Backend Tests
-    needs: [code-quality]
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
+      - name: Setup Node.js (frontend)
+        uses: actions/setup-node@v4
         with:
-          go-version: "1.25"
-          cache: true
-          cache-dependency-path: back/go.sum
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: front/package-lock.json
 
-      - name: Copy backend env file
-        run: cd back && cp .env.example .env
+      - name: Install frontend deps
+        run: |
+          cd front
+          npm ci
 
-      - name: Build Go backend
-        run: cd back && go build -v ./cmd/main.go
+  # ============================================
+  # Block 3: Generate GraphQL artifacts (gqlgen back, codegen front)
+  # ============================================
+  generate-graphql:
+    runs-on: ubuntu-latest
+    name: "Génération GraphQL (back: gqlgen, front: codegen)"
+    needs: [setup]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
-      - name: Run Go tests
-        run: cd back && go test ./... -v -coverprofile=coverage.out
+      - name: Generate backend GraphQL (gqlgen)
+        working-directory: back
+        run: |
+          # run gqlgen via go run to avoid requiring a global binary
+          go run github.com/99designs/gqlgen generate
 
-      - name: Upload coverage artifact
+      - name: Generate frontend GraphQL types
+        working-directory: front
+        run: |
+          npm run codegen
+
+      - name: Upload generated artifacts (optional)
         uses: actions/upload-artifact@v4
         with:
-          name: backend-coverage
-          path: back/coverage.out
-          retention-days: 7
+          name: generated-graphql
+          path: |
+            back/gqlgen.yml
+            front/generated
+          retention-days: 1
 
   # ============================================
-  # Job 3: Frontend Build
+  # Block 3.5: Frontend Build (install, codegen, build)
   # ============================================
   frontend-build:
     runs-on: ubuntu-latest
     name: Frontend Build
-    needs: [code-quality]
+    needs: [generate-graphql]
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -93,50 +128,142 @@ jobs:
           cache: "npm"
           cache-dependency-path: front/package-lock.json
 
-      - name: Install dependencies
-        run: cd front && npm ci
+      - name: Install frontend dependencies
+        working-directory: front
+        run: |
+          npm ci
 
-      - name: Generate GraphQL types
-        run: cd front && npm run codegen
+      - name: Generate frontend GraphQL types (safety)
+        working-directory: front
+        run: |
+          npm run codegen
 
       - name: Build Next.js frontend
-        run: cd front && npm run build
+        working-directory: front
+        run: |
+          npm run build
 
-      - name: Upload build artifact
+      - name: Upload frontend build artifact
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build
-          path: front/.next
+          path: front/.next/
           retention-days: 1
 
   # ============================================
-  # Job 4: Docker Build & Push
+  # Block 4: Tests (backend & frontend) - commented for now
   # ============================================
-  docker:
+  tests:
     runs-on: ubuntu-latest
-    name: Docker Build & Push
-    needs: [backend-tests, frontend-build]
+    name: Tests (backend & frontend)
+    needs: [generate-graphql]
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      # Backend tests (commented for now)
+      - name: Run backend tests
+        working-directory: back
+        run: |
+          cp .env.example .env || true
+          go test ./... -v -coverprofile=coverage.out
+      - name: Upload backend coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: back/coverage.out
+          retention-days: 7
+
+      # Frontend tests (commented for now)
+      # - name: Run frontend tests
+      #   working-directory: front
+      #   run: |
+      #     npm test -- --watchAll=false
+
+  # ============================================
+  # Block 5: Docker build
+  # ============================================
+  docker-build:
+    runs-on: ubuntu-latest
+    name: Docker Build
+    needs: [generate-graphql]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Copy backend env file
-        run: cd back && cp .env.example .env
+      - name: Prepare backend env
+        run: |
+          cd back
+          cp .env.example .env || true
 
-      - name: Build Docker images
+      - name: Build docker images
         run: docker compose build --no-cache
 
-      # Décommenter cette section pour activer le push vers un registry
-      # - name: Login to Docker Registry
-      #   if: github.ref == 'refs/heads/main'
-      #   uses: docker/login-action@v3
-      #   with:
-      #     registry: ghcr.io
-      #     username: ${{ github.actor }}
-      #     password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload docker metadata (optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-images-meta
+          path: |
+            # optionally list files you want to save
+          retention-days: 1
 
-      # - name: Push Docker images
-      #   if: github.ref == 'refs/heads/main'
-      #   run: docker compose push
+  # ============================================
+  # Block 6: Docker push (only on main)
+  # ============================================
+  docker-push:
+    runs-on: ubuntu-latest
+    name: Docker Push
+    needs: [docker-build]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Login to registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push docker images
+        run: docker compose push
+
+  # ============================================
+  # Optional: SonarQube scan using sonar-scanner CLI in Docker
+  # requires secrets: SONAR_HOST_URL, SONAR_TOKEN, SONAR_PROJECT_KEY
+  # ============================================
+  sonarqube-scan:
+    runs-on: ubuntu-latest
+    name: SonarQube Scan (docker scanner)
+    needs: [tests]
+    if: ${{ always() && (secrets.SONAR_HOST_URL != '') && (secrets.SONAR_TOKEN != '') }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Download backend coverage (if uploaded)
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-coverage
+          path: back
+
+      - name: Run SonarScanner (Docker)
+        run: |
+          # mount repository and run sonar-scanner CLI inside docker
+          docker run --rm \
+            -e SONAR_HOST_URL="${{ secrets.SONAR_HOST_URL }}" \
+            -e SONAR_TOKEN="${{ secrets.SONAR_TOKEN }}" \
+            -v "${{ github.workspace }}":/usr/src \
+            sonarsource/sonar-scanner-cli \
+            -Dsonar.projectKey="${{ secrets.SONAR_PROJECT_KEY }}" \
+            -Dsonar.sources=back \
+            -Dsonar.host.url="${{ secrets.SONAR_HOST_URL }}" \
+            -Dsonar.login="${{ secrets.SONAR_TOKEN }}" \
+            -Dsonar.go.coverage.reportPaths=back/coverage.out
+
+      - name: Upload SonarQube result note
+        run: echo "Sonar scan finished. Check SonarQube dashboard."
