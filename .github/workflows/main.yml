@@ -94,7 +94,7 @@ jobs:
         working-directory: back
         run: |
           # run gqlgen via go run to avoid requiring a global binary
-          go run gqlgen generate
+          gqlgen generate
 
       - name: Generate frontend GraphQL types
         working-directory: front
