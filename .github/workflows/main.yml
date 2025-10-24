@@ -101,7 +101,7 @@ jobs:
         working-directory: back
         run: |
           # run gqlgen via go run to avoid requiring a global binary
-          gqlgen generate
+          go run github.com/99designs/gqlgen@v0.17.81 generate
 
       - name: Generate frontend GraphQL
         working-directory: front
@@ -141,13 +141,11 @@ jobs:
 
       - name: Generate frontend GraphQL types (safety)
         working-directory: front
-        run: |
-          npm run codegen
+        run: npm run codegen
 
       - name: Build Next.js frontend
         working-directory: front
-        run: |
-          npm run build
+        run: npm run build
 
       - name: Upload frontend build artifact
         uses: actions/upload-artifact@v4
