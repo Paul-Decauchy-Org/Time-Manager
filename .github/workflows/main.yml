@@ -7,11 +7,11 @@ on:
 
 jobs:
   # ============================================
-  # Block 1: Qualité du code (lint back, lint front commented)
+  # Block 1: Code Quality (lint back, lint front)
   # ============================================
   quality-check:
     runs-on: ubuntu-latest
-    name: Qualité du code
+    name: Code Quality
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -45,11 +45,11 @@ jobs:
       #     npm run lint
 
   # ============================================
-  # Block 2: Setup (backend & frontend)
+  # Block 2: Setup Back & Front
   # ============================================
   setup:
     runs-on: ubuntu-latest
-    name: Setup environments (back & front)
+    name: Setup Back & Front
     needs: [quality-check]
     steps:
       - name: Checkout repository
@@ -84,7 +84,7 @@ jobs:
   # ============================================
   generate-graphql:
     runs-on: ubuntu-latest
-    name: "Génération GraphQL (back: gqlgen, front: codegen)"
+    name: "Génératon GraphQL (back: gqlgen, front: codegen)"
     needs: [setup]
     steps:
       - name: Checkout repository
@@ -94,7 +94,7 @@ jobs:
         working-directory: back
         run: |
           # run gqlgen via go run to avoid requiring a global binary
-          go run github.com/99designs/gqlgen generate
+          go run gqlgen generate
 
       - name: Generate frontend GraphQL types
         working-directory: front
