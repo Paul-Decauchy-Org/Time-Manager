@@ -7,7 +7,7 @@ query GetUser($id: ID!){
         }
         timeTables{
             start
-            end
+            ends
         }
         timeTableEntries{
             arrival
