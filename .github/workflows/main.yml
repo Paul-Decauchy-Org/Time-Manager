@@ -240,7 +240,9 @@ jobs:
     runs-on: ubuntu-latest
     name: SonarQube Scan (docker scanner)
     needs: [tests]
-    if: ${{ always() && (secrets.SONAR_HOST_URL != '') && (secrets.SONAR_TOKEN != '') }}
+    env:
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -255,14 +257,14 @@ jobs:
         run: |
           # mount repository and run sonar-scanner CLI inside docker
           docker run --rm \
-            -e SONAR_HOST_URL="${{ secrets.SONAR_HOST_URL }}" \
-            -e SONAR_TOKEN="${{ secrets.SONAR_TOKEN }}" \
+            -e SONAR_HOST_URL="${{ env.SONAR_HOST_URL }}" \
+            -e SONAR_TOKEN="${{ env.SONAR_TOKEN }}" \
             -v "${{ github.workspace }}":/usr/src \
             sonarsource/sonar-scanner-cli \
             -Dsonar.projectKey="${{ secrets.SONAR_PROJECT_KEY }}" \
             -Dsonar.sources=back \
-            -Dsonar.host.url="${{ secrets.SONAR_HOST_URL }}" \
-            -Dsonar.login="${{ secrets.SONAR_TOKEN }}" \
+            -Dsonar.host.url="${{ env.SONAR_HOST_URL }}" \
+            -Dsonar.login="${{ env.SONAR_TOKEN }}" \
             -Dsonar.go.coverage.reportPaths=back/coverage.out
 
       - name: Upload SonarQube result note
