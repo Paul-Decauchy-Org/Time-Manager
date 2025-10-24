@@ -59,14 +59,14 @@ func GetUsersByGroup(inGroup bool) ([]*gmodel.User, error) {
 		return nil, errors.New("database not initialized")
 	}
 	var users []models.User
-
-	//récuperer les users presents team_users
-	sub := database.DB.Table("team_users").Select("user_id")
+	subTeamUsers := database.DB.Table("team_users").Select("user_id")
+	subManagers := database.DB.Table("teams").Select("manager_id")
 	query := database.DB.Where("role <> ?", "ADMIN")
+
 	if inGroup {
-		query = query.Where("id IN (?)", sub)
+		query = query.Where("id IN (?)", subTeamUsers).Where("id NOT IN (?)", subManagers)
 	} else {
-		query = query.Where("id NOT IN (?)", sub)
+		query = query.Where("id NOT IN (?)", subTeamUsers).Where("id NOT IN (?)", subManagers)
 	}
 
 	if err := query.Find(&users).Error; err != nil {

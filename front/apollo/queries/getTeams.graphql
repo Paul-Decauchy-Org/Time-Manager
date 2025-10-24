@@ -1,0 +1,16 @@
+query Teams {
+  teams {
+    id
+    name
+    description
+    managerID {
+      id
+      firstName
+      lastName
+      email
+      phone
+      role
+      password
+    }
+  }
+}

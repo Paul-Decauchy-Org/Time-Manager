@@ -1,5 +1,8 @@
 mutation clockOut{
   clockOut {
     id
+    arrival
+    departure
+    status
   }
 }

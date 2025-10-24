@@ -1,7 +1,7 @@
 .PHONY: up down logs clean restart dev
 
 up:
-	docker compose up back database --build --wait
+	docker compose up back database nginx sonarQube --build --wait
 
 dev:
 	docker compose up --build
@@ -19,6 +19,12 @@ logs-back:
 
 logs-db:
 	docker compose logs -f database
+
+logs-nginx:
+	docker compose logs -f nginx
+
+logs-sonar:
+	docker compose logs -f sonarQube
 
 logs-front:
 	docker compose logs -f front

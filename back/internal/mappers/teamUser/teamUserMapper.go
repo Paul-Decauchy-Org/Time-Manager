@@ -7,15 +7,12 @@ import (
 	gmodel "github.com/epitech/timemanager/internal/models"
 )
 
-
 func DBTeamUserToGraph(tu *gmodel.TeamUser) *model.TeamUser {
 	if tu == nil {
 		return nil
 	}
 
-	result := &model.TeamUser{
-		ID: tu.ID.String(),
-	}
+	result := &model.TeamUser{}
 	if tu.User != nil {
 		result.UserID = userMapper.DBUserToGraph(tu.User)
 	} else {

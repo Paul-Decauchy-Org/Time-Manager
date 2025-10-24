@@ -1,5 +1,8 @@
 mutation clockIn{
   clockIn {
     id
+    arrival
+    departure
+    status
   }
 }

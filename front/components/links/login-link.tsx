@@ -4,7 +4,7 @@ export default function LoginLink() {
       href="/login"
       className="text-sm font-medium text-primary hover:underline"
     >
-      Log in
+      Connexion
     </a>
   )
 }

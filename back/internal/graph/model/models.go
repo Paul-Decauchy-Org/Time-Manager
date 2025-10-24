@@ -65,9 +65,8 @@ type Team struct {
 }
 
 type TeamUser struct {
-	ID     string `json:"id"`
-	UserID *User  `json:"userID"`
-	TeamID *Team  `json:"teamID"`
+	UserID *User `json:"userID"`
+	TeamID *Team `json:"teamID"`
 }
 
 type TimeTable struct {
@@ -75,7 +74,7 @@ type TimeTable struct {
 	UserID *User     `json:"userID"`
 	Day    Jour      `json:"day"`
 	Start  time.Time `json:"start"`
-	End    time.Time `json:"end"`
+	Ends   time.Time `json:"ends"`
 }
 
 type TimeTableEntry struct {

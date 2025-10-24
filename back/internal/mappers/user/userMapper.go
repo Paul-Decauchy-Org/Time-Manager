@@ -42,10 +42,8 @@ func DBUserToGraphWithAllData(u *gmodel.User) *model.UserWithAllData {
 	}
 
 	// Extract []*dbmodels.Team from []dbmodels.TeamUser
-	teams := make([]*gmodel.Team, len(u.TeamUsers))
-	for i, tu := range u.TeamUsers {
-		teams[i] = tu.Team
-	}
+	teams := make([]*gmodel.Team, len(u.Teams))
+	copy(teams, u.Teams)
 
 	return &model.UserWithAllData{
 		ID:        u.ID.String(),

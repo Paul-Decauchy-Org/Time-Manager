@@ -1,0 +1,13 @@
+query GetTeamsWithMembers {
+  teams {
+    id
+    name
+    description
+    managerID {
+      id
+      firstName
+      lastName
+      email
+    }
+  }
+}

@@ -1,4 +1,3 @@
-import './env-config.ts'
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {

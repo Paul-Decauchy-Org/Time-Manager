@@ -1,0 +1,64 @@
+query TeamUsers {
+  teamUsers {
+    teamID {
+      id
+      name
+    }
+    userID {
+      id
+      firstName
+      lastName
+      email
+      phone
+      role
+      password
+    }
+  }
+}
+
+query TimeTableEntries {
+  timeTableEntries {
+    id
+    userID {
+      id
+    }
+    day
+    arrival
+    departure
+    status
+  }
+}
+
+query AllUsers {
+  UsersWithAllData {
+    id
+    firstName
+    lastName
+    email
+    phone
+    role
+    password
+    teams {
+      id
+      name
+    }
+    timeTableEntries {
+      id
+      day
+      arrival
+      departure
+      status
+    }
+  }
+}
+
+query UsersByTeam($teamID: ID!){
+  usersByTeam(teamID: $teamID){
+    id
+    firstName
+    lastName
+    phone
+    email
+    role
+  }
+}
