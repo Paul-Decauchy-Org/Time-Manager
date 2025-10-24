@@ -84,19 +84,18 @@ jobs:
   # ============================================
   generate-graphql:
     runs-on: ubuntu-latest
-    name: "Génératon GraphQL (back: gqlgen, front: codegen)"
-    needs: [setup]
+    name: "Generation GraphQL Artifacts"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Generate backend GraphQL (gqlgen)
+      - name: Generate backend GraphQL
         working-directory: back
         run: |
           # run gqlgen via go run to avoid requiring a global binary
           go run github.com/99designs/gqlgen@v0.17.81 generate
 
-      - name: Generate frontend GraphQL types
+      - name: Generate frontend GraphQL
         working-directory: front
         run: |
           npm run codegen
