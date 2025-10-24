@@ -179,13 +179,7 @@ jobs:
         working-directory: back
         run: |
           cp .env.example .env || true
-          go test ./... -v -coverprofile=coverage.out
-      - name: Upload backend coverage
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-coverage
-          path: back/coverage.out
-          retention-days: 7
+          go test ./... -v
 
       # Frontend tests (commented for now)
       # - name: Run frontend tests
