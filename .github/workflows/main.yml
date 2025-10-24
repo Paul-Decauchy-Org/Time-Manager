@@ -89,16 +89,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
-      
-      - name: Install gqlgen binary
-        working-directory: back
-        run: go install github.com/99designs/gqlgen@v0.17.81
 
       - name: Generate backend GraphQL (gqlgen)
         working-directory: back
         run: |
           # run gqlgen via go run to avoid requiring a global binary
-          gqlgen generate
+          go run github.com/99designs/gqlgen@v0.17.81 generate
 
       - name: Generate frontend GraphQL types
         working-directory: front
