@@ -193,7 +193,7 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
     name: Docker Build
-    needs: [generate-graphql]
+    needs: [frontend-build, tests]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -243,36 +243,36 @@ jobs:
   # Optional: SonarQube scan using sonar-scanner CLI in Docker
   # requires secrets: SONAR_HOST_URL, SONAR_TOKEN, SONAR_PROJECT_KEY
   # ============================================
-  sonarqube-scan:
-    runs-on: ubuntu-latest
-    name: SonarQube Scan (docker scanner)
-    needs: [tests]
-    env:
-      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
+  # sonarqube-scan:
+  #   runs-on: ubuntu-latest
+  #   name: SonarQube Scan (docker scanner)
+  #   needs: [tests]
+  #   env:
+  #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v5
 
-      - name: Download backend coverage (if uploaded)
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-coverage
-          path: back
+  #     - name: Download backend coverage (if uploaded)
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: backend-coverage
+  #         path: back
 
-      - name: Run SonarScanner (Docker)
-        run: |
-          # mount repository and run sonar-scanner CLI inside docker
-          docker run --rm \
-            -e SONAR_HOST_URL="${{ env.SONAR_HOST_URL }}" \
-            -e SONAR_TOKEN="${{ env.SONAR_TOKEN }}" \
-            -v "${{ github.workspace }}":/usr/src \
-            sonarsource/sonar-scanner-cli \
-            -Dsonar.projectKey="${{ secrets.SONAR_PROJECT_KEY }}" \
-            -Dsonar.sources=back \
-            -Dsonar.host.url="${{ env.SONAR_HOST_URL }}" \
-            -Dsonar.login="${{ env.SONAR_TOKEN }}" \
-            -Dsonar.go.coverage.reportPaths=back/coverage.out
+  #     - name: Run SonarScanner (Docker)
+  #       run: |
+  #         # mount repository and run sonar-scanner CLI inside docker
+  #         docker run --rm \
+  #           -e SONAR_HOST_URL="${{ env.SONAR_HOST_URL }}" \
+  #           -e SONAR_TOKEN="${{ env.SONAR_TOKEN }}" \
+  #           -v "${{ github.workspace }}":/usr/src \
+  #           sonarsource/sonar-scanner-cli \
+  #           -Dsonar.projectKey="${{ secrets.SONAR_PROJECT_KEY }}" \
+  #           -Dsonar.sources=back \
+  #           -Dsonar.host.url="${{ env.SONAR_HOST_URL }}" \
+  #           -Dsonar.login="${{ env.SONAR_TOKEN }}" \
+  #           -Dsonar.go.coverage.reportPaths=back/coverage.out
 
-      - name: Upload SonarQube result note
-        run: echo "Sonar scan finished. Check SonarQube dashboard."
+  #     - name: Upload SonarQube result note
+  #       run: echo "Sonar scan finished. Check SonarQube dashboard."
