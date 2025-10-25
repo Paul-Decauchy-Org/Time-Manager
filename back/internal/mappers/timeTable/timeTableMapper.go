@@ -10,10 +10,10 @@ func DBTimeTableToGraph(t *gmodel.TimeTable) *model.TimeTable {
 		return nil
 	}
 	return &model.TimeTable{
-		ID:     t.ID.String(),
-		Day:    model.Jour(t.Day),
-		Start:  t.Start,
-		Ends:   t.Ends,
+		ID:    t.ID.String(),
+		Day:   model.Jour(t.Day),
+		Start: t.Start,
+		Ends:  t.Ends,
 	}
 }
 

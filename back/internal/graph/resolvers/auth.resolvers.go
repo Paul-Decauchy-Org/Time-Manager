@@ -11,30 +11,30 @@ import (
 )
 
 // signUp resolver
-func (r * mutationResolver) SignUp(ctx context.Context, input model.SignUpInput) (*model.User, error) {
+func (r *mutationResolver) SignUp(ctx context.Context, input model.SignUpInput) (*model.User, error) {
 	return r.AuthService.SignUp(input)
 }
 
 // login resolver
-func (r * mutationResolver) Login(ctx context.Context, email, password string) (*model.UserLogged, error) {
+func (r *mutationResolver) Login(ctx context.Context, email, password string) (*model.UserLogged, error) {
 	userLogged, err := r.AuthService.Login(email, password)
 	if err != nil {
 		return nil, errors.New("invalid credentials")
 	}
 	if w, ok := ctx.Value("ResponseWriter").(http.ResponseWriter); ok {
-        http.SetCookie(w, &http.Cookie{
-            Name:     "token",
-            Value:    userLogged.Token,
-            Path:     "/",
-            HttpOnly: true,
-            MaxAge:   3600 * 24,
-        })
-    }
+		http.SetCookie(w, &http.Cookie{
+			Name:     "token",
+			Value:    userLogged.Token,
+			Path:     "/",
+			HttpOnly: true,
+			MaxAge:   3600 * 24,
+		})
+	}
 	return userLogged, nil
 }
 
 // Logout resolver
-func (r * mutationResolver) Logout(ctx context.Context) (string, error) {
+func (r *mutationResolver) Logout(ctx context.Context) (string, error) {
 	w, ok := ctx.Value("ResponseWriter").(http.ResponseWriter)
 	if !ok {
 		return "", errors.New("could not find ResponseWriter in context")
@@ -45,14 +45,14 @@ func (r * mutationResolver) Logout(ctx context.Context) (string, error) {
 		Value:    "",
 		Path:     "/",
 		HttpOnly: true,
-		MaxAge:   -1, 
+		MaxAge:   -1,
 	})
 
 	return "Logged out successfully", nil
 }
 
 // Get profile resolver
-func (r * queryResolver) Me(ctx context.Context) (*model.User, error) {
+func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 	email, ok := ctx.Value(middlewares.ContextUserEmailKey).(string)
 	if !ok {
 		return nil, errors.New("could not find email in context")
@@ -61,7 +61,7 @@ func (r * queryResolver) Me(ctx context.Context) (*model.User, error) {
 }
 
 // Update profile resolver
-func (r * mutationResolver) UpdateProfile(ctx context.Context, input model.UpdateProfileInput)(*model.User, error){
+func (r *mutationResolver) UpdateProfile(ctx context.Context, input model.UpdateProfileInput) (*model.User, error) {
 	email, ok := ctx.Value(middlewares.ContextUserEmailKey).(string)
 	if !ok {
 		return nil, errors.New("could not find email in context")
@@ -70,9 +70,9 @@ func (r * mutationResolver) UpdateProfile(ctx context.Context, input model.Updat
 }
 
 // Delete profile resolver
-func (r *mutationResolver) DeleteProfile(ctx context.Context)(bool, error){
+func (r *mutationResolver) DeleteProfile(ctx context.Context) (bool, error) {
 	email, ok := ctx.Value(middlewares.ContextUserEmailKey).(string)
-	if !ok{
+	if !ok {
 		return false, errors.New("could not find email in context")
 	}
 	w, ok := ctx.Value("ResponseWriter").(http.ResponseWriter)
@@ -85,7 +85,7 @@ func (r *mutationResolver) DeleteProfile(ctx context.Context)(bool, error){
 		Value:    "",
 		Path:     "/",
 		HttpOnly: true,
-		MaxAge:   -1, 
+		MaxAge:   -1,
 	})
 	return r.AuthService.DeleteProfile(email)
 }

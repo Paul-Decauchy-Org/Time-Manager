@@ -1,9 +1,9 @@
 package middlewares
 
 import (
-	"slices"
 	"context"
 	"errors"
+	"slices"
 )
 
 func VerifyRole(ctx context.Context, allowedRoles ...string) error {
@@ -12,7 +12,7 @@ func VerifyRole(ctx context.Context, allowedRoles ...string) error {
 		return errors.New("failed to get role from context")
 	}
 	if slices.Contains(allowedRoles, role) {
-			return nil 
+		return nil
 	}
 	return errors.New("forbidden: you don't have access")
 }
