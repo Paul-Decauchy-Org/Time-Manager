@@ -151,7 +151,6 @@ type ComplexityRoot struct {
 		Role             func(childComplexity int) int
 		Teams            func(childComplexity int) int
 		TimeTableEntries func(childComplexity int) int
-		TimeTables       func(childComplexity int) int
 	}
 }
 
@@ -812,12 +811,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.UserWithAllData.TimeTableEntries(childComplexity), true
-	case "UserWithAllData.timeTables":
-		if e.complexity.UserWithAllData.TimeTables == nil {
-			break
-		}
-
-		return e.complexity.UserWithAllData.TimeTables(childComplexity), true
 
 	}
 	return 0, false
@@ -2759,8 +2752,6 @@ func (ec *executionContext) fieldContext_Query_userWithAllData(ctx context.Conte
 				return ec.fieldContext_UserWithAllData_teams(ctx, field)
 			case "timeTableEntries":
 				return ec.fieldContext_UserWithAllData_timeTableEntries(ctx, field)
-			case "timeTables":
-				return ec.fieldContext_UserWithAllData_timeTables(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserWithAllData", field.Name)
 		},
@@ -2821,8 +2812,6 @@ func (ec *executionContext) fieldContext_Query_UsersWithAllData(_ context.Contex
 				return ec.fieldContext_UserWithAllData_teams(ctx, field)
 			case "timeTableEntries":
 				return ec.fieldContext_UserWithAllData_timeTableEntries(ctx, field)
-			case "timeTables":
-				return ec.fieldContext_UserWithAllData_timeTables(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserWithAllData", field.Name)
 		},
@@ -2873,8 +2862,6 @@ func (ec *executionContext) fieldContext_Query_usersByTeam(ctx context.Context, 
 				return ec.fieldContext_UserWithAllData_teams(ctx, field)
 			case "timeTableEntries":
 				return ec.fieldContext_UserWithAllData_timeTableEntries(ctx, field)
-			case "timeTables":
-				return ec.fieldContext_UserWithAllData_timeTables(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserWithAllData", field.Name)
 		},
@@ -3026,8 +3013,6 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 				return ec.fieldContext_UserWithAllData_teams(ctx, field)
 			case "timeTableEntries":
 				return ec.fieldContext_UserWithAllData_timeTableEntries(ctx, field)
-			case "timeTables":
-				return ec.fieldContext_UserWithAllData_timeTables(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserWithAllData", field.Name)
 		},
@@ -3422,8 +3407,6 @@ func (ec *executionContext) fieldContext_Team_users(_ context.Context, field gra
 				return ec.fieldContext_UserWithAllData_teams(ctx, field)
 			case "timeTableEntries":
 				return ec.fieldContext_UserWithAllData_timeTableEntries(ctx, field)
-			case "timeTables":
-				return ec.fieldContext_UserWithAllData_timeTables(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserWithAllData", field.Name)
 		},
@@ -3643,9 +3626,9 @@ func (ec *executionContext) _TimeTable_effectiveTo(ctx context.Context, field gr
 			return obj.EffectiveTo, nil
 		},
 		nil,
-		ec.marshalNTime2timeᚐTime,
+		ec.marshalOTime2ᚖtimeᚐTime,
 		true,
-		true,
+		false,
 	)
 }
 
@@ -4540,49 +4523,6 @@ func (ec *executionContext) fieldContext_UserWithAllData_timeTableEntries(_ cont
 				return ec.fieldContext_TimeTableEntry_status(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TimeTableEntry", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _UserWithAllData_timeTables(ctx context.Context, field graphql.CollectedField, obj *model.UserWithAllData) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_UserWithAllData_timeTables,
-		func(ctx context.Context) (any, error) {
-			return obj.TimeTables, nil
-		},
-		nil,
-		ec.marshalNTimeTable2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTimeTableᚄ,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_UserWithAllData_timeTables(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "UserWithAllData",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_TimeTable_id(ctx, field)
-			case "start":
-				return ec.fieldContext_TimeTable_start(ctx, field)
-			case "ends":
-				return ec.fieldContext_TimeTable_ends(ctx, field)
-			case "effectiveFrom":
-				return ec.fieldContext_TimeTable_effectiveFrom(ctx, field)
-			case "effectiveTo":
-				return ec.fieldContext_TimeTable_effectiveTo(ctx, field)
-			case "isActive":
-				return ec.fieldContext_TimeTable_isActive(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type TimeTable", field.Name)
 		},
 	}
 	return fc, nil
@@ -7217,9 +7157,6 @@ func (ec *executionContext) _TimeTable(ctx context.Context, sel ast.SelectionSet
 			}
 		case "effectiveTo":
 			out.Values[i] = ec._TimeTable_effectiveTo(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "isActive":
 			out.Values[i] = ec._TimeTable_isActive(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -7495,11 +7432,6 @@ func (ec *executionContext) _UserWithAllData(ctx context.Context, sel ast.Select
 			}
 		case "timeTableEntries":
 			out.Values[i] = ec._UserWithAllData_timeTableEntries(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "timeTables":
-			out.Values[i] = ec._UserWithAllData_timeTables(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

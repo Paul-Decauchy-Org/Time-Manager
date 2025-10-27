@@ -27,7 +27,6 @@ type User struct {
 	Role             Role             `gorm:"type:text"`
 	Teams            []*Team          `gorm:"many2many:team_users;"`
 	TimeTableEntries []TimeTableEntry `gorm:"foreignKey:UserID"`
-	TimeTables       []TimeTable      `gorm:"foreignKey:UserID"`
 }
 
 type Team struct {

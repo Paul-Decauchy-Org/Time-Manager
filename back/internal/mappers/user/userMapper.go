@@ -5,7 +5,6 @@ package userMapper
 import (
 	"github.com/epitech/timemanager/internal/graph/model"
 	teamMapper "github.com/epitech/timemanager/internal/mappers/team"
-	timeTableMapper "github.com/epitech/timemanager/internal/mappers/timeTable"
 	timeTableEntriesMapper "github.com/epitech/timemanager/internal/mappers/timeTableEntries"
 	gmodel "github.com/epitech/timemanager/internal/models"
 )
@@ -36,10 +35,6 @@ func DBUserToGraphWithAllData(u *gmodel.User) *model.UserWithAllData {
 		timeTableEntries[i] = &u.TimeTableEntries[i]
 	}
 
-	timeTable := make([]*gmodel.TimeTable, len(u.TimeTables))
-	for i := range u.TimeTables {
-		timeTable[i] = &u.TimeTables[i]
-	}
 
 	// Extract []*dbmodels.Team from []dbmodels.TeamUser
 	teams := make([]*gmodel.Team, len(u.Teams))
@@ -56,7 +51,6 @@ func DBUserToGraphWithAllData(u *gmodel.User) *model.UserWithAllData {
 		Role:             model.Role(u.Role),
 		Teams:            teamMapper.DBTeamsToGraph(teams),
 		TimeTableEntries: timeTableEntriesMapper.DBTimeTableEntriesToGraph(timeTableEntries),
-		TimeTables:       timeTableMapper.DBTimeTablesToGraph(timeTable),
 	}
 }
 

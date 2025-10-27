@@ -14,7 +14,7 @@ func DBTimeTableToGraph(t *gmodel.TimeTable) *model.TimeTable {
 		Start:         t.Start,
 		Ends:          t.Ends,
 		EffectiveFrom: t.EffectiveFrom,
-		EffectiveTo:   t.EffectiveTo,
+		EffectiveTo:   &t.EffectiveTo,
 		IsActive:      t.IsActive,
 	}
 }

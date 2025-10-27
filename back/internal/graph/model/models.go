@@ -70,12 +70,12 @@ type TeamUser struct {
 }
 
 type TimeTable struct {
-	ID            string    `json:"id"`
-	Start         time.Time `json:"start"`
-	Ends          time.Time `json:"ends"`
-	EffectiveFrom time.Time `json:"effectiveFrom"`
-	EffectiveTo   time.Time `json:"effectiveTo"`
-	IsActive      bool      `json:"isActive"`
+	ID            string     `json:"id"`
+	Start         time.Time  `json:"start"`
+	Ends          time.Time  `json:"ends"`
+	EffectiveFrom time.Time  `json:"effectiveFrom"`
+	EffectiveTo   *time.Time `json:"effectiveTo,omitempty"`
+	IsActive      bool       `json:"isActive"`
 }
 
 type TimeTableEntry struct {
@@ -147,7 +147,6 @@ type UserWithAllData struct {
 	Role             Role              `json:"role"`
 	Teams            []*Team           `json:"teams"`
 	TimeTableEntries []*TimeTableEntry `json:"timeTableEntries"`
-	TimeTables       []*TimeTable      `json:"timeTables"`
 }
 
 type Role string

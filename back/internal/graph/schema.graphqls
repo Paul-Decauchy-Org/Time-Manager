@@ -22,7 +22,6 @@ type UserWithAllData {
   role: Role!
   teams: [Team!]!
   timeTableEntries: [TimeTableEntry!]!
-  timeTables: [TimeTable!]!
 }
 
 enum Role {
@@ -62,7 +61,7 @@ type TimeTable {
   start: Time!
   ends: Time!
   effectiveFrom: Time!
-  effectiveTo: Time!
+  effectiveTo: Time
   isActive: Boolean!
 }
 

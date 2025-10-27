@@ -156,7 +156,7 @@ func (r *Repository) SetRole(userID string, role model.Role) (*model.User, error
 }
 
 func (r *Repository) SetTimeTable(start string, end string)(*model.TimeTable, error){
-	layout := "08:00"
+	layout := "15:04"
 
 	startTime, err := time.Parse(layout, start)
 	if err != nil {
@@ -166,8 +166,13 @@ func (r *Repository) SetTimeTable(start string, end string)(*model.TimeTable, er
 	if err != nil {
 		return nil, errors.New("invalid start time format, excepted : HH:mm")
 	}
-	if err := r.DB.Model(&dbmodels.TimeTable{}).Where("is_active = ?", true).Update("is_active", false).Error; err != nil {
-		return nil, errors.New("failed to desactive previous timetable")
+	if err := r.DB.Model(&dbmodels.TimeTable{}).
+		Where("is_active = ?", true).
+		Updates(map[string]any{
+			"is_active":    false,
+			"effective_to": time.Now(),
+		}).Error; err != nil {
+		return nil, errors.New("failed to deactivate previous timetable")
 	}
 	newTimeTable := &dbmodels.TimeTable{
 		Start: startTime,

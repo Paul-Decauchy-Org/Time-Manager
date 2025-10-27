@@ -61,8 +61,8 @@ CREATE TABLE IF NOT EXISTS time_tables (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   start timestamp NOT NULL,
   ends timestamp NOT NULL
-  effective_from timestamp NOT NULL,
-  effective_to timestamp,
+  effective_from timestamptz NOT NULL,
+  effective_to timestamptz,
   is_active boolean NOT NULL
 );
 
