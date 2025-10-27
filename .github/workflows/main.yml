@@ -243,62 +243,73 @@ jobs:
   # Optional: SonarQube scan using sonar-scanner CLI in Docker
   # requires secrets: SONAR_HOST_URL, SONAR_TOKEN, SONAR_PROJECT_KEY
   # ============================================
-  sonarqube-scan:
+  # sonarqube-scan:
+  #   runs-on: ubuntu-latest
+  #   name: SonarQube Scan
+  #   needs: [tests]
+  #   env:
+  #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v5
+
+  #     - name: Download backend coverage (if uploaded)
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: backend-coverage
+  #         path: back
+  #       continue-on-error: true
+
+  #     - name: Download frontend coverage (if uploaded)
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: front-coverage
+  #         path: front/coverage
+  #       continue-on-error: true
+
+  #     - name: Run SonarScanner for backend
+  #       run: |
+  #         set -euo pipefail
+  #         echo "Running SonarScanner for backend..."
+  #         docker run --rm \
+  #           -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
+  #           -e SONAR_TOKEN="${SONAR_TOKEN}" \
+  #           -v "${{ github.workspace }}":/usr/src \
+  #           sonarsource/sonar-scanner-cli \
+  #           -Dsonar.projectKey="${{ secrets.SONAR_PROJECT_KEY_BACK }}" \
+  #           -Dsonar.projectBaseDir=/usr/src/back \
+  #           -Dsonar.sources=. \
+  #           -Dsonar.host.url="${SONAR_HOST_URL}" \
+  #           -Dsonar.login="${SONAR_TOKEN}" \
+  #           -Dsonar.go.coverage.reportPaths=/usr/src/back/coverage.out || true
+
+  #     - name: Run SonarScanner for frontend
+  #       run: |
+  #         set -euo pipefail
+  #         echo "Running SonarScanner for frontend..."
+  #         docker run --rm \
+  #           -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
+  #           -e SONAR_TOKEN="${SONAR_TOKEN}" \
+  #           -v "${{ github.workspace }}":/usr/src \
+  #           sonarsource/sonar-scanner-cli \
+  #           -Dsonar.projectKey="${{ secrets.SONAR_PROJECT_KEY_FRONT }}" \
+  #           -Dsonar.projectBaseDir=/usr/src/front \
+  #           -Dsonar.sources=./ \
+  #           -Dsonar.host.url="${SONAR_HOST_URL}" \
+  #           -Dsonar.login="${SONAR_TOKEN}" \
+  #           -Dsonar.javascript.lcov.reportPaths=/usr/src/front/coverage/lcov.info || true
+
+  #     - name: Notify Sonar scan finished
+  #       run: echo "Sonar scans finished for backend and frontend. Check SonarQube dashboard."
+  sonarqube:
+    name: SonarQube
     runs-on: ubuntu-latest
-    name: SonarQube Scan
-    needs: [tests]
-    env:
-      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Download backend coverage (if uploaded)
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
         with:
-          name: backend-coverage
-          path: back
-        continue-on-error: true
-
-      - name: Download frontend coverage (if uploaded)
-        uses: actions/download-artifact@v4
-        with:
-          name: front-coverage
-          path: front/coverage
-        continue-on-error: true
-
-      - name: Run SonarScanner for backend
-        run: |
-          set -euo pipefail
-          echo "Running SonarScanner for backend..."
-          docker run --rm \
-            -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
-            -e SONAR_TOKEN="${SONAR_TOKEN}" \
-            -v "${{ github.workspace }}":/usr/src \
-            sonarsource/sonar-scanner-cli \
-            -Dsonar.projectKey="${{ secrets.SONAR_PROJECT_KEY_BACK }}" \
-            -Dsonar.projectBaseDir=/usr/src/back \
-            -Dsonar.sources=. \
-            -Dsonar.host.url="${SONAR_HOST_URL}" \
-            -Dsonar.login="${SONAR_TOKEN}" \
-            -Dsonar.go.coverage.reportPaths=/usr/src/back/coverage.out || true
-
-      - name: Run SonarScanner for frontend
-        run: |
-          set -euo pipefail
-          echo "Running SonarScanner for frontend..."
-          docker run --rm \
-            -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
-            -e SONAR_TOKEN="${SONAR_TOKEN}" \
-            -v "${{ github.workspace }}":/usr/src \
-            sonarsource/sonar-scanner-cli \
-            -Dsonar.projectKey="${{ secrets.SONAR_PROJECT_KEY_FRONT }}" \
-            -Dsonar.projectBaseDir=/usr/src/front \
-            -Dsonar.sources=./ \
-            -Dsonar.host.url="${SONAR_HOST_URL}" \
-            -Dsonar.login="${SONAR_TOKEN}" \
-            -Dsonar.javascript.lcov.reportPaths=/usr/src/front/coverage/lcov.info || true
-
-      - name: Notify Sonar scan finished
-        run: echo "Sonar scans finished for backend and frontend. Check SonarQube dashboard."
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
