@@ -59,12 +59,11 @@ CREATE INDEX IF NOT EXISTS idx_time_table_entries_user_id ON time_table_entries(
 -- TimeTable table
 CREATE TABLE IF NOT EXISTS time_tables (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id uuid NOT NULL,
-  day text NOT NULL,
-  start timestamptz NOT NULL,
-  ends timestamptz NOT NULL,
-  CONSTRAINT fk_tt_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  CONSTRAINT time_tables_day_check CHECK (day IN ('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'))
+  start timestamp NOT NULL,
+  ends timestamp NOT NULL
+  effective_from timestamp NOT NULL,
+  effective_to timestamp,
+  is_active boolean NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_time_tables_user_day ON time_tables(user_id, day);

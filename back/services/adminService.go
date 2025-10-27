@@ -11,6 +11,7 @@ type AdminRepo interface {
 	GetUser(string) (*model.UserWithAllData, error)
 	SetManagerTeam(string, string) (*model.Team, error)
 	SetRole(string, model.Role) (*model.User, error)
+	SetTimeTable(string, string) (*model.TimeTable, error)
 }
 
 type AdminService struct {
@@ -43,4 +44,8 @@ func (s *AdminService) SetManagerTeam(userID string, teamID string) (*model.Team
 
 func (s *AdminService) SetRole(userID string, role model.Role) (*model.User, error) {
 	return s.AdminRepo.SetRole(userID, role)
+}
+
+func (s *AdminService) SetTimeTable(start, end string)(*model.TimeTable, error){
+	return s.AdminRepo.SetTimeTable(start, end)
 }

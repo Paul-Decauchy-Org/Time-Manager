@@ -54,3 +54,11 @@ func (r *mutationResolver) SetRole(ctx context.Context, userID string, role mode
 	}
 	return r.AdminService.SetRole(userID, role)
 }
+
+// set timetable
+func (r *mutationResolver) SetTimeTable(ctx context.Context, start, end string)(*model.TimeTable, error){
+	if err := middlewares.VerifyRole(ctx, "ADMIN"); err != nil {
+		return nil, err
+	}
+	return r.AdminService.SetTimeTable(start, end)
+}

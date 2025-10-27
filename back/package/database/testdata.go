@@ -243,10 +243,8 @@ func createTestTimeTableEntries(users []*dbmodels.User) error {
 
     // Pour chaque utilisateur (sauf admin et managers)
     for i := 3; i < len(users); i++ {
-        user := users[i]
-
         // Créer des entrées pour les 7 derniers jours
-        for day := 0; day < 7; day++ {
+        for day := range 7 {
             date := today.AddDate(0, 0, -day)
 
             // Morning session (9h-12h)
@@ -266,7 +264,6 @@ func createTestTimeTableEntries(users []*dbmodels.User) error {
             // Ajouter les entrées du matin
             entries = append(entries, &dbmodels.TimeTable{
                 ID:     uuid.New(),
-                UserID: user.ID,
                 Start: morningStart,
                 Ends:   morningEnd,
             })
@@ -275,7 +272,6 @@ func createTestTimeTableEntries(users []*dbmodels.User) error {
             if date.Weekday() != time.Friday || i%3 != 0 {
                 entries = append(entries, &dbmodels.TimeTable{
                     ID:     uuid.New(),
-                    UserID: user.ID,
                     Start: afternoonStart,
                     Ends:   afternoonEnd,
                 })
@@ -286,7 +282,6 @@ func createTestTimeTableEntries(users []*dbmodels.User) error {
         if i%2 == 0 && now.Hour() >= 9 && now.Hour() < 18 {
             entries = append(entries, &dbmodels.TimeTable{
                 ID:     uuid.New(),
-                UserID: user.ID,
                 Start: today.Add(9 * time.Hour),
                 Ends:   now, // En cours
             })

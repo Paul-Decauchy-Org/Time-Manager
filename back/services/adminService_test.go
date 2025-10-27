@@ -59,6 +59,15 @@ func (m *MockAdminRepo) SetRole(userID string, role model.Role) (*model.User, er
 	return args.Get(0).(*model.User), args.Error(1)
 }
 
+func (m *MockAdminRepo) SetTimeTable(start, end string)(*model.TimeTable, error){
+	args := m.Called(start, end)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+
+	}
+	return args.Get(0).(*model.TimeTable), args.Error(1)
+}
+
 func TestAdminService_CreateUser_Success(t *testing.T) {
 	mockRepo := new(MockAdminRepo)
 	svc := NewAdminService(mockRepo)

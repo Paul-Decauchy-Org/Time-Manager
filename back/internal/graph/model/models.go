@@ -70,11 +70,12 @@ type TeamUser struct {
 }
 
 type TimeTable struct {
-	ID     string    `json:"id"`
-	UserID *User     `json:"userID"`
-	Day    Jour      `json:"day"`
-	Start  time.Time `json:"start"`
-	Ends   time.Time `json:"ends"`
+	ID            string    `json:"id"`
+	Start         time.Time `json:"start"`
+	Ends          time.Time `json:"ends"`
+	EffectiveFrom time.Time `json:"effectiveFrom"`
+	EffectiveTo   time.Time `json:"effectiveTo"`
+	IsActive      bool      `json:"isActive"`
 }
 
 type TimeTableEntry struct {
@@ -147,67 +148,6 @@ type UserWithAllData struct {
 	Teams            []*Team           `json:"teams"`
 	TimeTableEntries []*TimeTableEntry `json:"timeTableEntries"`
 	TimeTables       []*TimeTable      `json:"timeTables"`
-}
-
-type Jour string
-
-const (
-	JourMonday    Jour = "MONDAY"
-	JourThusday   Jour = "THUSDAY"
-	JourWednesday Jour = "WEDNESDAY"
-	JourThursday  Jour = "THURSDAY"
-	JourFriday    Jour = "FRIDAY"
-)
-
-var AllJour = []Jour{
-	JourMonday,
-	JourThusday,
-	JourWednesday,
-	JourThursday,
-	JourFriday,
-}
-
-func (e Jour) IsValid() bool {
-	switch e {
-	case JourMonday, JourThusday, JourWednesday, JourThursday, JourFriday:
-		return true
-	}
-	return false
-}
-
-func (e Jour) String() string {
-	return string(e)
-}
-
-func (e *Jour) UnmarshalGQL(v any) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = Jour(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid Jour", str)
-	}
-	return nil
-}
-
-func (e Jour) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-func (e *Jour) UnmarshalJSON(b []byte) error {
-	s, err := strconv.Unquote(string(b))
-	if err != nil {
-		return err
-	}
-	return e.UnmarshalGQL(s)
-}
-
-func (e Jour) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
-	e.MarshalGQL(&buf)
-	return buf.Bytes(), nil
 }
 
 type Role string

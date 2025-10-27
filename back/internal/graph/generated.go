@@ -66,6 +66,7 @@ type ComplexityRoot struct {
 		RemoveUserFromTeam func(childComplexity int, userID string, teamID string) int
 		SetManagerTeam     func(childComplexity int, userID string, teamID string) int
 		SetRole            func(childComplexity int, userID string, role model.Role) int
+		SetTimeTable       func(childComplexity int, start string, end string) int
 		SignUp             func(childComplexity int, input model.SignUpInput) int
 		UpdateProfile      func(childComplexity int, input model.UpdateProfileInput) int
 		UpdateTeam         func(childComplexity int, id string, input model.UpdateTeamInput) int
@@ -75,7 +76,6 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetUser          func(childComplexity int, id string) int
-		GetUsersInTeam   func(childComplexity int, teamID string) int
 		Me               func(childComplexity int) int
 		Roles            func(childComplexity int) int
 		Team             func(childComplexity int, id string) int
@@ -105,11 +105,12 @@ type ComplexityRoot struct {
 	}
 
 	TimeTable struct {
-		Day    func(childComplexity int) int
-		Ends   func(childComplexity int) int
-		ID     func(childComplexity int) int
-		Start  func(childComplexity int) int
-		UserID func(childComplexity int) int
+		EffectiveFrom func(childComplexity int) int
+		EffectiveTo   func(childComplexity int) int
+		Ends          func(childComplexity int) int
+		ID            func(childComplexity int) int
+		IsActive      func(childComplexity int) int
+		Start         func(childComplexity int) int
 	}
 
 	TimeTableEntry struct {
@@ -165,6 +166,7 @@ type MutationResolver interface {
 	DeleteUser(ctx context.Context, id string) (bool, error)
 	SetManagerTeam(ctx context.Context, userID string, teamID string) (*model.Team, error)
 	SetRole(ctx context.Context, userID string, role model.Role) (*model.User, error)
+	SetTimeTable(ctx context.Context, start string, end string) (*model.TimeTable, error)
 	CreateMassiveUsers(ctx context.Context, input model.CreateMassiveUsersInput) ([]*model.User, error)
 	CreateThreeUsers(ctx context.Context) ([]*model.User, error)
 	CreateTeam(ctx context.Context, input model.CreateTeamInput) (*model.Team, error)
@@ -376,6 +378,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.SetRole(childComplexity, args["userID"].(string), args["role"].(model.Role)), true
+	case "Mutation.setTimeTable":
+		if e.complexity.Mutation.SetTimeTable == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_setTimeTable_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.SetTimeTable(childComplexity, args["start"].(string), args["end"].(string)), true
 	case "Mutation.signUp":
 		if e.complexity.Mutation.SignUp == nil {
 			break
@@ -591,12 +604,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.TeamUser.UserID(childComplexity), true
 
-	case "TimeTable.day":
-		if e.complexity.TimeTable.Day == nil {
+	case "TimeTable.effectiveFrom":
+		if e.complexity.TimeTable.EffectiveFrom == nil {
 			break
 		}
 
-		return e.complexity.TimeTable.Day(childComplexity), true
+		return e.complexity.TimeTable.EffectiveFrom(childComplexity), true
+	case "TimeTable.effectiveTo":
+		if e.complexity.TimeTable.EffectiveTo == nil {
+			break
+		}
+
+		return e.complexity.TimeTable.EffectiveTo(childComplexity), true
 	case "TimeTable.ends":
 		if e.complexity.TimeTable.Ends == nil {
 			break
@@ -609,18 +628,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.TimeTable.ID(childComplexity), true
+	case "TimeTable.isActive":
+		if e.complexity.TimeTable.IsActive == nil {
+			break
+		}
+
+		return e.complexity.TimeTable.IsActive(childComplexity), true
 	case "TimeTable.start":
 		if e.complexity.TimeTable.Start == nil {
 			break
 		}
 
 		return e.complexity.TimeTable.Start(childComplexity), true
-	case "TimeTable.userID":
-		if e.complexity.TimeTable.UserID == nil {
-			break
-		}
-
-		return e.complexity.TimeTable.UserID(childComplexity), true
 
 	case "TimeTableEntry.arrival":
 		if e.complexity.TimeTableEntry.Arrival == nil {
@@ -1091,6 +1110,22 @@ func (ec *executionContext) field_Mutation_setRole_args(ctx context.Context, raw
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_setTimeTable_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "start", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["start"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "end", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["end"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_signUp_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1191,17 +1226,6 @@ func (ec *executionContext) field_Query_team_args(ctx context.Context, rawArgs m
 		return nil, err
 	}
 	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_getUsersInTeam_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "teamID", ec.unmarshalNID2string)
-	if err != nil {
-		return nil, err
-	}
-	args["teamID"] = arg0
 	return args, nil
 }
 
@@ -1787,6 +1811,61 @@ func (ec *executionContext) fieldContext_Mutation_setRole(ctx context.Context, f
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_setRole_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_setTimeTable(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_setTimeTable,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().SetTimeTable(ctx, fc.Args["start"].(string), fc.Args["end"].(string))
+		},
+		nil,
+		ec.marshalNTimeTable2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTimeTable,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_setTimeTable(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TimeTable_id(ctx, field)
+			case "start":
+				return ec.fieldContext_TimeTable_start(ctx, field)
+			case "ends":
+				return ec.fieldContext_TimeTable_ends(ctx, field)
+			case "effectiveFrom":
+				return ec.fieldContext_TimeTable_effectiveFrom(ctx, field)
+			case "effectiveTo":
+				return ec.fieldContext_TimeTable_effectiveTo(ctx, field)
+			case "isActive":
+				return ec.fieldContext_TimeTable_isActive(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TimeTable", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_setTimeTable_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2506,14 +2585,16 @@ func (ec *executionContext) fieldContext_Query_timeTables(_ context.Context, fie
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_TimeTable_id(ctx, field)
-			case "userID":
-				return ec.fieldContext_TimeTable_userID(ctx, field)
-			case "day":
-				return ec.fieldContext_TimeTable_day(ctx, field)
 			case "start":
 				return ec.fieldContext_TimeTable_start(ctx, field)
 			case "ends":
 				return ec.fieldContext_TimeTable_ends(ctx, field)
+			case "effectiveFrom":
+				return ec.fieldContext_TimeTable_effectiveFrom(ctx, field)
+			case "effectiveTo":
+				return ec.fieldContext_TimeTable_effectiveTo(ctx, field)
+			case "isActive":
+				return ec.fieldContext_TimeTable_isActive(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TimeTable", field.Name)
 		},
@@ -3465,80 +3546,6 @@ func (ec *executionContext) fieldContext_TimeTable_id(_ context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _TimeTable_userID(ctx context.Context, field graphql.CollectedField, obj *model.TimeTable) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_TimeTable_userID,
-		func(ctx context.Context) (any, error) {
-			return obj.UserID, nil
-		},
-		nil,
-		ec.marshalNUser2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUser,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_TimeTable_userID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TimeTable",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "firstName":
-				return ec.fieldContext_User_firstName(ctx, field)
-			case "lastName":
-				return ec.fieldContext_User_lastName(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "phone":
-				return ec.fieldContext_User_phone(ctx, field)
-			case "password":
-				return ec.fieldContext_User_password(ctx, field)
-			case "role":
-				return ec.fieldContext_User_role(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TimeTable_day(ctx context.Context, field graphql.CollectedField, obj *model.TimeTable) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_TimeTable_day,
-		func(ctx context.Context) (any, error) {
-			return obj.Day, nil
-		},
-		nil,
-		ec.marshalNJour2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐJour,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_TimeTable_day(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TimeTable",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Jour does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _TimeTable_start(ctx context.Context, field graphql.CollectedField, obj *model.TimeTable) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -3592,6 +3599,93 @@ func (ec *executionContext) fieldContext_TimeTable_ends(_ context.Context, field
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeTable_effectiveFrom(ctx context.Context, field graphql.CollectedField, obj *model.TimeTable) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TimeTable_effectiveFrom,
+		func(ctx context.Context) (any, error) {
+			return obj.EffectiveFrom, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TimeTable_effectiveFrom(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeTable",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeTable_effectiveTo(ctx context.Context, field graphql.CollectedField, obj *model.TimeTable) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TimeTable_effectiveTo,
+		func(ctx context.Context) (any, error) {
+			return obj.EffectiveTo, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TimeTable_effectiveTo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeTable",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TimeTable_isActive(ctx context.Context, field graphql.CollectedField, obj *model.TimeTable) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TimeTable_isActive,
+		func(ctx context.Context) (any, error) {
+			return obj.IsActive, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TimeTable_isActive(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TimeTable",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4477,14 +4571,16 @@ func (ec *executionContext) fieldContext_UserWithAllData_timeTables(_ context.Co
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_TimeTable_id(ctx, field)
-			case "userID":
-				return ec.fieldContext_TimeTable_userID(ctx, field)
-			case "day":
-				return ec.fieldContext_TimeTable_day(ctx, field)
 			case "start":
 				return ec.fieldContext_TimeTable_start(ctx, field)
 			case "ends":
 				return ec.fieldContext_TimeTable_ends(ctx, field)
+			case "effectiveFrom":
+				return ec.fieldContext_TimeTable_effectiveFrom(ctx, field)
+			case "effectiveTo":
+				return ec.fieldContext_TimeTable_effectiveTo(ctx, field)
+			case "isActive":
+				return ec.fieldContext_TimeTable_isActive(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TimeTable", field.Name)
 		},
@@ -6522,6 +6618,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "setTimeTable":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_setTimeTable(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createMassiveUsers":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createMassiveUsers(ctx, field)
@@ -7097,16 +7200,6 @@ func (ec *executionContext) _TimeTable(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "userID":
-			out.Values[i] = ec._TimeTable_userID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "day":
-			out.Values[i] = ec._TimeTable_day(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "start":
 			out.Values[i] = ec._TimeTable_start(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -7114,6 +7207,21 @@ func (ec *executionContext) _TimeTable(ctx context.Context, sel ast.SelectionSet
 			}
 		case "ends":
 			out.Values[i] = ec._TimeTable_ends(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "effectiveFrom":
+			out.Values[i] = ec._TimeTable_effectiveFrom(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "effectiveTo":
+			out.Values[i] = ec._TimeTable_effectiveTo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "isActive":
+			out.Values[i] = ec._TimeTable_isActive(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -7876,16 +7984,6 @@ func (ec *executionContext) marshalNID2ᚕstringᚄ(ctx context.Context, sel ast
 	return ret
 }
 
-func (ec *executionContext) unmarshalNJour2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐJour(ctx context.Context, v any) (model.Jour, error) {
-	var res model.Jour
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNJour2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐJour(ctx context.Context, sel ast.SelectionSet, v model.Jour) graphql.Marshaler {
-	return v
-}
-
 func (ec *executionContext) unmarshalNRole2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐRole(ctx context.Context, v any) (model.Role, error) {
 	var res model.Role
 	err := res.UnmarshalGQL(v)
@@ -8106,6 +8204,10 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNTimeTable2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTimeTable(ctx context.Context, sel ast.SelectionSet, v model.TimeTable) graphql.Marshaler {
+	return ec._TimeTable(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNTimeTable2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTimeTableᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TimeTable) graphql.Marshaler {
