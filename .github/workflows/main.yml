@@ -254,6 +254,21 @@ jobs:
             echo "Sonar secrets present. Proceeding with scan."
           fi
 
+      - name: Verify SonarCloud organization and token (API check)
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
+        run: |
+          echo "Checking SonarCloud organization access..."
+          # Query SonarCloud organizations and look for the organization key
+          resp=$(curl -s -u "$SONAR_TOKEN": "https://sonarcloud.io/api/organizations/search" -G --data-urlencode "organization=$SONAR_ORGANIZATION")
+          echo "$resp" | grep -q "\"key\":\"$SONAR_ORGANIZATION\"" || {
+            echo "::error::SonarCloud organization '$SONAR_ORGANIZATION' not found or token cannot access it."
+            echo "Make sure the SONAR_ORGANIZATION secret holds the organization KEY (not the display name) and that the token was created in that organization."
+            exit 1
+          }
+          echo "Organization found and token appears valid."
+
       - name: Checkout repository
         uses: actions/checkout@v5
 
