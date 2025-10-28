@@ -151,14 +151,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      # Backend tests (commented for now)
+      # Backend tests
       - name: Run backend tests
         working-directory: back
         run: |
           cp .env.example .env || true
           # Fail fast semantics with readable logs: capture output to test.log
           set -o pipefail || true
-          go test ./... -v -coverprofile=coverage.out 2>&1 | tee test.log
+          go test ./... -v 2>&1 | tee test.log
       - name: Show test failures (tail)
         working-directory: back
         run: |
@@ -172,12 +172,7 @@ jobs:
           name: backend-test-log
           path: back/test.log
           retention-days: 7
-      - name: Upload backend coverage
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-coverage
-          path: back/coverage.out
-          retention-days: 7
+      # backend coverage generation/upload removed per request
 
       # Frontend tests (commented for now)
       # - name: Run frontend tests
