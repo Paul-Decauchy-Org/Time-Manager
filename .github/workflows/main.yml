@@ -234,7 +234,7 @@ jobs:
 
   # ============================================
   # SonarCloud scan (backend + frontend) using SonarCloud GitHub Action
-  # requires secrets: SONAR_TOKEN, SONAR_ORGANIZATION, SONAR_PROJECT_KEY_BACK, SONAR_PROJECT_KEY_FRONT
+  # requires secrets: SONAR_TOKEN, SONAR_ORGANIZATION
   # ============================================
   sonarcloud-scan:
     runs-on: ubuntu-latest
@@ -261,7 +261,7 @@ jobs:
         run: |
           echo "Checking SonarCloud organization access..."
           # Query SonarCloud organizations and look for the organization key
-          resp=$(curl -s -u "$SONAR_TOKEN": "https://sonarcloud.io/api/organizations/search" -G --data-urlencode "organization=$SONAR_ORGANIZATION")
+          resp=$(curl -s -u "$SONAR_TOKEN": "https://sonarcloud.io/project/configuration/GitHubActions?id=Paul-Decauchy-Org_Time-Manager" -G --data-urlencode "organization=$SONAR_ORGANIZATION")
           echo "$resp" | grep -q "\"key\":\"$SONAR_ORGANIZATION\"" || {
             echo "::error::SonarCloud organization '$SONAR_ORGANIZATION' not found or token cannot access it."
             echo "Make sure the SONAR_ORGANIZATION secret holds the organization KEY (not the display name) and that the token was created in that organization."
