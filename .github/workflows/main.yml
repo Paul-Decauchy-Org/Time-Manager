@@ -240,7 +240,19 @@ jobs:
     runs-on: ubuntu-latest
     name: SonarCloud Scan (backend + frontend)
     needs: [tests, frontend-build]
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
     steps:
+      - name: Verify SonarCloud secrets
+        run: |
+          if [ -z "$SONAR_TOKEN" ] || [ -z "$SONAR_ORGANIZATION" ]; then
+            echo "::error::Missing SONAR_TOKEN or SONAR_ORGANIZATION secrets. Please add them in Settings → Secrets → Actions."
+            exit 1
+          else
+            echo "Sonar secrets present. Proceeding with scan."
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v5
 
