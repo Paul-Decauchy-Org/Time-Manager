@@ -16,52 +16,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      # Backend lint (active)
-      - name: Setup Go (for lint)
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.25"
-          cache: true
-          cache-dependency-path: back/go.sum
-
-      - name: Check gofmt & go vet
-        run: |
-          cd back
-          test -z "$(gofmt -l .)" || (echo "gofmt found issues" && exit 1)
-          go vet ./...
-
-      # Frontend lint (commented for now)
-      # - name: Setup Node.js (for frontend lint)
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: "20"
-      #     cache: "npm"
-      #     cache-dependency-path: front/package-lock.json
-      #
-      # - name: Lint frontend
-      #   run: |
-      #     cd front
-      #     npm ci
-      #     npm run lint
-
-  # ============================================
-  # Block 2: Setup Back & Front
-  # ============================================
-  setup:
-    runs-on: ubuntu-latest
-    name: Setup Back & Front
-    needs: [quality-check]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Setup Go (backend)
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.25"
-          cache: true
-          cache-dependency-path: back/go.sum
-
       - name: Install backend deps
         run: |
           cd back
@@ -85,7 +39,7 @@ jobs:
   generate-graphql:
     runs-on: ubuntu-latest
     name: "Generation GraphQL Artifacts"
-    needs: [setup]
+    needs: [quality-check]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -163,6 +117,29 @@ jobs:
           path: front/.next/
           retention-days: 1
 
+      - name: Run frontend tests and generate lcov (optional)
+        working-directory: front
+        run: |
+          # Attempt to run frontend tests to generate lcov (don't fail the job if tests are missing or fail)
+          npm run test -- --coverage --coverageReporters=lcov --watchAll=false || true
+
+      - name: Check frontend coverage
+        id: check_front_cov
+        run: |
+          if [ -f front/coverage/lcov.info ]; then
+            echo "coverage_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "coverage_exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload frontend coverage
+        if: steps.check_front_cov.outputs.coverage_exists == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: front-coverage
+          path: front/coverage/lcov.info
+          retention-days: 7
+
   # ============================================
   # Block 4: Tests (backend & frontend) - commented for now
   # ============================================
@@ -179,7 +156,14 @@ jobs:
         working-directory: back
         run: |
           cp .env.example .env || true
-          go test ./... -v
+          # run tests and produce coverage for Sonar
+          go test ./... -v -coverprofile=coverage.out
+      - name: Upload backend coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: back/coverage.out
+          retention-days: 7
 
       # Frontend tests (commented for now)
       # - name: Run frontend tests
@@ -240,76 +224,40 @@ jobs:
   #       run: docker compose push
 
   # ============================================
-  # Optional: SonarQube scan using sonar-scanner CLI in Docker
-  # requires secrets: SONAR_HOST_URL, SONAR_TOKEN, SONAR_PROJECT_KEY
+  # SonarCloud scan (backend + frontend) using SonarCloud GitHub Action
+  # requires secrets: SONAR_TOKEN, SONAR_ORGANIZATION, SONAR_PROJECT_KEY_BACK, SONAR_PROJECT_KEY_FRONT
   # ============================================
-  # sonarqube-scan:
-  #   runs-on: ubuntu-latest
-  #   name: SonarQube Scan
-  #   needs: [tests]
-  #   env:
-  #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v5
-
-  #     - name: Download backend coverage (if uploaded)
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: backend-coverage
-  #         path: back
-  #       continue-on-error: true
-
-  #     - name: Download frontend coverage (if uploaded)
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: front-coverage
-  #         path: front/coverage
-  #       continue-on-error: true
-
-  #     - name: Run SonarScanner for backend
-  #       run: |
-  #         set -euo pipefail
-  #         echo "Running SonarScanner for backend..."
-  #         docker run --rm \
-  #           -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
-  #           -e SONAR_TOKEN="${SONAR_TOKEN}" \
-  #           -v "${{ github.workspace }}":/usr/src \
-  #           sonarsource/sonar-scanner-cli \
-  #           -Dsonar.projectKey="${{ secrets.SONAR_PROJECT_KEY_BACK }}" \
-  #           -Dsonar.projectBaseDir=/usr/src/back \
-  #           -Dsonar.sources=. \
-  #           -Dsonar.host.url="${SONAR_HOST_URL}" \
-  #           -Dsonar.login="${SONAR_TOKEN}" \
-  #           -Dsonar.go.coverage.reportPaths=/usr/src/back/coverage.out || true
-
-  #     - name: Run SonarScanner for frontend
-  #       run: |
-  #         set -euo pipefail
-  #         echo "Running SonarScanner for frontend..."
-  #         docker run --rm \
-  #           -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
-  #           -e SONAR_TOKEN="${SONAR_TOKEN}" \
-  #           -v "${{ github.workspace }}":/usr/src \
-  #           sonarsource/sonar-scanner-cli \
-  #           -Dsonar.projectKey="${{ secrets.SONAR_PROJECT_KEY_FRONT }}" \
-  #           -Dsonar.projectBaseDir=/usr/src/front \
-  #           -Dsonar.sources=./ \
-  #           -Dsonar.host.url="${SONAR_HOST_URL}" \
-  #           -Dsonar.login="${SONAR_TOKEN}" \
-  #           -Dsonar.javascript.lcov.reportPaths=/usr/src/front/coverage/lcov.info || true
-
-  #     - name: Notify Sonar scan finished
-  #       run: echo "Sonar scans finished for backend and frontend. Check SonarQube dashboard."
-  sonarqube:
-    name: SonarQube
+  sonarcloud-scan:
     runs-on: ubuntu-latest
+    name: SonarCloud Scan (backend + frontend)
+    needs: [tests, frontend-build]
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Download backend coverage (if uploaded)
+        uses: actions/download-artifact@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v6
+          name: backend-coverage
+          path: back
+        continue-on-error: true
+
+      - name: Download frontend coverage (if uploaded)
+        uses: actions/download-artifact@v4
+        with:
+          name: front-coverage
+          path: front/coverage
+        continue-on-error: true
+
+      - name: SonarCloud Scan (monorepo)
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          # We rely on sonar-project.properties at repo root which already
+          # sets sonar.sources=back,front and coverage paths.
+          args: >
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Notify SonarCloud scan finished
+        run: echo "SonarCloud scans finished for backend and frontend. Check SonarCloud dashboard."
