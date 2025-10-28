@@ -156,8 +156,22 @@ jobs:
         working-directory: back
         run: |
           cp .env.example .env || true
-          # run tests and produce coverage for Sonar
-          go test ./... -v -coverprofile=coverage.out
+          # Fail fast semantics with readable logs: capture output to test.log
+          set -o pipefail || true
+          go test ./... -v -coverprofile=coverage.out 2>&1 | tee test.log
+      - name: Show test failures (tail)
+        working-directory: back
+        run: |
+          # print any FAIL lines and last 200 lines to the log for quick debugging
+          grep -n "FAIL" test.log || true
+          echo '--- last 200 lines of test.log ---'
+          tail -n 200 test.log || true
+      - name: Upload backend test log
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-log
+          path: back/test.log
+          retention-days: 7
       - name: Upload backend coverage
         uses: actions/upload-artifact@v4
         with:
