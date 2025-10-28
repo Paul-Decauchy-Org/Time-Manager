@@ -238,6 +238,7 @@ jobs:
   # ============================================
   sonarcloud-scan:
     runs-on: ubuntu-latest
+    environment: secrets
     name: SonarCloud Scan (backend + frontend)
     needs: [tests, frontend-build]
     env:
