@@ -51,13 +51,12 @@ export function ClockOut({ className, disabled = false, onSuccess, onError, ...p
                                             if (loading) label = "Pointage en cours…"
                                             else if (disabled) label = "Déjà clôturé aujourd'hui"
                                             return (
-                                                <Button onClick= { handleClockOut } disabled = { disabled || loading
-                                        } className = "w-full bg-rose-600 hover:bg-rose-600/90 text-white" >
-                                        { label }
-                                        </Button>
-                                        )
-}) ()}
-{ error && <FieldError className="mt-2" > Impossible de clôturer.Réessayez.</FieldError> }
+                                                <Button onClick={handleClockOut} disabled={disabled || loading} className="w-full bg-gradient-to-r from-red-500 to-pink-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                                                    {label}
+                                                </Button>
+                                            )
+                                        })()}
+                                        {error && <FieldError className="mt-2"> Impossible de clôturer. Réessayez.</FieldError>}
 <FieldDescription className="mt-1" > Raccourci: Alt + O </FieldDescription>
     </Field>
     < div className = "pointer-events-none absolute inset-0 -z-10 opacity-50 [background:radial-gradient(500px_200px_at_bottom_right,theme(colors.rose/20),transparent_60%)]" />

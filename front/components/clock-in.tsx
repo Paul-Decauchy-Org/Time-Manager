@@ -51,7 +51,8 @@ export function ClockIn({ className, disabled = false, onSuccess, onError, ...pr
               if (loading) label = "Pointage en cours…"
               else if (disabled) label = "Déjà pointé aujourd'hui"
               return (
-                <Button onClick={handleClockIn} disabled={disabled || loading} className="w-full bg-emerald-600 hover:bg-emerald-600/90 text-white">
+                <Button onClick= { handleClockIn } disabled = { disabled || loading
+            } className ="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
                   {label}
                 </Button>
               )

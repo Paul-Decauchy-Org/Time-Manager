@@ -98,25 +98,28 @@ function ClockHistoryCard({ timeEntries, loading, error }: Readonly<{ timeEntrie
 }
 {
     !loading && !error && rows.length === 0 && (
-        <div className="text-muted-foreground text-sm" > Aucun pointage pour le moment.</div>
-                )
+        <div className="flex flex-col items-center justify-center gap-2 rounded-md border py-8 text-center text-muted-foreground">
+            <Timer className="size-6" />
+            <div className="text-sm">Aucun pointage pour le moment.</div>
+        </div>
+    )
 }
 {
     !loading && !error && rows.length > 0 && (
         <Tabs value={ view } onValueChange = {(v) => setView(v as any)
 } className = "w-full" >
-    <TabsList className="justify-end mb-4" style = {{ "width": "50%" }}>
-        <TabsTrigger value="table" className = " py-5" > Tableau </TabsTrigger>
-            < TabsTrigger value = "timeline" className = " py-5" > Timeline </TabsTrigger>
+    <TabsList className="ml-auto mb-4">
+        <TabsTrigger value="table" className="py-2">Tableau</TabsTrigger>
+        <TabsTrigger value="timeline" className="py-2">Timeline</TabsTrigger>
                 </TabsList>
                 < TabsContent value = "table" >
                     <Table className="text-md table-fixed" >
                         <TableHeader>
                         <TableRow>
-                        <TableHead className="w-[180px] whitespace-nowrap" > Jour </TableHead>
-                            < TableHead className = "w-[120px] whitespace-nowrap" > Arrivée </TableHead>
-                                < TableHead className = "w-[120px] whitespace-nowrap" > Départ </TableHead>
-                                    < TableHead className = "w-[140px] whitespace-nowrap" > Statut </TableHead>
+                        <TableHead className="w-[200px] whitespace-nowrap">Jour</TableHead>
+                            <TableHead className="w-[160px] whitespace-nowrap">Arrivée</TableHead>
+                                <TableHead className="w-[160px] whitespace-nowrap">Départ</TableHead>
+                                    <TableHead className="w-[160px] whitespace-nowrap">Statut</TableHead>
                                         </TableRow>
                                         </TableHeader>
                                         <TableBody>
@@ -143,8 +146,7 @@ function ClockHistoryCard({ timeEntries, loading, error }: Readonly<{ timeEntrie
                                         { r.departureLabel } </div>
                                         </TableCell>
                                         < TableCell >
-                                        <Badge variant={ variant } className = "inline-flex items-center gap-2 px-3 py-1.5 text-xs md:text-sm rounded-full" style = {{ "color": "white" }
-    }>
+                                        <Badge variant={variant} className="inline-flex items-center gap-2 px-3 py-1.5 text-xs md:text-sm rounded-full text-white">
     <Icon className="size-4" />
     { r.status }
     </Badge>
