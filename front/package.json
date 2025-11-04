@@ -6,8 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "biome check",
     "format": "biome format --write",
+    "format:check": "biome format --check",
     "codegen": "graphql-codegen --config codegen.ts",
     "schema": "rover graph introspect http://localhost:8084/query > schema.graphql",
     "sonar": "sonar-scanner"

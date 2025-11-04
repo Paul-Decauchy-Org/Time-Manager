@@ -1,31 +1,40 @@
 "use client"
 
-import { Card } from "./ui/card"
-import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
+import { cn } from "@/lib/utils"
+import { useEffect, useState } from "react"
+import { CalendarDays, Clock3 } from "lucide-react"
 
-export function Clock({
-                        className,
-                        ...props
-    }: React.ComponentProps<"div">) {
-         let time  = new Date().toLocaleTimeString()
-         let date = new Date().toLocaleDateString()
+export function Clock({ className, ...props }: React.ComponentProps<"div">) {
+  const [now, setNow] = useState(new Date())
 
-  const [ctime,setTime] = useState(time)
-  const [cdate, setDate] = useState(date)
-  const UpdateTime=()=>{
-    time =  new Date().toLocaleTimeString()
-    date =  new Date().toLocaleDateString()
-    setTime(time)
-    setDate(date)
-  }
-  setInterval(UpdateTime)
-    return(
-        <Card className='text-center text-primary max-h-150px'  >
-            <b style={{ fontSize:36 }}>{ctime}</b>
-            {cdate}
-        </Card>
-    )
-    
-    
-    
-    }
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+  const date = now.toLocaleDateString()
+
+  return (
+    <div className={cn(className)} {...props}>
+      <Card className="relative overflow-hidden">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-muted-foreground text-sm">
+            <Clock3 className="size-4" /> Heure actuelle
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center justify-center gap-2 py-6">
+          <div className="text-primary text-4xl font-semibold tracking-tight">
+            {time}
+          </div>
+          <div className="text-muted-foreground inline-flex items-center gap-2 text-sm">
+            <CalendarDays className="size-4" />
+            {date}
+          </div>
+          <div className="pointer-events-none absolute inset-0 -z-10 opacity-40 [background:radial-gradient(600px_200px_at_top_right,theme(colors.primary/20),transparent_60%)]" />
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

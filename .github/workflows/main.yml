@@ -21,6 +21,22 @@ jobs:
           cd back
           go mod download
 
+      - name: Lint backend (go vet)
+        working-directory: back
+        run: go vet ./...
+
+      - name: Check backend formatting (gofmt)
+        working-directory: back
+        run: |
+          UNFORMATTED=$(gofmt -l .)
+          if [ -n "$UNFORMATTED" ]; then
+            echo "::error::Go files need formatting:" 
+            echo "$UNFORMATTED"
+            exit 1
+          else
+            echo "All Go files are properly formatted."
+          fi
+
       - name: Setup Node.js (frontend)
         uses: actions/setup-node@v4
         with:
@@ -32,6 +48,14 @@ jobs:
         run: |
           cd front
           npm ci
+
+      # - name: Lint frontend (Biome)
+      #   working-directory: front
+      #   run: npm run lint -- --max-diagnostics=200
+
+      # - name: Check frontend formatting (Biome)
+      #   working-directory: front
+      #   run: npm run format:check
 
   # ============================================
   # Block 3: Generate GraphQL artifacts (gqlgen back, codegen front)
