@@ -24,6 +24,17 @@ type UserWithAllData {
   timeTableEntries: [TimeTableEntry!]!
 }
 
+type SignedUser {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
+  role: Role!
+  hasStartedDay: Boolean!
+  startedAt: String
+}
+
 enum Role {
   USER
   ADMIN
@@ -85,7 +96,7 @@ type Query {
   userWithAllData(id: ID!): UserWithAllData
   UsersWithAllData: [UserWithAllData!]!
   usersByTeam(teamID: ID!): [UserWithAllData!]!
-  me: User!
+  me: SignedUser!
 
   # queries for admin
   users: [User!]!

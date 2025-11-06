@@ -91,6 +91,17 @@ type ComplexityRoot struct {
 		UsersWithAllData func(childComplexity int) int
 	}
 
+	SignedUser struct {
+		Email         func(childComplexity int) int
+		FirstName     func(childComplexity int) int
+		HasStartedDay func(childComplexity int) int
+		ID            func(childComplexity int) int
+		LastName      func(childComplexity int) int
+		Password      func(childComplexity int) int
+		Role          func(childComplexity int) int
+		StartedAt     func(childComplexity int) int
+	}
+
 	Team struct {
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
@@ -189,7 +200,7 @@ type QueryResolver interface {
 	UserWithAllData(ctx context.Context, id string) (*model.UserWithAllData, error)
 	UsersWithAllData(ctx context.Context) ([]*model.UserWithAllData, error)
 	UsersByTeam(ctx context.Context, teamID string) ([]*model.UserWithAllData, error)
-	Me(ctx context.Context) (*model.User, error)
+	Me(ctx context.Context) (*model.SignedUser, error)
 	Users(ctx context.Context) ([]*model.User, error)
 	GetUser(ctx context.Context, id string) (*model.UserWithAllData, error)
 	Teams(ctx context.Context) ([]*model.Team, error)
@@ -558,6 +569,55 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.UsersWithAllData(childComplexity), true
+
+	case "SignedUser.email":
+		if e.complexity.SignedUser.Email == nil {
+			break
+		}
+
+		return e.complexity.SignedUser.Email(childComplexity), true
+	case "SignedUser.firstName":
+		if e.complexity.SignedUser.FirstName == nil {
+			break
+		}
+
+		return e.complexity.SignedUser.FirstName(childComplexity), true
+	case "SignedUser.hasStartedDay":
+		if e.complexity.SignedUser.HasStartedDay == nil {
+			break
+		}
+
+		return e.complexity.SignedUser.HasStartedDay(childComplexity), true
+	case "SignedUser.id":
+		if e.complexity.SignedUser.ID == nil {
+			break
+		}
+
+		return e.complexity.SignedUser.ID(childComplexity), true
+	case "SignedUser.lastName":
+		if e.complexity.SignedUser.LastName == nil {
+			break
+		}
+
+		return e.complexity.SignedUser.LastName(childComplexity), true
+	case "SignedUser.password":
+		if e.complexity.SignedUser.Password == nil {
+			break
+		}
+
+		return e.complexity.SignedUser.Password(childComplexity), true
+	case "SignedUser.role":
+		if e.complexity.SignedUser.Role == nil {
+			break
+		}
+
+		return e.complexity.SignedUser.Role(childComplexity), true
+	case "SignedUser.startedAt":
+		if e.complexity.SignedUser.StartedAt == nil {
+			break
+		}
+
+		return e.complexity.SignedUser.StartedAt(childComplexity), true
 
 	case "Team.description":
 		if e.complexity.Team.Description == nil {
@@ -2890,7 +2950,7 @@ func (ec *executionContext) _Query_me(ctx context.Context, field graphql.Collect
 			return ec.resolvers.Query().Me(ctx)
 		},
 		nil,
-		ec.marshalNUser2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUser,
+		ec.marshalNSignedUser2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐSignedUser,
 		true,
 		true,
 	)
@@ -2905,21 +2965,23 @@ func (ec *executionContext) fieldContext_Query_me(_ context.Context, field graph
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_User_id(ctx, field)
+				return ec.fieldContext_SignedUser_id(ctx, field)
 			case "firstName":
-				return ec.fieldContext_User_firstName(ctx, field)
+				return ec.fieldContext_SignedUser_firstName(ctx, field)
 			case "lastName":
-				return ec.fieldContext_User_lastName(ctx, field)
+				return ec.fieldContext_SignedUser_lastName(ctx, field)
 			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "phone":
-				return ec.fieldContext_User_phone(ctx, field)
+				return ec.fieldContext_SignedUser_email(ctx, field)
 			case "password":
-				return ec.fieldContext_User_password(ctx, field)
+				return ec.fieldContext_SignedUser_password(ctx, field)
 			case "role":
-				return ec.fieldContext_User_role(ctx, field)
+				return ec.fieldContext_SignedUser_role(ctx, field)
+			case "hasStartedDay":
+				return ec.fieldContext_SignedUser_hasStartedDay(ctx, field)
+			case "startedAt":
+				return ec.fieldContext_SignedUser_startedAt(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type SignedUser", field.Name)
 		},
 	}
 	return fc, nil
@@ -3228,6 +3290,238 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SignedUser_id(ctx context.Context, field graphql.CollectedField, obj *model.SignedUser) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_SignedUser_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_SignedUser_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SignedUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SignedUser_firstName(ctx context.Context, field graphql.CollectedField, obj *model.SignedUser) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_SignedUser_firstName,
+		func(ctx context.Context) (any, error) {
+			return obj.FirstName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_SignedUser_firstName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SignedUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SignedUser_lastName(ctx context.Context, field graphql.CollectedField, obj *model.SignedUser) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_SignedUser_lastName,
+		func(ctx context.Context) (any, error) {
+			return obj.LastName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_SignedUser_lastName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SignedUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SignedUser_email(ctx context.Context, field graphql.CollectedField, obj *model.SignedUser) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_SignedUser_email,
+		func(ctx context.Context) (any, error) {
+			return obj.Email, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_SignedUser_email(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SignedUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SignedUser_password(ctx context.Context, field graphql.CollectedField, obj *model.SignedUser) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_SignedUser_password,
+		func(ctx context.Context) (any, error) {
+			return obj.Password, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_SignedUser_password(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SignedUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SignedUser_role(ctx context.Context, field graphql.CollectedField, obj *model.SignedUser) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_SignedUser_role,
+		func(ctx context.Context) (any, error) {
+			return obj.Role, nil
+		},
+		nil,
+		ec.marshalNRole2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐRole,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_SignedUser_role(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SignedUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Role does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SignedUser_hasStartedDay(ctx context.Context, field graphql.CollectedField, obj *model.SignedUser) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_SignedUser_hasStartedDay,
+		func(ctx context.Context) (any, error) {
+			return obj.HasStartedDay, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_SignedUser_hasStartedDay(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SignedUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SignedUser_startedAt(ctx context.Context, field graphql.CollectedField, obj *model.SignedUser) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_SignedUser_startedAt,
+		func(ctx context.Context) (any, error) {
+			return obj.StartedAt, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_SignedUser_startedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SignedUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -7021,6 +7315,77 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
+var signedUserImplementors = []string{"SignedUser"}
+
+func (ec *executionContext) _SignedUser(ctx context.Context, sel ast.SelectionSet, obj *model.SignedUser) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, signedUserImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SignedUser")
+		case "id":
+			out.Values[i] = ec._SignedUser_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "firstName":
+			out.Values[i] = ec._SignedUser_firstName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "lastName":
+			out.Values[i] = ec._SignedUser_lastName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "email":
+			out.Values[i] = ec._SignedUser_email(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "password":
+			out.Values[i] = ec._SignedUser_password(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "role":
+			out.Values[i] = ec._SignedUser_role(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "hasStartedDay":
+			out.Values[i] = ec._SignedUser_hasStartedDay(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "startedAt":
+			out.Values[i] = ec._SignedUser_startedAt(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var teamImplementors = []string{"Team"}
 
 func (ec *executionContext) _Team(ctx context.Context, sel ast.SelectionSet, obj *model.Team) graphql.Marshaler {
@@ -7988,6 +8353,20 @@ func (ec *executionContext) marshalNRole2ᚕgithubᚗcomᚋepitechᚋtimemanager
 func (ec *executionContext) unmarshalNSignUpInput2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐSignUpInput(ctx context.Context, v any) (model.SignUpInput, error) {
 	res, err := ec.unmarshalInputSignUpInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNSignedUser2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐSignedUser(ctx context.Context, sel ast.SelectionSet, v model.SignedUser) graphql.Marshaler {
+	return ec._SignedUser(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSignedUser2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐSignedUser(ctx context.Context, sel ast.SelectionSet, v *model.SignedUser) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._SignedUser(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {

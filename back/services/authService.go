@@ -37,7 +37,7 @@ func (s *AuthService) Login(email, password string) (*model.UserLogged, error) {
 	}, nil
 }
 
-func (s *AuthService) Me(email string) (*model.User, error) {
+func (s *AuthService) Me(email string) (*model.SignedUser, error) {
 	return s.AuthRepo.Me(email)
 }
 

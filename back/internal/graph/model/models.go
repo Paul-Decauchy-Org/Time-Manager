@@ -56,6 +56,17 @@ type SignUpInput struct {
 	Password  string `json:"password"`
 }
 
+type SignedUser struct {
+	ID            string  `json:"id"`
+	FirstName     string  `json:"firstName"`
+	LastName      string  `json:"lastName"`
+	Email         string  `json:"email"`
+	Password      string  `json:"password"`
+	Role          Role    `json:"role"`
+	HasStartedDay bool    `json:"hasStartedDay"`
+	StartedAt     *string `json:"startedAt,omitempty"`
+}
+
 type Team struct {
 	ID          string             `json:"id"`
 	Name        string             `json:"name"`

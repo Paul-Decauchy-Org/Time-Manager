@@ -25,6 +25,24 @@ func DBUserToGraph(u *gmodel.User) *model.User {
 	}
 }
 
+func DBUserToSignedGraph(u *gmodel.User, hasStartedDay bool, startedAt *string) *model.SignedUser {
+	if u == nil {
+		return nil
+	}
+
+	return &model.SignedUser{
+		ID:            u.ID.String(),
+		FirstName:     u.FirstName,
+		LastName:      u.LastName,
+		Email:         u.Email,
+		Password:      "",
+		Role:          model.Role(u.Role),
+		HasStartedDay: hasStartedDay,
+		StartedAt:     startedAt,
+	}
+}
+
+
 func DBUserToGraphWithAllData(u *gmodel.User) *model.UserWithAllData {
 	if u == nil {
 		return nil
