@@ -1,4 +1,4 @@
-name: CI/CD
+name: Time Manager CI/CD Pipeline
 
 on:
   push:
@@ -7,53 +7,67 @@ on:
 
 jobs:
   # ============================================
-  # Job 1: Linting & Formatting
+  # Block 1: Code Quality (lint back, lint front)
   # ============================================
-  # lint:
-  #   runs-on: ubuntu-latest
-  #   name: Lint & Format Check
-  #   steps:
-  #     - uses: actions/checkout@v5
-
-  #     # Frontend Linting
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '20'
-  #         cache: 'npm'
-  #         cache-dependency-path: front/package-lock.json
-
-  #     - name: Install frontend dependencies
-  #       run: cd front && npm ci
-
-  #     - name: Run Biome lint
-  #       run: cd front && npm run lint
-
-  #     # Backend Linting
-  #     - name: Setup Go
-  #       uses: actions/setup-go@v5
-  #       with:
-  #         go-version: '1.23'
-  #         cache: true
-  #         cache-dependency-path: back/go.sum
-
-  #     - name: Run go fmt
-  #       run: cd back && test -z "$(gofmt -l .)"
-
-  #     - name: Run go vet
-  #       run: cd back && go vet ./...
-
-  # ============================================
-  # Job 2: Build Tests
-  # ============================================
-  build:
+  quality-check:
     runs-on: ubuntu-latest
-    name: Build Check
-    # needs: [lint]
+    name: Code Quality
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
-      # Backend Build
+      - name: Install backend deps
+        run: |
+          cd back
+          go mod download
+
+      - name: Lint backend (go vet)
+        working-directory: back
+        run: go vet ./...
+
+      - name: Check backend formatting (gofmt)
+        working-directory: back
+        run: |
+          UNFORMATTED=$(gofmt -l .)
+          if [ -n "$UNFORMATTED" ]; then
+            echo "::error::Go files need formatting:" 
+            echo "$UNFORMATTED"
+            exit 1
+          else
+            echo "All Go files are properly formatted."
+          fi
+
+      - name: Setup Node.js (frontend)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: front/package-lock.json
+
+      - name: Install frontend deps
+        run: |
+          cd front
+          npm ci
+
+      # - name: Lint frontend (Biome)
+      #   working-directory: front
+      #   run: npm run lint -- --max-diagnostics=200
+
+      # - name: Check frontend formatting (Biome)
+      #   working-directory: front
+      #   run: npm run format:check
+
+  # ============================================
+  # Block 3: Generate GraphQL artifacts (gqlgen back, codegen front)
+  # ============================================
+  generate-graphql:
+    runs-on: ubuntu-latest
+    name: "Generation GraphQL Artifacts"
+    needs: [quality-check]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
@@ -61,17 +75,45 @@ jobs:
           cache: true
           cache-dependency-path: back/go.sum
 
-      - name: Copy backend env file
-        run: cd back && cp .env.example .env
+      - name: Generate backend GraphQL
+        working-directory: back
+        run: |
+          # run gqlgen via go run to avoid requiring a global binary
+          go run github.com/99designs/gqlgen@v0.17.81 generate
 
-      - name: Build Go backend
-        run: cd back && go build -v ./cmd/main.go
+      - name: Setup Node.js (for codegen)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
-      # Run tests
-      - name: Run Go tests
-        run: cd back && go test ./... -v -coverprofile=coverage.out
+      - name: Install frontend deps (needed for codegen)
+        working-directory: front
+        run: npm ci
 
-      # Frontend Build
+      - name: Generate frontend GraphQL
+        working-directory: front
+        run: npm run codegen
+
+      - name: Upload generated artifacts (optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-graphql
+          path: |
+            back/gqlgen.yml
+            front/generated
+          retention-days: 1
+
+  # ============================================
+  # Block 3.5: Frontend Build (install, codegen, build)
+  # ============================================
+  frontend-build:
+    runs-on: ubuntu-latest
+    name: Frontend Build
+    needs: [generate-graphql]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -79,24 +121,223 @@ jobs:
           cache: "npm"
           cache-dependency-path: front/package-lock.json
 
-      - name: Install frontend dependencies && generate GraphQL types
-        run: cd front && npm ci && npm run codegen
+      - name: Install frontend dependencies
+        working-directory: front
+        run: |
+          npm ci
+
+      - name: Generate frontend GraphQL types (safety)
+        working-directory: front
+        run: npm run codegen
 
       - name: Build Next.js frontend
-        run: cd front && npm run build
+        working-directory: front
+        run: npm run build
+
+      - name: Upload frontend build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: front/.next/
+          retention-days: 1
+
+      - name: Run frontend tests and generate lcov (optional)
+        working-directory: front
+        run: |
+          # Attempt to run frontend tests to generate lcov (don't fail the job if tests are missing or fail)
+          npm run test -- --coverage --coverageReporters=lcov --watchAll=false || true
+
+      - name: Check frontend coverage
+        id: check_front_cov
+        run: |
+          if [ -f front/coverage/lcov.info ]; then
+            echo "coverage_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "coverage_exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload frontend coverage
+        if: steps.check_front_cov.outputs.coverage_exists == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: front-coverage
+          path: front/coverage/lcov.info
+          retention-days: 7
 
   # ============================================
-  # Job 3: Docker Build
+  # Block 4: Tests (backend & frontend) - commented for now
+  # ============================================
+  tests:
+    runs-on: ubuntu-latest
+    name: Tests (backend & frontend)
+    needs: [generate-graphql]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      # Backend tests
+      - name: Run backend tests
+        working-directory: back
+        run: |
+          cp .env.example .env || true
+          # Fail fast semantics with readable logs: capture output to test.log
+          set -o pipefail || true
+          go test ./... -v 2>&1 | tee test.log
+      - name: Show test failures (tail)
+        working-directory: back
+        run: |
+          # print any FAIL lines and last 200 lines to the log for quick debugging
+          grep -n "FAIL" test.log || true
+          echo '--- last 200 lines of test.log ---'
+          tail -n 200 test.log || true
+      - name: Upload backend test log
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-log
+          path: back/test.log
+          retention-days: 7
+      # backend coverage generation/upload removed per request
+
+      # Frontend tests (commented for now)
+      # - name: Run frontend tests
+      #   working-directory: front
+      #   run: |
+      #     npm test -- --watchAll=false
+
+  # ============================================
+  # Block 5: Docker build
   # ============================================
   docker-build:
     runs-on: ubuntu-latest
     name: Docker Build
-    needs: [build]
+    needs: [frontend-build, tests]
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
-      - name: Copy backend env file
-        run: cd back && cp .env.example .env
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker images
+      - name: Prepare backend env
+        run: |
+          cd back
+          cp .env.example .env || true
+
+      - name: Build docker images
         run: docker compose build --no-cache
+
+      - name: Upload docker metadata (optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-images-meta
+          path: |
+            # optionally list files you want to save
+          retention-days: 1
+
+  # ============================================
+  # Block 6: Docker push (only on main)
+  # ============================================
+  # docker-push:
+  #   runs-on: ubuntu-latest
+  #   needs: [docker-build]
+  #   if: github.ref == 'refs/heads/main'
+  #   permissions:
+  #     contents: read
+  #     packages: write
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v5
+
+  #     - name: Login to GHCR
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
+
+  #     - name: Build and push backend image
+  #       uses: docker/build-push-action@v4
+  #       with:
+  #         context: ./back
+  #         file: ./back/Dockerfile
+  #         push: true
+  #         tags: |
+  #           ghcr.io/${{ github.repository_owner }}/time-manager-back:latest
+  #           ghcr.io/${{ github.repository_owner }}/time-manager-back:${{ github.sha }}
+
+  #     - name: Build and push frontend image
+  #       uses: docker/build-push-action@v4
+  #       with:
+  #         context: ./front
+  #         file: ./front/Dockerfile
+  #         push: true
+  #         tags: |
+  #           ghcr.io/${{ github.repository_owner }}/time-manager-front:latest
+  #           ghcr.io/${{ github.repository_owner }}/time-manager-front:${{ github.sha }}
+
+  # ============================================
+  # SonarCloud scan (backend + frontend) using SonarCloud GitHub Action
+  # requires secrets: SONAR_TOKEN, SONAR_ORGANIZATION
+  # ============================================
+  # sonarcloud-scan:
+  #   runs-on: ubuntu-latest
+  #   environment: secrets
+  #   name: SonarCloud Scan (backend + frontend)
+  #   needs: [tests, frontend-build]
+  #   env:
+  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #     SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
+  #   steps:
+  #     - name: Verify SonarCloud secrets
+  #       run: |
+  #         if [ -z "$SONAR_TOKEN" ] || [ -z "$SONAR_ORGANIZATION" ]; then
+  #           echo "::error::Missing SONAR_TOKEN or SONAR_ORGANIZATION secrets. Please add them in Settings → Secrets → Actions."
+  #           exit 1
+  #         else
+  #           echo "Sonar secrets present. Proceeding with scan."
+  #         fi
+
+  #     - name: Verify SonarCloud organization and token (API check)
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #         SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
+  #       run: |
+  #         echo "Checking SonarCloud organization access..."
+  #         # Query SonarCloud organizations and look for the organization key
+  #         resp=$(curl -s -u "$SONAR_TOKEN": "https://sonarcloud.io/project/configuration/GitHubActions?id=Paul-Decauchy-Org_Time-Manager" -G --data-urlencode "organization=$SONAR_ORGANIZATION")
+  #         echo "$resp" | grep -q "\"key\":\"$SONAR_ORGANIZATION\"" || {
+  #           echo "::error::SonarCloud organization '$SONAR_ORGANIZATION' not found or token cannot access it."
+  #           echo "Make sure the SONAR_ORGANIZATION secret holds the organization KEY (not the display name) and that the token was created in that organization."
+  #           exit 1
+  #         }
+  #         echo "Organization found and token appears valid."
+
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v5
+
+  #     - name: Download backend coverage (if uploaded)
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: backend-coverage
+  #         path: back
+  #       continue-on-error: true
+
+  #     - name: Download frontend coverage (if uploaded)
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: front-coverage
+  #         path: front/coverage
+  #       continue-on-error: true
+
+  #     - name: SonarCloud Scan (monorepo)
+  #       uses: SonarSource/sonarcloud-github-action@master
+  #       with:
+  #         # We rely on sonar-project.properties at repo root which already
+  #         # sets sonar.sources=back,front and coverage paths.
+  #         args: >
+  #           -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  #     - name: Notify SonarCloud scan finished
+  #       run: echo "SonarCloud scans finished for backend and frontend. Check SonarCloud dashboard."

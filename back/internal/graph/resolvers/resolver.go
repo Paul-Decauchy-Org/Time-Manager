@@ -9,10 +9,10 @@ import (
 //
 // It serves as dependency injection for your app, add any dependencies you require here.
 
-type Resolver struct{
-	DB *gorm.DB
-	AuthService *services.AuthService
-	AdminService *services.AdminService
-	TeamService *services.TeamService
+type Resolver struct {
+	DB               *gorm.DB
+	AuthService      *services.AuthService
+	AdminService     *services.AdminService
+	TeamService      *services.TeamService
 	TimeTableService *services.TimeTableService
 }

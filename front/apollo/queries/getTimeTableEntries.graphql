@@ -1,0 +1,15 @@
+query GetTimeTableEntries {
+  timeTableEntries {
+    id
+    arrival
+    departure
+    status
+    day
+    userID {
+      id
+      firstName
+      lastName
+      email
+    }
+  }
+}

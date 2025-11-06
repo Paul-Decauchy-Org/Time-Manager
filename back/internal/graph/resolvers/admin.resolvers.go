@@ -8,7 +8,7 @@ import (
 )
 
 // create a user
-func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput)(*model.User, error){
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
 	if err := middlewares.VerifyRole(ctx, "ADMIN"); err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input mode
 }
 
 // delete a user
-func (r *mutationResolver) DeleteUser(ctx context.Context, id string)(bool, error){
+func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, error) {
 	if err := middlewares.VerifyRole(ctx, "ADMIN"); err != nil {
 		return false, err
 	}
@@ -32,7 +32,7 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string)(bool, erro
 }
 
 // get a user
-func (r *queryResolver) GetUser(ctx context.Context, id string)(*model.UserWithAllData, error){
+func (r *queryResolver) GetUser(ctx context.Context, id string) (*model.UserWithAllData, error) {
 	if err := middlewares.VerifyRole(ctx, "ADMIN"); err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (r *queryResolver) GetUser(ctx context.Context, id string)(*model.UserWithA
 }
 
 // set or change manager team
-func (r *mutationResolver) SetManagerTeam(ctx context.Context, userID string, teamID string)(*model.Team, error){
+func (r *mutationResolver) SetManagerTeam(ctx context.Context, userID string, teamID string) (*model.Team, error) {
 	if err := middlewares.VerifyRole(ctx, "ADMIN"); err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (r *mutationResolver) SetManagerTeam(ctx context.Context, userID string, te
 }
 
 // set role for a user
-func (r *mutationResolver) SetRole(ctx context.Context, userID string, role model.Role)(*model.User, error){
+func (r *mutationResolver) SetRole(ctx context.Context, userID string, role model.Role) (*model.User, error) {
 	if err := middlewares.VerifyRole(ctx, "ADMIN"); err != nil {
 		return nil, err
 	}

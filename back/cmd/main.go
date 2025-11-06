@@ -57,10 +57,10 @@ func main() {
 	teamService := services.NewTeamService(teamRepo)
 	timeTableService := services.NewTimeTableService(timeTableRepo)
 	resolver := &resolvers.Resolver{
-		DB:              db,
-		AuthService:     authService,
-		AdminService:    adminService,
-		TeamService:     teamService,
+		DB:               db,
+		AuthService:      authService,
+		AdminService:     adminService,
+		TeamService:      teamService,
 		TimeTableService: timeTableService,
 	}
 
@@ -78,7 +78,7 @@ func main() {
 		Cache: lru.New[string](100),
 	})
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
+		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:8080"},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Origin", "Content-Type", "Authorization", "Accept"},
 		ExposedHeaders:   []string{"Content-Length"},
