@@ -39,6 +39,9 @@ type Query {
   UsersWithAllData: [UserWithAllData!]!
   usersByTeam(teamID: ID!): [UserWithAllData!]!
   me: User!
+    # KPI queries
+  kpiUserSummary(userID: ID, from: Date, to: Date): UserKpiSummary!
+  kpiTeamSummary(teamID: ID!, from: Date, to: Date): TeamKpiSummary!
 }
 type Team {
   id: ID!
@@ -160,6 +163,40 @@ input UpdateUserInput {
   phone: String
   password: String
   role: Role
+}
+# KPI Types
+
+type KpiPoint {
+  date: Date!
+  minutes: Int!
+}
+
+type UserKpiSummary {
+  from: Date!
+  to: Date!
+  userID: ID!
+  workedMinutes: Int!
+  overtimeMinutes: Int!
+  daysPresent: Int!
+  currentStreakDays: Int!
+  punctualityRate: Float!
+  presentNow: Boolean!
+  dailyWorked: [KpiPoint!]!
+}
+
+type CoveragePoint {
+  time: Time!
+  count: Int!
+}
+
+type TeamKpiSummary {
+  from: Date!
+  to: Date!
+  teamID: ID!
+  totalWorkedMinutes: Int!
+  avgWorkedMinutesPerUser: Float!
+  activeUsers: Int!
+  coverage: [CoveragePoint!]!
 }
 "Directs the executor to defer this fragment when the `if` argument is true or undefined."
 directive @defer(
