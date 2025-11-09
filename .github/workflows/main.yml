@@ -252,6 +252,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Compute lowercase owner
+        id: gh
+        run: |
+          echo "owner_lc=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -266,10 +271,10 @@ jobs:
           file: ./back/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/time-manager-back:latest
-            ghcr.io/${{ github.repository_owner }}/time-manager-back:${{ github.sha }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-back:cache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-back:cache,mode=max
+            ghcr.io/${{ steps.gh.outputs.owner_lc }}/time-manager-back:latest
+            ghcr.io/${{ steps.gh.outputs.owner_lc }}/time-manager-back:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/${{ steps.gh.outputs.owner_lc }}/time-manager-back:cache
+          cache-to: type=registry,ref=ghcr.io/${{ steps.gh.outputs.owner_lc }}/time-manager-back:cache,mode=max
 
       - name: Push frontend image
         uses: docker/build-push-action@v5
@@ -278,10 +283,10 @@ jobs:
           file: ./front/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/time-manager-front:latest
-            ghcr.io/${{ github.repository_owner }}/time-manager-front:${{ github.sha }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-front:cache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-front:cache,mode=max
+            ghcr.io/${{ steps.gh.outputs.owner_lc }}/time-manager-front:latest
+            ghcr.io/${{ steps.gh.outputs.owner_lc }}/time-manager-front:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/${{ steps.gh.outputs.owner_lc }}/time-manager-front:cache
+          cache-to: type=registry,ref=ghcr.io/${{ steps.gh.outputs.owner_lc }}/time-manager-front:cache,mode=max
 
       - name: Push nginx image
         uses: docker/build-push-action@v5
@@ -290,18 +295,18 @@ jobs:
           file: ./nginx/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/time-manager-nginx:latest
-            ghcr.io/${{ github.repository_owner }}/time-manager-nginx:${{ github.sha }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-nginx:cache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-nginx:cache,mode=max
+            ghcr.io/${{ steps.gh.outputs.owner_lc }}/time-manager-nginx:latest
+            ghcr.io/${{ steps.gh.outputs.owner_lc }}/time-manager-nginx:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/${{ steps.gh.outputs.owner_lc }}/time-manager-nginx:cache
+          cache-to: type=registry,ref=ghcr.io/${{ steps.gh.outputs.owner_lc }}/time-manager-nginx:cache,mode=max
 
       - name: Tag database image (official postgres)
         run: |
           docker pull postgres:16-alpine
-          docker tag postgres:16-alpine ghcr.io/${{ github.repository_owner }}/time-manager-postgres:16-alpine
-          docker tag postgres:16-alpine ghcr.io/${{ github.repository_owner }}/time-manager-postgres:${{ github.sha }}
-          docker push ghcr.io/${{ github.repository_owner }}/time-manager-postgres:16-alpine
-          docker push ghcr.io/${{ github.repository_owner }}/time-manager-postgres:${{ github.sha }}
+          docker tag postgres:16-alpine ghcr.io/${{ steps.gh.outputs.owner_lc }}/time-manager-postgres:16-alpine
+          docker tag postgres:16-alpine ghcr.io/${{ steps.gh.outputs.owner_lc }}/time-manager-postgres:${{ github.sha }}
+          docker push ghcr.io/${{ steps.gh.outputs.owner_lc }}/time-manager-postgres:16-alpine
+          docker push ghcr.io/${{ steps.gh.outputs.owner_lc }}/time-manager-postgres:${{ github.sha }}
 
       - name: Summary
         run: |
@@ -313,7 +318,7 @@ jobs:
 
   # ============================================
   # SonarCloud scan (backend + frontend) using SonarCloud GitHub Action
-  # requires secrets: SONAR_TOKEN, SONAR_ORGANIZATION
+  # requires secret: SONAR_TOKEN (organization key is read from sonar-project.properties)
   # ============================================
   sonarcloud-scan:
     runs-on: ubuntu-latest
@@ -322,21 +327,17 @@ jobs:
     needs: [tests, frontend-build]
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
     steps:
       - name: Verify SonarCloud secrets
         run: |
-          if [ -z "$SONAR_TOKEN" ] || [ -z "$SONAR_ORGANIZATION" ]; then
-            echo "::error::Missing SONAR_TOKEN or SONAR_ORGANIZATION secrets. Please add them in Settings → Secrets → Actions."
+          if [ -z "$SONAR_TOKEN" ]; then
+            echo "::error::Missing SONAR_TOKEN secret. Please add it in Settings → Secrets → Actions."
             exit 1
           else
-            echo "Sonar secrets present. Proceeding with scan."
+            echo "Sonar token present. Proceeding with scan."
           fi
 
       - name: Verify SonarCloud organization and token (API check)
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
         run: |
           echo "Checking SonarCloud token validity..."
           token_resp=$(curl -s -u "$SONAR_TOKEN": "https://sonarcloud.io/api/authentication/validate")
@@ -345,11 +346,17 @@ jobs:
             exit 1
           }
 
-          echo "Checking SonarCloud organization access for key '$SONAR_ORGANIZATION'..."
-          org_status=$(curl -s -o /dev/null -w "%{http_code}" -u "$SONAR_TOKEN": "https://sonarcloud.io/api/organizations/show?key=$SONAR_ORGANIZATION")
+          # Read organization key from sonar-project.properties to avoid mismatch with secrets
+          ORG_KEY=$(grep -E '^sonar.organization=' sonar-project.properties | cut -d= -f2 | tr -d '\r')
+          if [ -z "$ORG_KEY" ]; then
+            echo "::error::Could not read sonar.organization from sonar-project.properties."
+            exit 1
+          fi
+          echo "Checking SonarCloud organization access for key '$ORG_KEY'..."
+          org_status=$(curl -s -o /dev/null -w "%{http_code}" -u "$SONAR_TOKEN": "https://sonarcloud.io/api/organizations/show?key=$ORG_KEY")
           if [ "$org_status" != "200" ]; then
-            echo "::error::SonarCloud organization '$SONAR_ORGANIZATION' not found or the token cannot access it."
-            echo "Ensure SONAR_ORGANIZATION is the organization KEY (e.g. 'paul-decauchy-org'), not the display name, and the token belongs to that org."
+            echo "::error::SonarCloud organization '$ORG_KEY' not found or the token cannot access it."
+            echo "Ensure sonar.organization in sonar-project.properties is the organization KEY (e.g. 'paul-decauchy-org'), not the display name, and the token belongs to that org."
             exit 1
           fi
           echo "Token valid and organization accessible."
@@ -373,11 +380,6 @@ jobs:
 
       - name: SonarCloud Scan (monorepo)
         uses: SonarSource/sonarcloud-github-action@master
-        with:
-          # We rely on sonar-project.properties at repo root which already
-          # sets sonar.sources=back,front and coverage paths.
-          args: >
-            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
