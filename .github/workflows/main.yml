@@ -237,43 +237,79 @@ jobs:
   # ============================================
   # Block 6: Docker push (only on main)
   # ============================================
-  # docker-push:
-  #   runs-on: ubuntu-latest
-  #   needs: [docker-build]
-  #   if: github.ref == 'refs/heads/main'
-  #   permissions:
-  #     contents: read
-  #     packages: write
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v5
+  docker-push:
+    runs-on: ubuntu-latest
+    needs: [docker-build]
+    # Only execute on push events to main (not on PRs)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
 
-  #     - name: Login to GHCR
-  #       uses: docker/login-action@v3
-  #       with:
-  #         registry: ghcr.io
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-  #     - name: Build and push backend image
-  #       uses: docker/build-push-action@v4
-  #       with:
-  #         context: ./back
-  #         file: ./back/Dockerfile
-  #         push: true
-  #         tags: |
-  #           ghcr.io/${{ github.repository_owner }}/time-manager-back:latest
-  #           ghcr.io/${{ github.repository_owner }}/time-manager-back:${{ github.sha }}
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-  #     - name: Build and push frontend image
-  #       uses: docker/build-push-action@v4
-  #       with:
-  #         context: ./front
-  #         file: ./front/Dockerfile
-  #         push: true
-  #         tags: |
-  #           ghcr.io/${{ github.repository_owner }}/time-manager-front:latest
-  #           ghcr.io/${{ github.repository_owner }}/time-manager-front:${{ github.sha }}
+      - name: Push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./back
+          file: ./back/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/time-manager-back:latest
+            ghcr.io/${{ github.repository_owner }}/time-manager-back:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-back:cache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-back:cache,mode=max
+
+      - name: Push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./front
+          file: ./front/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/time-manager-front:latest
+            ghcr.io/${{ github.repository_owner }}/time-manager-front:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-front:cache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-front:cache,mode=max
+
+      - name: Push nginx image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./nginx
+          file: ./nginx/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/time-manager-nginx:latest
+            ghcr.io/${{ github.repository_owner }}/time-manager-nginx:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-nginx:cache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-nginx:cache,mode=max
+
+      - name: Tag database image (official postgres)
+        run: |
+          docker pull postgres:16-alpine
+          docker tag postgres:16-alpine ghcr.io/${{ github.repository_owner }}/time-manager-postgres:16-alpine
+          docker tag postgres:16-alpine ghcr.io/${{ github.repository_owner }}/time-manager-postgres:${{ github.sha }}
+          docker push ghcr.io/${{ github.repository_owner }}/time-manager-postgres:16-alpine
+          docker push ghcr.io/${{ github.repository_owner }}/time-manager-postgres:${{ github.sha }}
+
+      - name: Summary
+        run: |
+          echo "Images pushed to GHCR (latest + SHA):" >> $GITHUB_STEP_SUMMARY
+          echo " - back" >> $GITHUB_STEP_SUMMARY
+          echo " - front" >> $GITHUB_STEP_SUMMARY
+          echo " - nginx" >> $GITHUB_STEP_SUMMARY
+          echo " - postgres (re-tag of official)" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
   # SonarCloud scan (backend + frontend) using SonarCloud GitHub Action
