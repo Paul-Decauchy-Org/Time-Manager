@@ -366,10 +366,16 @@ jobs:
             echo "::error::Could not read sonar.organization from sonar-project.properties."
             exit 1
           fi
+          echo "Listing organizations visible to token (debug)..."
+          curl -s -u "$SONAR_TOKEN": "https://sonarcloud.io/api/organizations/search?member=true" | head -c 2000 || true
+
           echo "Checking SonarCloud organization access for key '$ORG_KEY'..."
           org_status=$(curl -s -o /dev/null -w "%{http_code}" -u "$SONAR_TOKEN": "https://sonarcloud.io/api/organizations/show?key=$ORG_KEY")
           if [ "$org_status" != "200" ]; then
-            echo "::error::SonarCloud organization '$ORG_KEY' not found or the token cannot access it."
+            echo "::error::SonarCloud organization '$ORG_KEY' not found or the token cannot access it (HTTP $org_status)."
+            echo "Response preview:"
+            curl -s -u "$SONAR_TOKEN": "https://sonarcloud.io/api/organizations/show?key=$ORG_KEY" | head -c 2000 || true
+            echo
             echo "Ensure sonar.organization in sonar-project.properties is the organization KEY (e.g. 'paul-decauchy-org'), not the display name, and the token belongs to that org."
             exit 1
           fi
