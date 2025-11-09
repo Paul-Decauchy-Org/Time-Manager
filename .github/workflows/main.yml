@@ -279,65 +279,65 @@ jobs:
   # SonarCloud scan (backend + frontend) using SonarCloud GitHub Action
   # requires secrets: SONAR_TOKEN, SONAR_ORGANIZATION
   # ============================================
-  # sonarcloud-scan:
-  #   runs-on: ubuntu-latest
-  #   environment: secrets
-  #   name: SonarCloud Scan (backend + frontend)
-  #   needs: [tests, frontend-build]
-  #   env:
-  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #     SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
-  #   steps:
-  #     - name: Verify SonarCloud secrets
-  #       run: |
-  #         if [ -z "$SONAR_TOKEN" ] || [ -z "$SONAR_ORGANIZATION" ]; then
-  #           echo "::error::Missing SONAR_TOKEN or SONAR_ORGANIZATION secrets. Please add them in Settings → Secrets → Actions."
-  #           exit 1
-  #         else
-  #           echo "Sonar secrets present. Proceeding with scan."
-  #         fi
+  sonarcloud-scan:
+    runs-on: ubuntu-latest
+    environment: secrets
+    name: SonarCloud Scan (backend + frontend)
+    needs: [tests, frontend-build]
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
+    steps:
+      - name: Verify SonarCloud secrets
+        run: |
+          if [ -z "$SONAR_TOKEN" ] || [ -z "$SONAR_ORGANIZATION" ]; then
+            echo "::error::Missing SONAR_TOKEN or SONAR_ORGANIZATION secrets. Please add them in Settings → Secrets → Actions."
+            exit 1
+          else
+            echo "Sonar secrets present. Proceeding with scan."
+          fi
 
-  #     - name: Verify SonarCloud organization and token (API check)
-  #       env:
-  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #         SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
-  #       run: |
-  #         echo "Checking SonarCloud organization access..."
-  #         # Query SonarCloud organizations and look for the organization key
-  #         resp=$(curl -s -u "$SONAR_TOKEN": "https://sonarcloud.io/project/configuration/GitHubActions?id=Paul-Decauchy-Org_Time-Manager" -G --data-urlencode "organization=$SONAR_ORGANIZATION")
-  #         echo "$resp" | grep -q "\"key\":\"$SONAR_ORGANIZATION\"" || {
-  #           echo "::error::SonarCloud organization '$SONAR_ORGANIZATION' not found or token cannot access it."
-  #           echo "Make sure the SONAR_ORGANIZATION secret holds the organization KEY (not the display name) and that the token was created in that organization."
-  #           exit 1
-  #         }
-  #         echo "Organization found and token appears valid."
+      - name: Verify SonarCloud organization and token (API check)
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
+        run: |
+          echo "Checking SonarCloud organization access..."
+          # Query SonarCloud organizations and look for the organization key
+          resp=$(curl -s -u "$SONAR_TOKEN": "https://sonarcloud.io/project/configuration/GitHubActions?id=Paul-Decauchy-Org" -G --data-urlencode "organization=$SONAR_ORGANIZATION")
+          echo "$resp" | grep -q "\"key\":\"$SONAR_ORGANIZATION\"" || {
+            echo "::error::SonarCloud organization '$SONAR_ORGANIZATION' not found or token cannot access it."
+            echo "Make sure the SONAR_ORGANIZATION secret holds the organization KEY (not the display name) and that the token was created in that organization."
+            exit 1
+          }
+          echo "Organization found and token appears valid."
 
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v5
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
-  #     - name: Download backend coverage (if uploaded)
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: backend-coverage
-  #         path: back
-  #       continue-on-error: true
+      - name: Download backend coverage (if uploaded)
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-coverage
+          path: back
+        continue-on-error: true
 
-  #     - name: Download frontend coverage (if uploaded)
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: front-coverage
-  #         path: front/coverage
-  #       continue-on-error: true
+      - name: Download frontend coverage (if uploaded)
+        uses: actions/download-artifact@v4
+        with:
+          name: front-coverage
+          path: front/coverage
+        continue-on-error: true
 
-  #     - name: SonarCloud Scan (monorepo)
-  #       uses: SonarSource/sonarcloud-github-action@master
-  #       with:
-  #         # We rely on sonar-project.properties at repo root which already
-  #         # sets sonar.sources=back,front and coverage paths.
-  #         args: >
-  #           -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-  #       env:
-  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: SonarCloud Scan (monorepo)
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          # We rely on sonar-project.properties at repo root which already
+          # sets sonar.sources=back,front and coverage paths.
+          args: >
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  #     - name: Notify SonarCloud scan finished
-  #       run: echo "SonarCloud scans finished for backend and frontend. Check SonarCloud dashboard."
+      - name: Notify SonarCloud scan finished
+        run: echo "SonarCloud scans finished for backend and frontend. Check SonarCloud dashboard."
