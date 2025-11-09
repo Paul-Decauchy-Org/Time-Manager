@@ -328,6 +328,20 @@ jobs:
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Show sonar-project.properties (debug)
+        run: |
+          if [ -f sonar-project.properties ]; then
+            echo '--- sonar-project.properties ---'
+            cat sonar-project.properties
+            echo '--------------------------------'
+          else
+            echo '::error::sonar-project.properties file not found at repository root.'
+            ls -al
+          fi
+
       - name: Verify SonarCloud secrets
         run: |
           if [ -z "$SONAR_TOKEN" ]; then
@@ -360,9 +374,6 @@ jobs:
             exit 1
           fi
           echo "Token valid and organization accessible."
-
-      - name: Checkout repository
-        uses: actions/checkout@v5
 
       - name: Download backend coverage (if uploaded)
         uses: actions/download-artifact@v4
