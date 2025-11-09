@@ -338,15 +338,21 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
         run: |
-          echo "Checking SonarCloud organization access..."
-          # Query SonarCloud organizations and look for the organization key
-          resp=$(curl -s -u "$SONAR_TOKEN": "https://sonarcloud.io/project/configuration/GitHubActions?id=Paul-Decauchy-Org" -G --data-urlencode "organization=$SONAR_ORGANIZATION")
-          echo "$resp" | grep -q "\"key\":\"$SONAR_ORGANIZATION\"" || {
-            echo "::error::SonarCloud organization '$SONAR_ORGANIZATION' not found or token cannot access it."
-            echo "Make sure the SONAR_ORGANIZATION secret holds the organization KEY (not the display name) and that the token was created in that organization."
+          echo "Checking SonarCloud token validity..."
+          token_resp=$(curl -s -u "$SONAR_TOKEN": "https://sonarcloud.io/api/authentication/validate")
+          echo "$token_resp" | grep -q '"valid":true' || {
+            echo "::error::Invalid SONAR_TOKEN or missing permissions. Generate a token in SonarCloud (Account → Security) within the target organization."
             exit 1
           }
-          echo "Organization found and token appears valid."
+
+          echo "Checking SonarCloud organization access for key '$SONAR_ORGANIZATION'..."
+          org_status=$(curl -s -o /dev/null -w "%{http_code}" -u "$SONAR_TOKEN": "https://sonarcloud.io/api/organizations/show?key=$SONAR_ORGANIZATION")
+          if [ "$org_status" != "200" ]; then
+            echo "::error::SonarCloud organization '$SONAR_ORGANIZATION' not found or the token cannot access it."
+            echo "Ensure SONAR_ORGANIZATION is the organization KEY (e.g. 'paul-decauchy-org'), not the display name, and the token belongs to that org."
+            exit 1
+          fi
+          echo "Token valid and organization accessible."
 
       - name: Checkout repository
         uses: actions/checkout@v5
