@@ -456,7 +456,7 @@ jobs:
             -Dsonar.projectBaseDir=front
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   sonarCLoud-back:
     name: SonarCloud Back
@@ -477,4 +477,4 @@ jobs:
             -Dsonar.projectBaseDir=back
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
