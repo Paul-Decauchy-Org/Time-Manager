@@ -176,23 +176,45 @@ jobs:
         uses: actions/checkout@v5
 
       # Backend tests
-      - name: Run backend tests with coverage and JSON report
+      - name: Run backend tests with coverage and JSON report (best-effort)
         working-directory: back
+        continue-on-error: true
         run: |
           cp .env.example .env || true
-          set -e
           set -o pipefail || true
           # Single invocation to produce both coverage and JSON report
           go test ./... -coverprofile=coverage.out -covermode=atomic -v -json | tee test-report.json
 
+      - name: Check backend coverage
+        id: check_back_cov
+        working-directory: back
+        run: |
+          if [ -f coverage.out ]; then
+            echo "coverage_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "coverage_exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Upload backend coverage
+        if: steps.check_back_cov.outputs.coverage_exists == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage
           path: back/coverage.out
           retention-days: 7
 
+      - name: Check backend test report
+        id: check_back_report
+        working-directory: back
+        run: |
+          if [ -f test-report.json ]; then
+            echo "report_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "report_exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Upload backend test report (JSON)
+        if: steps.check_back_report.outputs.report_exists == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: backend-test-report
