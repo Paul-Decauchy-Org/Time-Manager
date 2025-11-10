@@ -239,7 +239,10 @@ func (s *KpiService) GetTeamKpiSummary(ctx context.Context, teamID uuid.UUID, fr
 	}
 
 	// build sorted coverage slice
-	type kv struct{ t string; v int }
+	type kv struct {
+		t string
+		v int
+	}
 	tmp := make([]kv, 0, len(coverageCounts))
 	for k, v := range coverageCounts {
 		tmp = append(tmp, kv{t: k, v: v})
