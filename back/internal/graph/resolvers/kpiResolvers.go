@@ -47,10 +47,14 @@ func (r *queryResolver) KpiTeamSummary(ctx context.Context, teamID string, from 
 	}
 	var fromT, toT time.Time
 	if from != nil && *from != "" {
-		if t, err := time.Parse("2006-01-02", *from); err == nil { fromT = t }
+		if t, err := time.Parse("2006-01-02", *from); err == nil {
+			fromT = t
+		}
 	}
 	if to != nil && *to != "" {
-		if t, err := time.Parse("2006-01-02", *to); err == nil { toT = t }
+		if t, err := time.Parse("2006-01-02", *to); err == nil {
+			toT = t
+		}
 	}
 	return r.KpiService.GetTeamKpiSummary(ctx, tid, fromT, toT)
 }
