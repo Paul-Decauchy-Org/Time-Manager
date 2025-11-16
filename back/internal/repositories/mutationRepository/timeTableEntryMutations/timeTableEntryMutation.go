@@ -14,6 +14,9 @@ import (
 	"gorm.io/gorm"
 )
 
+const layoutISO = "2006-01-02"
+const userIdAndDayCondition = "user_id = ? AND day = ?"
+
 func ClockIn(ctx context.Context, db *gorm.DB) (*model.TimeTableEntry, error) {
 	userIDstr, ok := ctx.Value(middlewares.ContextUserIDKey).(string)
 	if !ok || userIDstr == "" {
@@ -25,11 +28,11 @@ func ClockIn(ctx context.Context, db *gorm.DB) (*model.TimeTableEntry, error) {
 		return nil, fmt.Errorf("invalid user ID in context: %v", err)
 	}
 
-	currentDate := time.Now().Format("2006-01-02")
+	currentDate := time.Now().Format(layoutISO)
 	now := time.Now()
 
 	var existingEntry dbmodels.TimeTableEntry
-	result := db.Where("user_id = ? AND day = ?", userID, currentDate).First(&existingEntry)
+	result := db.Where(userIdAndDayCondition, userID, currentDate).First(&existingEntry)
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -81,11 +84,11 @@ func ClockOut(ctx context.Context, db *gorm.DB) (*model.TimeTableEntry, error) {
 		return nil, fmt.Errorf("invalid user ID format: %w", err)
 	}
 
-	currentDate := time.Now().Format("2006-01-02")
+	currentDate := time.Now().Format(layoutISO)
 	now := time.Now()
 
 	var existingEntry dbmodels.TimeTableEntry
-	result := db.Where("user_id = ? AND day = ?", userID, currentDate).First(&existingEntry)
+	result := db.Where(userIdAndDayCondition, userID, currentDate).First(&existingEntry)
 
 	if result.Error != nil {
 		return nil, errors.New("no clock-in record found for today")
@@ -108,7 +111,7 @@ func ClockOut(ctx context.Context, db *gorm.DB) (*model.TimeTableEntry, error) {
 func checkPlannedHours(db *gorm.DB, userID uuid.UUID, now time.Time) {
 	dayOfWeek := now.Weekday().String()
 	var timeTable dbmodels.TimeTable
-	if err := db.Where("user_id = ? AND day = ?", userID, dayOfWeek).First(&timeTable).Error; err == nil {
+	if err := db.Where(userIdAndDayCondition, userID, dayOfWeek).First(&timeTable).Error; err == nil {
 		plannedStart := timeTable.Start
 
 		nowHour, nowMin := now.Hour(), now.Minute()

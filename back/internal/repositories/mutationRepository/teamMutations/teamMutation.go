@@ -12,11 +12,18 @@ import (
 	dbmodels "github.com/epitech/timemanager/internal/models"
 	"github.com/epitech/timemanager/package/database"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
+
+var databaseInitializationError = errors.New("database not initialized")
+var teamIdFormatError = errors.New("invalid team ID format")
+
+const idCondition = "id = ?"
+const userIdAndTeamIdCondition = "user_id = ? AND team_id = ?"
 
 func CreateTeam(input gmodel.CreateTeamInput) (*gmodel.Team, error) {
 	if database.DB == nil {
-		return nil, errors.New("database not initialized")
+		return nil, databaseInitializationError
 	}
 	db := database.DB
 
@@ -71,7 +78,7 @@ func CreateTeam(input gmodel.CreateTeamInput) (*gmodel.Team, error) {
 
 func UpdateTeam(id string, input gmodel.UpdateTeamInput) (*gmodel.Team, error) {
 	if database.DB == nil {
-		return nil, errors.New("database not initialized")
+		return nil, databaseInitializationError
 	}
 	db := database.DB
 
@@ -83,14 +90,18 @@ func UpdateTeam(id string, input gmodel.UpdateTeamInput) (*gmodel.Team, error) {
 		}
 	}()
 
+	rollbackErr := func(err error) (*gmodel.Team, error) {
+		tx.Rollback()
+		return nil, err
+	}
+
 	teamID, err := uuid.Parse(id)
 	if err != nil {
-		return nil, errors.New("invalid team ID format")
+		return nil, teamIdFormatError
 	}
 	var team dbmodels.Team
-	if err := tx.Where("id = ?", teamID).First(&team).Error; err != nil {
-		tx.Rollback()
-		return nil, errors.New("team not found: " + err.Error())
+	if err := tx.Where(idCondition, teamID).First(&team).Error; err != nil {
+		return rollbackErr(errors.New("team not found: " + err.Error()))
 	}
 
 	if input.Name != nil {
@@ -102,31 +113,18 @@ func UpdateTeam(id string, input gmodel.UpdateTeamInput) (*gmodel.Team, error) {
 	if input.ManagerID != nil {
 		managerUUID, err := uuid.Parse(*input.ManagerID)
 		if err != nil {
-			tx.Rollback()
-			return nil, errors.New("invalid manager ID format")
+			return rollbackErr(errors.New("invalid manager ID format"))
 		}
 
-		var newManager dbmodels.User
-		if err := tx.First(&newManager, managerUUID).Error; err != nil {
-			tx.Rollback()
-			return nil, errors.New("new manager not found")
-		}
-
-		if newManager.Role != dbmodels.Role(gmodel.RoleAdmin) &&
-			newManager.Role != dbmodels.Role(gmodel.RoleManager) {
-			newManager.Role = dbmodels.Role(gmodel.RoleManager)
-			if err := tx.Save(&newManager).Error; err != nil {
-				tx.Rollback()
-				return nil, errors.New("failed to update new manager role: " + err.Error())
-			}
+		if err := updateManagerRole(tx, managerUUID); err != nil {
+			return rollbackErr(err)
 		}
 
 		team.ManagerID = managerUUID
 	}
 
 	if err := tx.Save(&team).Error; err != nil {
-		tx.Rollback()
-		return nil, errors.New("failed to update team: " + err.Error())
+		return rollbackErr(errors.New("failed to update team: " + err.Error()))
 	}
 	// Valider la transaction
 	if err := tx.Commit().Error; err != nil {
@@ -134,22 +132,40 @@ func UpdateTeam(id string, input gmodel.UpdateTeamInput) (*gmodel.Team, error) {
 	}
 
 	var updatedTeam dbmodels.Team
-	if err := db.Preload("Manager").Where("id = ?", teamID).First(&updatedTeam).Error; err != nil {
+	if err := db.Preload("Manager").Where(idCondition, teamID).First(&updatedTeam).Error; err != nil {
 		return nil, err
 	}
 
 	return teamMapper.DBTeamToGraph(&updatedTeam), nil
 }
 
+func updateManagerRole(tx *gorm.DB, managerUUID uuid.UUID) error {
+	var newManager dbmodels.User
+	if err := tx.First(&newManager, managerUUID).Error; err != nil {
+		return errors.New("new manager not found")
+	}
+
+	// If already Admin or Manager, nothing to do
+	if newManager.Role == dbmodels.Role(gmodel.RoleAdmin) || newManager.Role == dbmodels.Role(gmodel.RoleManager) {
+		return nil
+	}
+
+	newManager.Role = dbmodels.Role(gmodel.RoleManager)
+	if err := tx.Save(&newManager).Error; err != nil {
+		return errors.New("failed to update new manager role: " + err.Error())
+	}
+	return nil
+}
+
 func DeleteTeam(id string) (bool, error) {
 	if database.DB == nil {
-		return false, errors.New("database not initialized")
+		return false, databaseInitializationError
 	}
 	db := database.DB
 
 	teamID, err := uuid.Parse(id)
 	if err != nil {
-		return false, errors.New("invalid team ID format")
+		return false, teamIdFormatError
 	}
 
 	tx := db.Begin()
@@ -160,7 +176,7 @@ func DeleteTeam(id string) (bool, error) {
 	}()
 
 	var team dbmodels.Team
-	if err := tx.Where("id = ?", teamID).First(&team).Error; err != nil {
+	if err := tx.Where(idCondition, teamID).First(&team).Error; err != nil {
 		tx.Rollback()
 		return false, errors.New("team not found: " + err.Error())
 	}
@@ -184,7 +200,7 @@ func DeleteTeam(id string) (bool, error) {
 
 func AddUserToTeam(userID string, teamID string) (*gmodel.TeamUser, error) {
 	if database.DB == nil {
-		return nil, errors.New("database not initialized")
+		return nil, databaseInitializationError
 	}
 	db := database.DB
 
@@ -195,21 +211,21 @@ func AddUserToTeam(userID string, teamID string) (*gmodel.TeamUser, error) {
 
 	teamUUID, err := uuid.Parse(teamID)
 	if err != nil {
-		return nil, errors.New("invalid team ID format")
+		return nil, teamIdFormatError
 	}
 
 	var user dbmodels.User
-	if err := db.Where("id = ?", userUUID).First(&user).Error; err != nil {
+	if err := db.Where(idCondition, userUUID).First(&user).Error; err != nil {
 		return nil, errors.New("user not found")
 	}
 
 	var team dbmodels.Team
-	if err := db.Where("id = ?", teamUUID).First(&team).Error; err != nil {
+	if err := db.Where(idCondition, teamUUID).First(&team).Error; err != nil {
 		return nil, errors.New("team not found")
 	}
 
 	var existingTeamUser dbmodels.TeamUser
-	result := db.Where("user_id = ? AND team_id = ?", userUUID, teamUUID).First(&existingTeamUser)
+	result := db.Where(userIdAndTeamIdCondition, userUUID, teamUUID).First(&existingTeamUser)
 	if result.Error == nil {
 		return nil, errors.New("user is already in this team")
 	}
@@ -225,7 +241,7 @@ func AddUserToTeam(userID string, teamID string) (*gmodel.TeamUser, error) {
 
 	// Reload with composite key
 	if err := db.Preload("User").Preload("Team").Preload("Team.Manager").
-		Where("user_id = ? AND team_id = ?", userUUID, teamUUID).
+		Where(userIdAndTeamIdCondition, userUUID, teamUUID).
 		First(&teamUser).Error; err != nil {
 		return nil, errors.New("failed to load team user data: " + err.Error())
 	}
@@ -235,17 +251,17 @@ func AddUserToTeam(userID string, teamID string) (*gmodel.TeamUser, error) {
 
 func AddUsersToTeam(input gmodel.AddUsersToTeamInput) ([]*gmodel.TeamUser, error) {
 	if database.DB == nil {
-		return nil, errors.New("database not initialized")
+		return nil, databaseInitializationError
 	}
 	db := database.DB
 
 	teamUUID, err := uuid.Parse(input.TeamID)
 	if err != nil {
-		return nil, errors.New("invalid team ID format")
+		return nil, teamIdFormatError
 	}
 
 	var team dbmodels.Team
-	if err := db.Where("id = ?", teamUUID).First(&team).Error; err != nil {
+	if err := db.Where(idCondition, teamUUID).First(&team).Error; err != nil {
 		return nil, errors.New("team not found")
 	}
 
@@ -260,44 +276,12 @@ func AddUsersToTeam(input gmodel.AddUsersToTeamInput) ([]*gmodel.TeamUser, error
 	failedUsers := make([]string, 0)
 
 	for _, userIDStr := range input.UserIDs {
-		userUUID, err := uuid.Parse(userIDStr)
-		if err != nil {
-			failedUsers = append(failedUsers, fmt.Sprintf("%s (invalid ID format)", userIDStr))
+		res, fail := addUserToTeamTx(tx, teamUUID, userIDStr)
+		if fail != "" {
+			failedUsers = append(failedUsers, fail)
 			continue
 		}
-
-		var user dbmodels.User
-		if err := tx.Where("id = ?", userUUID).First(&user).Error; err != nil {
-			failedUsers = append(failedUsers, fmt.Sprintf("%s (user not found)", userIDStr))
-			continue
-		}
-
-		var existingTeamUser dbmodels.TeamUser
-		result := tx.Where("user_id = ? AND team_id = ?", userUUID, teamUUID).First(&existingTeamUser)
-		if result.Error == nil {
-			failedUsers = append(failedUsers, fmt.Sprintf("%s (already in team)", userIDStr))
-			continue
-		}
-
-		teamUser := dbmodels.TeamUser{
-			UserID: userUUID,
-			TeamID: teamUUID,
-		}
-
-		if err := tx.Create(&teamUser).Error; err != nil {
-			failedUsers = append(failedUsers, fmt.Sprintf("%s (db error)", userIDStr))
-			continue
-		}
-
-		// Reload with composite key
-		if err := tx.Preload("User").Preload("Team").Preload("Team.Manager").
-			Where("user_id = ? AND team_id = ?", userUUID, teamUUID).
-			First(&teamUser).Error; err != nil {
-			failedUsers = append(failedUsers, fmt.Sprintf("%s (load error)", userIDStr))
-			continue
-		}
-
-		results = append(results, teamUserMapper.DBTeamUserToGraph(&teamUser))
+		results = append(results, res)
 	}
 
 	if len(results) == 0 {
@@ -316,9 +300,43 @@ func AddUsersToTeam(input gmodel.AddUsersToTeamInput) ([]*gmodel.TeamUser, error
 	return results, nil
 }
 
+func addUserToTeamTx(tx *gorm.DB, teamUUID uuid.UUID, userIDStr string) (*gmodel.TeamUser, string) {
+	userUUID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		return nil, fmt.Sprintf("%s (invalid ID format)", userIDStr)
+	}
+
+	var user dbmodels.User
+	if err := tx.Where(idCondition, userUUID).First(&user).Error; err != nil {
+		return nil, fmt.Sprintf("%s (user not found)", userIDStr)
+	}
+
+	var existingTeamUser dbmodels.TeamUser
+	if err := tx.Where(userIdAndTeamIdCondition, userUUID, teamUUID).First(&existingTeamUser).Error; err == nil {
+		return nil, fmt.Sprintf("%s (already in team)", userIDStr)
+	}
+
+	teamUser := dbmodels.TeamUser{
+		UserID: userUUID,
+		TeamID: teamUUID,
+	}
+
+	if err := tx.Create(&teamUser).Error; err != nil {
+		return nil, fmt.Sprintf("%s (db error)", userIDStr)
+	}
+
+	if err := tx.Preload("User").Preload("Team").Preload("Team.Manager").
+		Where(userIdAndTeamIdCondition, userUUID, teamUUID).
+		First(&teamUser).Error; err != nil {
+		return nil, fmt.Sprintf("%s (load error)", userIDStr)
+	}
+
+	return teamUserMapper.DBTeamUserToGraph(&teamUser), ""
+}
+
 func RemoveUserFromTeam(userID string, teamID string) (bool, error) {
 	if database.DB == nil {
-		return false, errors.New("database not initialized")
+		return false, databaseInitializationError
 	}
 	db := database.DB
 
@@ -329,10 +347,10 @@ func RemoveUserFromTeam(userID string, teamID string) (bool, error) {
 
 	teamUUID, err := uuid.Parse(teamID)
 	if err != nil {
-		return false, errors.New("invalid team ID format")
+		return false, teamIdFormatError
 	}
 
-	result := db.Where("user_id = ? AND team_id = ?", userUUID, teamUUID).Delete(&dbmodels.TeamUser{})
+	result := db.Where(userIdAndTeamIdCondition, userUUID, teamUUID).Delete(&dbmodels.TeamUser{})
 	if result.Error != nil {
 		return false, errors.New("failed to remove user from team: " + result.Error.Error())
 	}

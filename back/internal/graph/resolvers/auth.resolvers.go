@@ -10,6 +10,8 @@ import (
 	"github.com/epitech/timemanager/package/middlewares"
 )
 
+var cannotFindEmailInContextError = errors.New("could not find email in context")
+
 // signUp resolver
 func (r *mutationResolver) SignUp(ctx context.Context, input model.SignUpInput) (*model.User, error) {
 	return r.AuthService.SignUp(input)
@@ -55,7 +57,7 @@ func (r *mutationResolver) Logout(ctx context.Context) (string, error) {
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 	email, ok := ctx.Value(middlewares.ContextUserEmailKey).(string)
 	if !ok {
-		return nil, errors.New("could not find email in context")
+		return nil, cannotFindEmailInContextError
 	}
 	return r.AuthService.Me(email)
 }
@@ -64,7 +66,7 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 func (r *mutationResolver) UpdateProfile(ctx context.Context, input model.UpdateProfileInput) (*model.User, error) {
 	email, ok := ctx.Value(middlewares.ContextUserEmailKey).(string)
 	if !ok {
-		return nil, errors.New("could not find email in context")
+		return nil, cannotFindEmailInContextError
 	}
 	return r.AuthService.UpdateProfile(email, input)
 }
@@ -73,7 +75,7 @@ func (r *mutationResolver) UpdateProfile(ctx context.Context, input model.Update
 func (r *mutationResolver) DeleteProfile(ctx context.Context) (bool, error) {
 	email, ok := ctx.Value(middlewares.ContextUserEmailKey).(string)
 	if !ok {
-		return false, errors.New("could not find email in context")
+		return false, cannotFindEmailInContextError
 	}
 	w, ok := ctx.Value("ResponseWriter").(http.ResponseWriter)
 	if !ok {
