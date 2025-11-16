@@ -160,3 +160,109 @@ func (s *KpiService) GetUserKpiSummary(ctx context.Context, userID *uuid.UUID, f
 	}
 	return res, nil
 }
+
+// GetTeamKpiSummary aggregates KPIs for a team in a date range.
+// - totalWorkedMinutes: sum of durations for all entries in window
+// - avgWorkedMinutesPerUser: total / distinct users appearing in entries
+// - activeUsers: users with an open entry (status true and no departure) at query time
+// - coverage: number of concurrent users per hour slice (ISO timestamps)
+func (s *KpiService) GetTeamKpiSummary(ctx context.Context, teamID uuid.UUID, from, to time.Time) (*model.TeamKpiSummary, error) {
+	end := to
+	start := from
+	if end.IsZero() {
+		end = time.Now()
+	}
+	if start.IsZero() {
+		start = end.AddDate(0, 0, -30)
+	}
+	if start.After(end) {
+		start, end = end, start
+	}
+
+	// fetch entries filtered by team and date range
+	tid := teamID
+	entries, err := s.Repo.GetTimeTableEntriesFiltered(nil, &tid, &start, &end)
+	if err != nil {
+		return nil, err
+	}
+
+	totalWorkedMinutes := 0
+	distinctUsers := map[string]struct{}{}
+	activeNow := map[string]struct{}{}
+	coverageCounts := map[string]int{}
+
+	now := time.Now()
+	for _, e := range entries {
+		// track distinct users
+		if e.UserID != nil {
+			distinctUsers[e.UserID.ID] = struct{}{}
+		}
+		arr := e.Arrival
+		dep := e.Departure
+		effectiveDep := dep
+		if dep == nil || dep.IsZero() {
+			if e.Status {
+				effectiveDep = &now
+				if e.UserID != nil {
+					activeNow[e.UserID.ID] = struct{}{}
+				}
+			}
+		}
+		if effectiveDep == nil || effectiveDep.Before(arr) {
+			continue
+		}
+		durMin := int(effectiveDep.Sub(arr).Minutes())
+		if durMin < 0 {
+			durMin = 0
+		}
+		totalWorkedMinutes += durMin
+
+		// coverage per hour buckets
+		sh := arr.Truncate(time.Hour)
+		eh := effectiveDep.Truncate(time.Hour)
+		for cur := sh; !cur.After(eh); cur = cur.Add(time.Hour) {
+			// ignore buckets completely outside requested window
+			if cur.Before(start) && cur.Add(time.Hour).Before(start) {
+				continue
+			}
+			if cur.After(end) {
+				break
+			}
+			key := cur.Format(time.RFC3339)
+			coverageCounts[key]++
+		}
+	}
+
+	avg := 0.0
+	if len(distinctUsers) > 0 {
+		avg = float64(totalWorkedMinutes) / float64(len(distinctUsers))
+	}
+
+	// build sorted coverage slice
+	type kv struct {
+		t string
+		v int
+	}
+	tmp := make([]kv, 0, len(coverageCounts))
+	for k, v := range coverageCounts {
+		tmp = append(tmp, kv{t: k, v: v})
+	}
+	sort.Slice(tmp, func(i, j int) bool { return tmp[i].t < tmp[j].t })
+	cov := make([]*model.CoveragePoint, 0, len(tmp))
+	for _, p := range tmp {
+		if ts, err := time.Parse(time.RFC3339, p.t); err == nil {
+			cov = append(cov, &model.CoveragePoint{Time: ts, Count: int32(p.v)})
+		}
+	}
+
+	out := &model.TeamKpiSummary{
+		From:                    start.Format("2006-01-02"),
+		To:                      end.Format("2006-01-02"),
+		TeamID:                  teamID.String(),
+		TotalWorkedMinutes:      int32(totalWorkedMinutes),
+		AvgWorkedMinutesPerUser: avg,
+		ActiveUsers:             int32(len(activeNow)),
+		Coverage:                cov,
+	}
+	return out, nil
+}

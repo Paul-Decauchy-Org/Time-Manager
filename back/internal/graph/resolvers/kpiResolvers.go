@@ -2,6 +2,7 @@ package resolvers
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/epitech/timemanager/internal/graph/model"
@@ -37,20 +38,23 @@ func (r *queryResolver) KpiTeamSummary(ctx context.Context, teamID string, from 
 	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
 		return nil, err
 	}
-	var fromS, toS string
-	if from != nil {
-		fromS = *from
+	if teamID == "" {
+		return nil, errors.New("teamID required")
 	}
-	if to != nil {
-		toS = *to
+	tid, err := uuid.Parse(teamID)
+	if err != nil {
+		return nil, errors.New("invalid teamID")
 	}
-	return &model.TeamKpiSummary{
-		From:                    fromS,
-		To:                      toS,
-		TeamID:                  teamID,
-		TotalWorkedMinutes:      0,
-		AvgWorkedMinutesPerUser: 0,
-		ActiveUsers:             0,
-		Coverage:                []*model.CoveragePoint{},
-	}, nil
+	var fromT, toT time.Time
+	if from != nil && *from != "" {
+		if t, err := time.Parse("2006-01-02", *from); err == nil {
+			fromT = t
+		}
+	}
+	if to != nil && *to != "" {
+		if t, err := time.Parse("2006-01-02", *to); err == nil {
+			toT = t
+		}
+	}
+	return r.KpiService.GetTeamKpiSummary(ctx, tid, fromT, toT)
 }

@@ -2,8 +2,9 @@ name: Time Manager CI/CD Pipeline
 
 on:
   push:
+    branches: ["**"]
   pull_request:
-    branches: ["main"]
+    branches: ["**"]
 
 jobs:
   # ============================================
@@ -48,7 +49,6 @@ jobs:
         run: |
           cd front
           npm ci
-
       # - name: Lint frontend (Biome)
       #   working-directory: front
       #   run: npm run lint -- --max-diagnostics=200
@@ -176,25 +176,49 @@ jobs:
         uses: actions/checkout@v5
 
       # Backend tests
-      - name: Run backend tests
+      - name: Run backend tests with coverage and JSON report (best-effort)
         working-directory: back
+        continue-on-error: true
         run: |
           cp .env.example .env || true
-          # Fail fast semantics with readable logs: capture output to test.log
           set -o pipefail || true
-          go test ./... -v 2>&1 | tee test.log
-      - name: Show test failures (tail)
+          # Single invocation to produce both coverage and JSON report
+          go test ./... -coverprofile=coverage.out -covermode=atomic -v -json | tee test-report.json
+
+      - name: Check backend coverage
+        id: check_back_cov
         working-directory: back
         run: |
-          # print any FAIL lines and last 200 lines to the log for quick debugging
-          grep -n "FAIL" test.log || true
-          echo '--- last 200 lines of test.log ---'
-          tail -n 200 test.log || true
-      - name: Upload backend test log
+          if [ -f coverage.out ]; then
+            echo "coverage_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "coverage_exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload backend coverage
+        if: steps.check_back_cov.outputs.coverage_exists == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: backend-test-log
-          path: back/test.log
+          name: backend-coverage
+          path: back/coverage.out
+          retention-days: 7
+
+      - name: Check backend test report
+        id: check_back_report
+        working-directory: back
+        run: |
+          if [ -f test-report.json ]; then
+            echo "report_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "report_exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload backend test report (JSON)
+        if: steps.check_back_report.outputs.report_exists == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-report
+          path: back/test-report.json
           retention-days: 7
       # backend coverage generation/upload removed per request
 
@@ -245,6 +269,21 @@ jobs:
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix:
+        include:
+          - component: back
+            context: ./back
+            dockerfile: ./back/Dockerfile
+            image: time-manager-back
+          - component: front
+            context: ./front
+            dockerfile: ./front/Dockerfile
+            image: time-manager-front
+          - component: nginx
+            context: ./nginx
+            dockerfile: ./nginx/Dockerfile
+            image: time-manager-nginx
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -252,68 +291,33 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to GHCR
+      - name: Compute lowercase owner
+        id: gh
+        run: echo "owner_lc=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push backend image
-        uses: docker/build-push-action@v5
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
         with:
-          context: ./back
-          file: ./back/Dockerfile
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/time-manager-back:latest
-            ghcr.io/${{ github.repository_owner }}/time-manager-back:${{ github.sha }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-back:cache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-back:cache,mode=max
-
-      - name: Push frontend image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./front
-          file: ./front/Dockerfile
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/time-manager-front:latest
-            ghcr.io/${{ github.repository_owner }}/time-manager-front:${{ github.sha }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-front:cache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-front:cache,mode=max
-
-      - name: Push nginx image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./nginx
-          file: ./nginx/Dockerfile
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/time-manager-nginx:latest
-            ghcr.io/${{ github.repository_owner }}/time-manager-nginx:${{ github.sha }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-nginx:cache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/time-manager-nginx:cache,mode=max
-
-      - name: Tag database image (official postgres)
-        run: |
-          docker pull postgres:16-alpine
-          docker tag postgres:16-alpine ghcr.io/${{ github.repository_owner }}/time-manager-postgres:16-alpine
-          docker tag postgres:16-alpine ghcr.io/${{ github.repository_owner }}/time-manager-postgres:${{ github.sha }}
-          docker push ghcr.io/${{ github.repository_owner }}/time-manager-postgres:16-alpine
-          docker push ghcr.io/${{ github.repository_owner }}/time-manager-postgres:${{ github.sha }}
-
-      - name: Summary
-        run: |
-          echo "Images pushed to GHCR (latest + SHA):" >> $GITHUB_STEP_SUMMARY
-          echo " - back" >> $GITHUB_STEP_SUMMARY
-          echo " - front" >> $GITHUB_STEP_SUMMARY
-          echo " - nginx" >> $GITHUB_STEP_SUMMARY
-          echo " - postgres (re-tag of official)" >> $GITHUB_STEP_SUMMARY
+            ghcr.io/${{ steps.gh.outputs.owner_lc }}/${{ matrix.image }}:latest
+            ghcr.io/${{ steps.gh.outputs.owner_lc }}/${{ matrix.image }}:${{ github.sha }}
+          platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   # ============================================
   # SonarCloud scan (backend + frontend) using SonarCloud GitHub Action
-  # requires secrets: SONAR_TOKEN, SONAR_ORGANIZATION
+  # requires secret: SONAR_TOKEN (organization key is read from sonar-project.properties)
   # ============================================
   sonarcloud-scan:
     runs-on: ubuntu-latest
@@ -322,64 +326,12 @@ jobs:
     needs: [tests, frontend-build]
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
     steps:
-      - name: Verify SonarCloud secrets
-        run: |
-          if [ -z "$SONAR_TOKEN" ] || [ -z "$SONAR_ORGANIZATION" ]; then
-            echo "::error::Missing SONAR_TOKEN or SONAR_ORGANIZATION secrets. Please add them in Settings → Secrets → Actions."
-            exit 1
-          else
-            echo "Sonar secrets present. Proceeding with scan."
-          fi
-
-      - name: Verify SonarCloud organization and token (API check)
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
-        run: |
-          echo "Checking SonarCloud token validity..."
-          token_resp=$(curl -s -u "$SONAR_TOKEN": "https://sonarcloud.io/api/authentication/validate")
-          echo "$token_resp" | grep -q '"valid":true' || {
-            echo "::error::Invalid SONAR_TOKEN or missing permissions. Generate a token in SonarCloud (Account → Security) within the target organization."
-            exit 1
-          }
-
-          echo "Checking SonarCloud organization access for key '$SONAR_ORGANIZATION'..."
-          org_status=$(curl -s -o /dev/null -w "%{http_code}" -u "$SONAR_TOKEN": "https://sonarcloud.io/api/organizations/show?key=$SONAR_ORGANIZATION")
-          if [ "$org_status" != "200" ]; then
-            echo "::error::SonarCloud organization '$SONAR_ORGANIZATION' not found or the token cannot access it."
-            echo "Ensure SONAR_ORGANIZATION is the organization KEY (e.g. 'paul-decauchy-org'), not the display name, and the token belongs to that org."
-            exit 1
-          fi
-          echo "Token valid and organization accessible."
-
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v5
-
-      - name: Download backend coverage (if uploaded)
-        uses: actions/download-artifact@v4
         with:
-          name: backend-coverage
-          path: back
-        continue-on-error: true
-
-      - name: Download frontend coverage (if uploaded)
-        uses: actions/download-artifact@v4
-        with:
-          name: front-coverage
-          path: front/coverage
-        continue-on-error: true
-
-      - name: SonarCloud Scan (monorepo)
-        uses: SonarSource/sonarcloud-github-action@master
-        with:
-          # We rely on sonar-project.properties at repo root which already
-          # sets sonar.sources=back,front and coverage paths.
-          args: >
-            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+          fetch-depth: 0
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      - name: Notify SonarCloud scan finished
-        run: echo "SonarCloud scans finished for backend and frontend. Check SonarCloud dashboard."

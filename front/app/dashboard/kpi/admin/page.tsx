@@ -53,7 +53,7 @@ function StatCard(IconComp: any, label: string, value: string | number, colorKey
         { className: "flex items-center gap-3" },
         React.createElement(
           "div",
-            { className: `h-9 w-9 rounded-full flex items-center justify-center ${c.iconBg}` },
+          { className: `h-9 w-9 rounded-full flex items-center justify-center ${c.iconBg}` },
           React.createElement(IconComp, { className: `h-5 w-5 ${c.icon}` })
         ),
         React.createElement("div", null,
@@ -94,8 +94,8 @@ export default function AdminKpiPage() {
           fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ query: qUsers }) }),
           fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ query: qTeams }) }),
         ])
-  const ju = await ru.json()
-  const jt = await rt.json()
+        const ju = await ru.json()
+        const jt = await rt.json()
         const allUsers: any[] = ju?.data?.UsersWithAllData ?? []
         const allTeams: any[] = jt?.data?.teams ?? []
         const filtered = allTeams.filter((t) => !isManager || t.managerID?.id === user?.id)
@@ -168,9 +168,9 @@ export default function AdminKpiPage() {
       React.createElement("div", { className: "flex items-center justify-between mb-4" },
         React.createElement("div", { className: "text-2xl font-semibold" }, "KPIs Admin"),
         React.createElement("div", { className: "hidden md:flex items-center gap-2" },
-          React.createElement("button", { className: `h-8 rounded-md border px-3 text-sm ${preset === "7d" ? "bg-accent" : "hover:bg-accent/60"}` , onClick: () => setPreset("7d") }, "7 jours"),
-          React.createElement("button", { className: `h-8 rounded-md border px-3 text-sm ${preset === "30d" ? "bg-accent" : "hover:bg-accent/60"}` , onClick: () => setPreset("30d") }, "30 jours"),
-          React.createElement("button", { className: `h-8 rounded-md border px-3 text-sm ${preset === "90d" ? "bg-accent" : "hover:bg-accent/60"}` , onClick: () => setPreset("90d") }, "90 jours"),
+          React.createElement("button", { className: `h-8 rounded-md border px-3 text-sm ${preset === "7d" ? "bg-accent" : "hover:bg-accent/60"}`, onClick: () => setPreset("7d") }, "7 jours"),
+          React.createElement("button", { className: `h-8 rounded-md border px-3 text-sm ${preset === "30d" ? "bg-accent" : "hover:bg-accent/60"}`, onClick: () => setPreset("30d") }, "30 jours"),
+          React.createElement("button", { className: `h-8 rounded-md border px-3 text-sm ${preset === "90d" ? "bg-accent" : "hover:bg-accent/60"}`, onClick: () => setPreset("90d") }, "90 jours"),
         )
       ),
       React.createElement("div", { className: "grid gap-4 grid-cols-1 md:grid-cols-3 mb-6" },
@@ -204,18 +204,20 @@ export default function AdminKpiPage() {
           "Couverture globale (somme des equipes)"
         ),
         React.createElement(ChartContainer as any, { config: { count: { label: "Presence", color: "var(--primary)" } }, className: "aspect-auto h-[260px] w-full" },
-          React.createElement(AreaChart as any, { data: coverage },
-            React.createElement("defs", null,
-              React.createElement("linearGradient", { id: "fillAdminCount", x1: "0", y1: "0", x2: "0", y2: "1" },
-                React.createElement("stop", { offset: "5%", stopColor: "var(--color-count)", stopOpacity: 0.8 }),
-                React.createElement("stop", { offset: "95%", stopColor: "var(--color-count)", stopOpacity: 0.1 }),
+          (coverage.length === 0)
+            ? React.createElement("div", { className: "flex h-full items-center justify-center text-sm text-muted-foreground" }, "Aucune donnée sur la période sélectionnée")
+            : React.createElement(AreaChart as any, { data: coverage },
+                React.createElement("defs", null,
+                  React.createElement("linearGradient", { id: "fillAdminCount", x1: "0", y1: "0", x2: "0", y2: "1" },
+                    React.createElement("stop", { offset: "5%", stopColor: "var(--color-count)", stopOpacity: 0.8 }),
+                    React.createElement("stop", { offset: "95%", stopColor: "var(--color-count)", stopOpacity: 0.1 }),
+                  )
+                ),
+                React.createElement(CartesianGrid as any, { vertical: false }),
+                React.createElement(XAxis as any, { dataKey: "time", tickLine: false, axisLine: false, tickMargin: 8, minTickGap: 16, tickFormatter: fmtTick }),
+                React.createElement(ChartTooltip as any, { cursor: false, content: React.createElement(ChartTooltipContent as any, { indicator: "dot" }) }),
+                React.createElement(Area as any, { dataKey: "count", type: "natural", fill: "url(#fillAdminCount)", stroke: "var(--color-count)" })
               )
-            ),
-            React.createElement(CartesianGrid as any, { vertical: false }),
-            React.createElement(XAxis as any, { dataKey: "time", tickLine: false, axisLine: false, tickMargin: 8, minTickGap: 16, tickFormatter: fmtTick }),
-            React.createElement(ChartTooltip as any, { cursor: false, content: React.createElement(ChartTooltipContent as any, { indicator: "dot" }) }),
-            React.createElement(Area as any, { dataKey: "count", type: "natural", fill: "url(#fillAdminCount)", stroke: "var(--color-count)" })
-          )
         )
       ),
       status ? React.createElement("div", { className: "pt-3 text-destructive" }, status) : null

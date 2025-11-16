@@ -7,7 +7,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select"
 import { Heatmap } from "@/components/heatmap"
 import { Users, Clock, AlertTriangle, TrendingUp } from "lucide-react"
-import { KpiTeamSummaryDocument, AllUsersDocument } from "@/generated/graphql"
+import { KpiTeamSummaryDocument, AllUsersDocument, TeamsDocument } from "@/generated/graphql"
 import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client"
 
 function getEntriesForTeam(users: any[], teamID: string, from: string, to: string) {
@@ -122,64 +122,53 @@ export default function TeamKpiPage() {
     const [preset, setPreset] = React.useState<string>("30d")
     const { from, to } = rangeFromPreset(preset)
 
-    const [loading, setLoading] = React.useState(false)
+    // Local UI state
     const [error, setError] = React.useState<string | null>(null)
-    const [summary, setSummary] = React.useState<any>(null)
+    const [loading, setLoading] = React.useState<boolean>(false)
     const [teams, setTeams] = React.useState<any[]>([])
     const [teamID, setTeamID] = React.useState<string | null>(null)
-    const [teamName, setTeamName] = React.useState<string>("")
-    const [teamEntries, setTeamEntries] = React.useState<any[]>([])
 
-
-    // Load teams and set initial selection
     React.useEffect(() => {
         let cancelled = false
         async function run() {
             try {
-                const endpoint = process.env.NEXT_PUBLIC_SCHEMA_URL as string
-                const teamsQuery = `query Teams { teams { id name managerID { id } } }`
-                const teamsResp = await fetch(endpoint, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify({ query: teamsQuery }),
-                })
-                const teamsJson = await teamsResp.json()
-                const t: any[] = teamsJson?.data?.teams ?? []
-                if (!cancelled) { setTeams(t) }
-                const initial = t.find((x) => !isManager || x.managerID?.id === user?.id) || t[0]
-                if (!cancelled && initial) {
-                    setTeamID(initial.id)
-                    setTeamName(initial.name)
+                const res = await clientRef.current.query({ query: TeamsDocument as any, fetchPolicy: "no-cache" })
+                const fetched: any[] = res?.data?.teams ?? []
+                if (!cancelled) {
+                    setTeams(fetched)
+                    if (!teamID && fetched.length) {
+                        const initial = fetched.find((x) => !isManager || x.managerID?.id === user?.id) || fetched[0]
+                        if (initial) {
+                            setTeamID(initial.id)
+                        }
+                    }
                 }
             } catch (e: any) {
-                if (!cancelled) setError(String(e.message ?? e))
+                if (!cancelled) setError(String(e.message || e))
             }
         }
         run()
         return () => { cancelled = true }
-    }, [user?.id, isManager])
+    }, [isManager, user?.id, teamID])
 
-    // Load KPI summary and users' entries for selected team and range
+    const [summary, setSummary] = React.useState<any>(null)
+    const [teamEntries, setTeamEntries] = React.useState<any[]>([])
     React.useEffect(() => {
         let cancelled = false
         async function run() {
             if (!teamID) return
             setLoading(true)
-            setError(null)
             try {
                 const kpiRes = await clientRef.current.query({ query: KpiTeamSummaryDocument as any, variables: { teamID, from, to }, fetchPolicy: "no-cache" })
-                if (!cancelled) { setSummary((kpiRes.data)?.kpiTeamSummary) }
-
-                // Load all users with entries then filter by team (quick solution)
+                if (!cancelled) setSummary(kpiRes?.data?.kpiTeamSummary)
                 const usersRes = await clientRef.current.query({ query: AllUsersDocument as any, fetchPolicy: "no-cache" })
-                const users: any[] = (usersRes.data)?.UsersWithAllData ?? []
+                const users: any[] = usersRes?.data?.UsersWithAllData ?? []
                 const entries = getEntriesForTeam(users, teamID, from, to)
-                if (!cancelled) { setTeamEntries(entries) }
+                if (!cancelled) setTeamEntries(entries)
             } catch (e: any) {
-                if (!cancelled) { setError(String(e.message ?? e)) }
+                if (!cancelled) setError(String(e.message || e))
             } finally {
-                if (!cancelled) { setLoading(false) }
+                if (!cancelled) setLoading(false)
             }
         }
         run()
@@ -188,10 +177,16 @@ export default function TeamKpiPage() {
 
     const cov = (summary?.coverage ?? []).map((c: any) => ({ time: String(c.time), count: Number(c.count) }))
 
-    // Derived stats from teamEntries
     const { latenessRate, topLateName, dailyArr, heatCells } = computeTeamDerived(teamEntries)
 
     const teamsToShow = teams.filter((t) => !isManager || t.managerID?.id === user?.id)
+    const selectedTeamId: string | undefined = React.useMemo(() => {
+        return teamID ?? teamsToShow[0]?.id
+    }, [teamID, teamsToShow]) || undefined
+    const teamName = React.useMemo(() => {
+        const t = teams.find((x) => x.id === selectedTeamId)
+        return t?.name || ""
+    }, [teams, selectedTeamId])
 
     const header = React.createElement(
         "div",
@@ -203,12 +198,10 @@ export default function TeamKpiPage() {
         ),
         React.createElement("div", { className: "flex items-center gap-2" },
             React.createElement(Select as any, {
-                value: teamID || undefined,
+                value: selectedTeamId,
                 onValueChange: (id: string) => {
                     if (id === "no-teams") return
                     setTeamID(id)
-                    const t = teams.find((x) => x.id === id)
-                    setTeamName(t?.name || "")
                 }
             },
                 React.createElement(SelectTrigger as any, { size: "sm", className: "w-[280px]", disabled: teamsToShow.length === 0 },
@@ -296,11 +289,11 @@ export default function TeamKpiPage() {
         { className: "px-6 mb-6" },
         React.createElement("div", { className: "rounded-xl border p-4 shadow-sm" },
             React.createElement("div", { className: "text-lg font-semibold mb-2" }, "Minutes par jour"),
-            React.createElement(ChartContainer as any, { config: { minutes: { label: "Minutes", color: "hsl(210 90% 45%)" } }, className: "aspect-auto h-[260px] w-full" },
+            React.createElement(ChartContainer as any, { config: { minutes: { label: "Minutes", color: "hsla(180, 90%, 45%, 0.45)" } }, className: "aspect-auto h-[260px] w-full" },
                 React.createElement(BarChart as any, { data: dailyArr },
                     React.createElement(CartesianGrid as any, { vertical: false }),
-                    React.createElement(XAxis as any, { dataKey: "date", tickLine: false, axisLine: false, tickMargin: 8, minTickGap: 16 }),
-                    React.createElement(YAxis as any, { hide: true }),
+                    React.createElement(XAxis as any, { dataKey: "date", tickLine: true, axisLine: true, tickMargin: 8, minTickGap: 8 }),
+                    React.createElement(YAxis as any, { hide: false }),
                     React.createElement(ChartTooltip as any, { cursor: { fill: "hsl(210 90% 45% / .05)" }, content: React.createElement(ChartTooltipContent as any, { indicator: "dot" }) }),
                     React.createElement(Bar as any, { dataKey: "minutes", fill: "var(--color-minutes)", radius: [6, 6, 0, 0] })
                 )
