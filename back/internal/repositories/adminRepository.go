@@ -14,6 +14,7 @@ import (
 var idParsingError = errors.New("error while parsing id")
 var userNotFoundError = errors.New("user not found")
 var teamNotFoundError = errors.New("team not found")
+
 const whereID = "id = ?"
 
 func (r *Repository) CreateUser(input model.CreateUserInput) (*model.User, error) {

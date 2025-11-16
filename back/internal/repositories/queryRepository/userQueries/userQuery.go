@@ -12,6 +12,7 @@ import (
 )
 
 var databaseInitializationError = errors.New("database not initialized")
+
 const idNotInCondition = "id NOT IN (?)"
 
 func ListUsers() ([]*gmodel.User, error) {
