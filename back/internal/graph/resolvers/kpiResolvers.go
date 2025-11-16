@@ -10,6 +10,8 @@ import (
 	"github.com/google/uuid"
 )
 
+const layoutISO = "2006-01-02"
+
 func (r *queryResolver) KpiUserSummary(ctx context.Context, userID *string, from *string, to *string) (*model.UserKpiSummary, error) {
 	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER", "USER"); err != nil {
 		return nil, err
@@ -22,12 +24,12 @@ func (r *queryResolver) KpiUserSummary(ctx context.Context, userID *string, from
 	}
 	var fromT, toT time.Time
 	if from != nil && *from != "" {
-		if t, err := time.Parse("2006-01-02", *from); err == nil {
+		if t, err := time.Parse(layoutISO, *from); err == nil {
 			fromT = t
 		}
 	}
 	if to != nil && *to != "" {
-		if t, err := time.Parse("2006-01-02", *to); err == nil {
+		if t, err := time.Parse(layoutISO, *to); err == nil {
 			toT = t
 		}
 	}
@@ -47,12 +49,12 @@ func (r *queryResolver) KpiTeamSummary(ctx context.Context, teamID string, from 
 	}
 	var fromT, toT time.Time
 	if from != nil && *from != "" {
-		if t, err := time.Parse("2006-01-02", *from); err == nil {
+		if t, err := time.Parse(layoutISO, *from); err == nil {
 			fromT = t
 		}
 	}
 	if to != nil && *to != "" {
-		if t, err := time.Parse("2006-01-02", *to); err == nil {
+		if t, err := time.Parse(layoutISO, *to); err == nil {
 			toT = t
 		}
 	}

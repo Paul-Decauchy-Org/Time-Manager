@@ -11,10 +11,13 @@ import (
 	// "github.com/google/uuid"
 )
 
+var databaseInitializationError = errors.New("database not initialized")
+const idNotInCondition = "id NOT IN (?)"
+
 func ListUsers() ([]*gmodel.User, error) {
 	// Defensive check to avoid panic when DB is not initialized
 	if database.DB == nil {
-		return nil, errors.New("database not initialized")
+		return nil, databaseInitializationError
 	}
 	db := database.DB
 	var users []models.User
@@ -30,7 +33,7 @@ func ListUsers() ([]*gmodel.User, error) {
 
 func ListUsersWithAllData() ([]*gmodel.UserWithAllData, error) {
 	if database.DB == nil {
-		return nil, errors.New("database not initialized")
+		return nil, databaseInitializationError
 	}
 	var users []models.User
 	if err := database.DB.Preload("Teams").Preload("TimeTableEntries").Preload("TimeTables").Find(&users).Error; err != nil {
@@ -45,7 +48,7 @@ func ListUsersWithAllData() ([]*gmodel.UserWithAllData, error) {
 
 func GetUserByEmail(email string) (*gmodel.User, error) {
 	if database.DB == nil {
-		return nil, errors.New("database not initialized")
+		return nil, databaseInitializationError
 	}
 	var user models.User
 	if err := database.DB.First(&user, "email = ?", email).Error; err != nil {
@@ -56,7 +59,7 @@ func GetUserByEmail(email string) (*gmodel.User, error) {
 
 func GetUsersByGroup(inGroup bool) ([]*gmodel.User, error) {
 	if database.DB == nil {
-		return nil, errors.New("database not initialized")
+		return nil, databaseInitializationError
 	}
 	var users []models.User
 	subTeamUsers := database.DB.Table("team_users").Select("user_id")
@@ -64,9 +67,9 @@ func GetUsersByGroup(inGroup bool) ([]*gmodel.User, error) {
 	query := database.DB.Where("role <> ?", "ADMIN")
 
 	if inGroup {
-		query = query.Where("id IN (?)", subTeamUsers).Where("id NOT IN (?)", subManagers)
+		query = query.Where("id IN (?)", subTeamUsers).Where(idNotInCondition, subManagers)
 	} else {
-		query = query.Where("id NOT IN (?)", subTeamUsers).Where("id NOT IN (?)", subManagers)
+		query = query.Where(idNotInCondition, subTeamUsers).Where(idNotInCondition, subManagers)
 	}
 
 	if err := query.Find(&users).Error; err != nil {
