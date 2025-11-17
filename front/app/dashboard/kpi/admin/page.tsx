@@ -19,6 +19,10 @@ function rangeFromPreset(preset: string): { from: string; to: string } {
   return { from, to }
 }
 
+type Preset = "7d" | "30d" | "90d"
+const PRESETS: Preset[] = ["7d", "30d", "90d"]
+const PRESET_LABELS: Record<Preset, string> = { "7d": "7 jours", "30d": "30 jours", "90d": "90 jours" }
+
 function mergeCoverage(arrays: Array<Array<{ time: string; count: number }>>) {
   const map = new Map<string, number>()
   for (const a of arrays) {
@@ -168,9 +172,11 @@ export default function AdminKpiPage() {
       React.createElement("div", { className: "flex items-center justify-between mb-4" },
         React.createElement("div", { className: "text-2xl font-semibold" }, "KPIs Admin"),
         React.createElement("div", { className: "hidden md:flex items-center gap-2" },
-          React.createElement("button", { className: `h-8 rounded-md border px-3 text-sm ${preset === "7d" ? "bg-accent" : "hover:bg-accent/60"}`, onClick: () => setPreset("7d") }, "7 jours"),
-          React.createElement("button", { className: `h-8 rounded-md border px-3 text-sm ${preset === "30d" ? "bg-accent" : "hover:bg-accent/60"}`, onClick: () => setPreset("30d") }, "30 jours"),
-          React.createElement("button", { className: `h-8 rounded-md border px-3 text-sm ${preset === "90d" ? "bg-accent" : "hover:bg-accent/60"}`, onClick: () => setPreset("90d") }, "90 jours"),
+          ...PRESETS.map((p) => React.createElement("button", {
+            key: p,
+            className: `h-8 rounded-md border px-3 text-sm ${preset === p ? "bg-accent" : "hover:bg-accent/60"}`,
+            onClick: () => setPreset(p),
+          }, PRESET_LABELS[p]))
         )
       ),
       React.createElement("div", { className: "grid gap-4 grid-cols-1 md:grid-cols-3 mb-6" },

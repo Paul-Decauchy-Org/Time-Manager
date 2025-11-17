@@ -6,17 +6,21 @@ import (
 	"time"
 
 	"github.com/epitech/timemanager/internal/graph/model"
-	"github.com/epitech/timemanager/internal/repositories"
 	"github.com/google/uuid"
 )
 
 const layoutISO = "2006-01-02"
 
-type KpiService struct {
-	Repo *repositories.Repository
+// KpiRepository is the minimal repository contract used by KpiService.
+type KpiRepository interface {
+	GetTimeTableEntriesFiltered(userID *uuid.UUID, teamID *uuid.UUID, from, to *time.Time) ([]*model.TimeTableEntry, error)
 }
 
-func NewKpiService(repo *repositories.Repository) *KpiService {
+type KpiService struct {
+	Repo KpiRepository
+}
+
+func NewKpiService(repo KpiRepository) *KpiService {
 	return &KpiService{Repo: repo}
 }
 

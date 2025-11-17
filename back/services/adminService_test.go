@@ -59,7 +59,34 @@ func (m *MockAdminRepo) SetRole(userID string, role model.Role) (*model.User, er
 	return args.Get(0).(*model.User), args.Error(1)
 }
 
-func TestAdminService_CreateUser_Success(t *testing.T) {
+func TestAdminServiceDeleteUserAndGetUserAndSetRole(t *testing.T) {
+	mockRepo := new(MockAdminRepo)
+	svc := NewAdminService(mockRepo)
+
+	// Delete
+	mockRepo.On("DeleteUser", "id-1").Return(true, nil).Once()
+	ok, err := svc.DeleteUser("id-1")
+	assert.NoError(t, err)
+	assert.True(t, ok)
+
+	// GetUser
+	uw := &model.UserWithAllData{ID: "id-1", Email: "a@b"}
+	mockRepo.On("GetUser", "id-1").Return(uw, nil).Once()
+	got, err := svc.GetUser("id-1")
+	assert.NoError(t, err)
+	assert.Equal(t, uw, got)
+
+	// SetRole
+	u := &model.User{ID: "id-1", Role: model.RoleAdmin}
+	mockRepo.On("SetRole", "id-1", model.Role(model.RoleAdmin)).Return(u, nil).Once()
+	out, err := svc.SetRole("id-1", model.Role(model.RoleAdmin))
+	assert.NoError(t, err)
+	assert.Equal(t, u, out)
+
+	mockRepo.AssertExpectations(t)
+}
+
+func TestAdminServiceCreateUserSuccess(t *testing.T) {
 	mockRepo := new(MockAdminRepo)
 	svc := NewAdminService(mockRepo)
 
@@ -94,7 +121,7 @@ func ptrString(s string) *string {
 	return &s
 }
 
-func TestAdminService_CreateUser_ErrorDuplicate(t *testing.T) {
+func TestAdminServiceCreateUserErrorDuplicate(t *testing.T) {
 	mockRepo := new(MockAdminRepo)
 	svc := NewAdminService(mockRepo)
 
@@ -112,7 +139,7 @@ func TestAdminService_CreateUser_ErrorDuplicate(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
-func TestAdminService_CreateUser_ErrorInvalidInput(t *testing.T) {
+func TestAdminServiceCreateUserErrorInvalidInput(t *testing.T) {
 	mockRepo := new(MockAdminRepo)
 	svc := NewAdminService(mockRepo)
 
@@ -130,7 +157,7 @@ func TestAdminService_CreateUser_ErrorInvalidInput(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
-func TestAdminService_UpdateUser(t *testing.T) {
+func TestAdminServiceUpdateUser(t *testing.T) {
 	mockRepo := new(MockAdminRepo)
 	svc := NewAdminService(mockRepo)
 
@@ -153,7 +180,7 @@ func TestAdminService_UpdateUser(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
-func TestAdminService_SetManagerTeam(t *testing.T) {
+func TestAdminServiceSetManagerTeam(t *testing.T) {
 	mockRepo := new(MockAdminRepo)
 	svc := NewAdminService(mockRepo)
 

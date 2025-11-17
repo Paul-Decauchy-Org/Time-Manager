@@ -109,6 +109,10 @@ function formatMinutes(mins: number) {
     return `${h}h${m.toString().padStart(2, "0")}`
 }
 
+type Preset = "7d" | "30d" | "90d"
+const PRESETS: Preset[] = ["7d", "30d", "90d"]
+const PRESET_LABELS: Record<Preset, string> = { "7d": "7 jours", "30d": "30 jours", "90d": "90 jours" }
+
 export default function TeamKpiPage() {
     const { user, isManager } = useAuth()
     const clientRef = React.useRef<any>(null)
@@ -119,7 +123,7 @@ export default function TeamKpiPage() {
             defaultOptions: { query: { fetchPolicy: "no-cache" }, watchQuery: { fetchPolicy: "no-cache" } },
         })
     }
-    const [preset, setPreset] = React.useState<string>("30d")
+    const [preset, setPreset] = React.useState<Preset>("30d")
     const { from, to } = rangeFromPreset(preset)
 
     // Local UI state
@@ -214,47 +218,66 @@ export default function TeamKpiPage() {
                     )
                 )
             ),
-            React.createElement("button", {
-                className: `h-8 rounded-md border px-3 text-sm ${preset === "7d" ? "bg-accent" : ""}`,
-                onClick: () => setPreset("7d"),
-            }, "7 jours"),
-            React.createElement("button", {
-                className: `h-8 rounded-md border px-3 text-sm ${preset === "30d" ? "bg-accent" : ""}`,
-                onClick: () => setPreset("30d"),
-            }, "30 jours"),
-            React.createElement("button", {
-                className: `h-8 rounded-md border px-3 text-sm ${preset === "90d" ? "bg-accent" : ""}`,
-                onClick: () => setPreset("90d"),
-            }, "90 jours"),
+            ...PRESETS.map((p) =>
+                React.createElement("button", {
+                    key: p,
+                    className: `h-8 rounded-md border px-3 text-sm ${preset === p ? "bg-accent" : ""}`,
+                    onClick: () => setPreset(p),
+                }, PRESET_LABELS[p])
+            ),
         )
     )
+
+    const statCards = [
+        {
+            key: "total",
+            container: "rounded-xl border p-4 shadow-sm bg-emerald-50/50 dark:bg-emerald-950/20",
+            iconRow: "flex items-center gap-2 text-sm text-emerald-700 dark:text-emerald-300",
+            icon: Clock,
+            label: "Total minutes",
+            value: summary ? formatMinutes(Number(summary.totalWorkedMinutes)) : "-",
+        },
+        {
+            key: "avg",
+            container: "rounded-xl border p-4 shadow-sm bg-sky-50/50 dark:bg-sky-950/20",
+            iconRow: "flex items-center gap-2 text-sm text-sky-700 dark:text-sky-300",
+            icon: TrendingUp,
+            label: "Moyenne / user",
+            value: summary ? formatMinutes(Math.round(Number(summary.avgWorkedMinutesPerUser || 0))) : "-",
+        },
+        {
+            key: "active",
+            container: "rounded-xl border p-4 shadow-sm bg-amber-50/50 dark:bg-amber-950/20",
+            iconRow: "flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300",
+            icon: Users,
+            label: "Utilisateurs actifs",
+            value: summary ? String(Number(summary.activeUsers)) : "-",
+        },
+        {
+            key: "late",
+            container: "rounded-xl border p-4 shadow-sm bg-rose-50/50 dark:bg-rose-950/20",
+            iconRow: "flex items-center gap-2 text-sm text-rose-700 dark:text-rose-300",
+            icon: AlertTriangle,
+            label: "Taux de retard",
+            value: `${Math.round(latenessRate * 100)}%`,
+        },
+    ] as const
 
     const cards = React.createElement(
         "div",
         { className: "grid gap-4 grid-cols-1 md:grid-cols-3 px-6 mb-6" },
-        React.createElement("div", { className: "rounded-xl border p-4 shadow-sm bg-emerald-50/50 dark:bg-emerald-950/20" },
-            React.createElement("div", { className: "flex items-center gap-2 text-sm text-emerald-700 dark:text-emerald-300" },
-                React.createElement(Clock, { className: "size-4" }), "Total minutes"
-            ),
-            React.createElement("div", { className: "text-xl font-semibold" }, summary ? formatMinutes(Number(summary.totalWorkedMinutes)) : "-")
-        ),
-        React.createElement("div", { className: "rounded-xl border p-4 shadow-sm bg-sky-50/50 dark:bg-sky-950/20" },
-            React.createElement("div", { className: "flex items-center gap-2 text-sm text-sky-700 dark:text-sky-300" },
-                React.createElement(TrendingUp, { className: "size-4" }), "Moyenne / user"
-            ),
-            React.createElement("div", { className: "text-xl font-semibold" }, summary ? formatMinutes(Math.round(Number(summary.avgWorkedMinutesPerUser || 0))) : "-")
-        ),
-        React.createElement("div", { className: "rounded-xl border p-4 shadow-sm bg-amber-50/50 dark:bg-amber-950/20" },
-            React.createElement("div", { className: "flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300" },
-                React.createElement(Users, { className: "size-4" }), "Utilisateurs actifs"
-            ),
-            React.createElement("div", { className: "text-xl font-semibold" }, summary ? String(Number(summary.activeUsers)) : "-")
-        ),
-        React.createElement("div", { className: "rounded-xl border p-4 shadow-sm bg-rose-50/50 dark:bg-rose-950/20" },
-            React.createElement("div", { className: "flex items-center gap-2 text-sm text-rose-700 dark:text-rose-300" },
-                React.createElement(AlertTriangle, { className: "size-4" }), "Taux de retard"
-            ),
-            React.createElement("div", { className: "text-xl font-semibold" }, `${Math.round(latenessRate * 100)}%`)
+        ...statCards.map((c) =>
+            React.createElement(
+                "div",
+                { key: c.key, className: c.container },
+                React.createElement(
+                    "div",
+                    { className: c.iconRow },
+                    React.createElement(c.icon as any, { className: "size-4" }),
+                    c.label
+                ),
+                React.createElement("div", { className: "text-xl font-semibold" }, c.value)
+            )
         ),
         React.createElement("div", { className: "rounded-xl border p-4 shadow-sm bg-purple-50/50 dark:bg-purple-950/20 md:col-span-2" },
             React.createElement("div", { className: "text-sm text-muted-foreground" }, "Plus en retard"),
