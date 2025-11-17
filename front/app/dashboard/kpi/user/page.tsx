@@ -6,16 +6,9 @@ import { useUserKpi } from "@/hooks/useUserKpi"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
-function rangeFromPreset(preset: string): { from: string; to: string } {
-  const toDate = new Date()
-  const to = toDate.toISOString().slice(0, 10)
-  const daysMap: Record<string, number> = { "7d": 7, "30d": 30, "90d": 90 }
-  const days = daysMap[preset] ?? 30
-  const fromDate = new Date()
-  fromDate.setDate(toDate.getDate() - days)
-  const from = fromDate.toISOString().slice(0, 10)
-  return { from, to }
-}
+type Preset = "7d" | "30d" | "90d"
+const PRESETS: Preset[] = ["7d", "30d", "90d"]
+const PRESET_LABELS: Record<Preset, string> = { "7d": "7 jours", "30d": "30 jours", "90d": "90 jours" }
 
 function formatMinutes(mins: number) {
   const h = Math.floor(mins / 60)
@@ -25,7 +18,7 @@ function formatMinutes(mins: number) {
 
 export default function UserKpiPage() {
   const { user } = useAuth()
-  const [preset, setPreset] = React.useState<string>("30d")
+  const [preset, setPreset] = React.useState<Preset>("30d")
   const { summary, loading, error, from, to } = useUserKpi({ userID: user?.id, preset: preset as any })
 
   const daily = (summary?.dailyWorked ?? []).map((p: any) => ({ date: String(p.date), minutes: Number(p.minutes) }))
@@ -37,41 +30,54 @@ export default function UserKpiPage() {
       React.createElement("div", { className: "text-2xl font-semibold" }, "Mes KPIs"),
       React.createElement("div", { className: "text-muted-foreground text-sm" }, `Periode: ${from} - ${to}`)
     ),
-    React.createElement("div", { className: "flex items-center gap-2" },
-      React.createElement("button", {
-        className: `h-8 rounded-md border px-3 text-sm ${preset === "7d" ? "bg-accent" : ""}`,
-        onClick: () => setPreset("7d"),
-      }, "7 jours"),
-      React.createElement("button", {
-        className: `h-8 rounded-md border px-3 text-sm ${preset === "30d" ? "bg-accent" : ""}`,
-        onClick: () => setPreset("30d"),
-      }, "30 jours"),
-      React.createElement("button", {
-        className: `h-8 rounded-md border px-3 text-sm ${preset === "90d" ? "bg-accent" : ""}`,
-        onClick: () => setPreset("90d"),
-      }, "90 jours"),
+    React.createElement(
+      "div",
+      { className: "flex items-center gap-2" },
+      PRESETS.map((p) => {
+        const label = PRESET_LABELS[p]
+        return React.createElement(
+          "button",
+          {
+            key: p,
+            className: `h-8 rounded-md border px-3 text-sm ${preset === p ? "bg-accent" : ""}`,
+            onClick: () => setPreset(p),
+          },
+          label
+        )
+      })
     )
   )
+
+  const stats = [
+    {
+      label: "Temps travaille",
+      value: summary ? formatMinutes(Number(summary.workedMinutes)) : "-",
+    },
+    {
+      label: "Heures sup",
+      value: summary ? formatMinutes(Number(summary.overtimeMinutes)) : "-",
+    },
+    {
+      label: "Jours presents",
+      value: summary ? String(Number(summary.daysPresent)) : "-",
+    },
+    {
+      label: "Streak",
+      value: summary ? `${Number(summary.currentStreakDays)} j` : "-",
+    },
+  ]
 
   const cards = React.createElement(
     "div",
     { className: "grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4 px-6 mb-6" },
-    React.createElement("div", { className: "rounded-xl border p-4 shadow-sm" },
-      React.createElement("div", { className: "text-sm text-muted-foreground" }, "Temps travaille"),
-      React.createElement("div", { className: "text-xl font-semibold" }, summary ? formatMinutes(Number(summary.workedMinutes)) : "-")
-    ),
-    React.createElement("div", { className: "rounded-xl border p-4 shadow-sm" },
-      React.createElement("div", { className: "text-sm text-muted-foreground" }, "Heures sup"),
-      React.createElement("div", { className: "text-xl font-semibold" }, summary ? formatMinutes(Number(summary.overtimeMinutes)) : "-")
-    ),
-    React.createElement("div", { className: "rounded-xl border p-4 shadow-sm" },
-      React.createElement("div", { className: "text-sm text-muted-foreground" }, "Jours presents"),
-      React.createElement("div", { className: "text-xl font-semibold" }, summary ? String(Number(summary.daysPresent)) : "-")
-    ),
-    React.createElement("div", { className: "rounded-xl border p-4 shadow-sm" },
-      React.createElement("div", { className: "text-sm text-muted-foreground" }, "Streak"),
-      React.createElement("div", { className: "text-xl font-semibold" }, summary ? `${Number(summary.currentStreakDays)} j` : "-")
-    ),
+    stats.map((s) =>
+      React.createElement(
+        "div",
+        { key: s.label, className: "rounded-xl border p-4 shadow-sm" },
+        React.createElement("div", { className: "text-sm text-muted-foreground" }, s.label),
+        React.createElement("div", { className: "text-xl font-semibold" }, s.value)
+      )
+    )
   )
 
   const chart = React.createElement(
