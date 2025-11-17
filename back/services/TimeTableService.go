@@ -4,15 +4,19 @@ import (
 	"time"
 
 	"github.com/epitech/timemanager/internal/graph/model"
-	"github.com/epitech/timemanager/internal/repositories"
 	"github.com/google/uuid"
 )
 
 type TimeTableService struct {
-	Repo *repositories.Repository
+	Repo TimeTableRepository
 }
 
-func NewTimeTableService(repo *repositories.Repository) *TimeTableService {
+type TimeTableRepository interface {
+	GetTimeTableEntries() ([]*model.TimeTableEntry, error)
+	GetTimeTableEntriesFiltered(userID *uuid.UUID, teamID *uuid.UUID, from, to *time.Time) ([]*model.TimeTableEntry, error)
+}
+
+func NewTimeTableService(repo TimeTableRepository) *TimeTableService {
 	return &TimeTableService{Repo: repo}
 }
 

@@ -69,7 +69,7 @@ func (m *MockTeamRepo) AddUserToTeam(userID string, teamID string) (*model.TeamU
 	return args.Get(0).(*model.TeamUser), args.Error(1)
 }
 
-func TestTeamService_GetTeamUsers(t *testing.T) {
+func TestTeamServiceGetTeamUsers(t *testing.T) {
 	repo := new(MockTeamRepo)
 	svc := NewTeamService(repo)
 	expected := []*model.TeamUser{{UserID: &model.User{ID: "u1"}, TeamID: &model.Team{ID: "t1"}}}
@@ -79,7 +79,7 @@ func TestTeamService_GetTeamUsers(t *testing.T) {
 	repo.AssertExpectations(t)
 }
 
-func TestTeamService_CreateUpdateDelete_Get_GetAll(t *testing.T) {
+func TestTeamServiceCreateUpdateDeleteGetGetAll(t *testing.T) {
 	repo := new(MockTeamRepo)
 	svc := NewTeamService(repo)
 
@@ -121,7 +121,7 @@ func TestTeamService_CreateUpdateDelete_Get_GetAll(t *testing.T) {
 	repo.AssertExpectations(t)
 }
 
-func TestTeamService_AddAndRemoveUsers(t *testing.T) {
+func TestTeamServiceAddAndRemoveUsers(t *testing.T) {
 	repo := new(MockTeamRepo)
 	svc := NewTeamService(repo)
 
@@ -149,7 +149,7 @@ func TestTeamService_AddAndRemoveUsers(t *testing.T) {
 	repo.AssertExpectations(t)
 }
 
-func TestTeamService_ErrorPaths(t *testing.T) {
+func TestTeamServiceErrorPaths(t *testing.T) {
 	repo := new(MockTeamRepo)
 	svc := NewTeamService(repo)
 

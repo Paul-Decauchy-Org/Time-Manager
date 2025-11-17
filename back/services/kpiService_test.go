@@ -16,6 +16,9 @@ type mockKpiRepo struct {
 	err     error
 }
 
+var layoutISOs = "2024-01-10"
+var dater = "2024-01-01"
+
 func (m *mockKpiRepo) GetTimeTableEntriesFiltered(userID *uuid.UUID, teamID *uuid.UUID, from, to *time.Time) ([]*model.TimeTableEntry, error) {
 	return m.entries, m.err
 }
@@ -28,8 +31,8 @@ func mustParseDayHour(day string, h, min int) time.Time {
 	return t
 }
 
-func TestKpiService_GetUserKpiSummary_BusinessAggregation(t *testing.T) {
-	day1 := "2024-01-10"
+func TestKpiServiceGetUserKpiSummaryBusinessAggregation(t *testing.T) {
+	day1 := layoutISOs
 	day2 := "2024-01-11"
 
 	u := &model.User{ID: uuid.New().String()}
@@ -74,7 +77,7 @@ func TestKpiService_GetUserKpiSummary_BusinessAggregation(t *testing.T) {
 	assert.Equal(t, int32(450), got.DailyWorked[1].Minutes)
 }
 
-func Test_normalizeWindow(t *testing.T) {
+func TestNormalizeWindow(t *testing.T) {
 	now := time.Now()
 	start, end := normalizeWindow(time.Time{}, time.Time{})
 	// end should default near now; start should be ~30 days before
@@ -84,11 +87,11 @@ func Test_normalizeWindow(t *testing.T) {
 
 	// swap when start > end
 	s, e := normalizeWindow(time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC), time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
-	assert.Equal(t, "2024-01-01", s.Format(layoutISO))
+	assert.Equal(t, dater, s.Format(layoutISO))
 	assert.Equal(t, "2024-02-01", e.Format(layoutISO))
 }
 
-func Test_aggregateDaily(t *testing.T) {
+func TestAggregateDaily(t *testing.T) {
 	today := "2024-01-15"
 	a1 := time.Date(2024, 1, 15, 9, 0, 0, 0, time.UTC)
 	d1 := time.Date(2024, 1, 15, 10, 0, 0, 0, time.UTC) // 60
@@ -116,9 +119,9 @@ func Test_aggregateDaily(t *testing.T) {
 	assert.True(t, presentNow2)
 }
 
-func Test_computeStreak(t *testing.T) {
+func TestComputeStreak(t *testing.T) {
 	daySet := map[string]struct{}{
-		"2024-01-10": {},
+		layoutISOs:   {},
 		"2024-01-09": {},
 		"2024-01-08": {},
 		"2024-01-05": {},
@@ -129,7 +132,7 @@ func Test_computeStreak(t *testing.T) {
 	assert.Equal(t, 0, computeStreak(map[string]struct{}{}))
 }
 
-func Test_computePunctuality(t *testing.T) {
+func TestComputePunctuality(t *testing.T) {
 	a1 := time.Date(2024, 1, 10, 9, 59, 59, 0, time.Local)
 	a2 := time.Date(2024, 1, 10, 10, 0, 0, 0, time.Local)
 	a3 := time.Date(2024, 1, 10, 10, 1, 0, 0, time.Local)
@@ -139,17 +142,17 @@ func Test_computePunctuality(t *testing.T) {
 	assert.Equal(t, 3, total)
 }
 
-func Test_buildPoints(t *testing.T) {
-	daily := map[string]int{"2024-01-10": 60, "2024-01-01": 30}
+func TestBuildPoints(t *testing.T) {
+	daily := map[string]int{layoutISOs: 60, dater: 30}
 	pts := buildPoints(daily)
 	assert.Equal(t, 2, len(pts))
-	assert.Equal(t, "2024-01-01", pts[0].Date)
+	assert.Equal(t, dater, pts[0].Date)
 	assert.Equal(t, int32(30), pts[0].Minutes)
-	assert.Equal(t, "2024-01-10", pts[1].Date)
+	assert.Equal(t, layoutISOs, pts[1].Date)
 	assert.Equal(t, int32(60), pts[1].Minutes)
 }
 
-func Test_effectiveDeparture(t *testing.T) {
+func TestEffectiveDeparture(t *testing.T) {
 	now := time.Now()
 	dep := time.Date(2024, 1, 1, 10, 0, 0, 0, time.Local)
 	// closed entry returns dep
@@ -165,7 +168,7 @@ func Test_effectiveDeparture(t *testing.T) {
 	assert.Nil(t, out3)
 }
 
-func Test_addCoverageBuckets_and_buildCoveragePoints(t *testing.T) {
+func TestAddCoverageBucketsAndBuildCoveragePoints(t *testing.T) {
 	counts := map[string]int{}
 	arr := time.Date(2024, 1, 10, 9, 15, 0, 0, time.UTC)
 	dep := time.Date(2024, 1, 10, 11, 45, 0, 0, time.UTC)
@@ -179,7 +182,7 @@ func Test_addCoverageBuckets_and_buildCoveragePoints(t *testing.T) {
 	assert.Equal(t, int32(1), cov[0].Count)
 }
 
-func TestKpiService_GetTeamKpiSummary(t *testing.T) {
+func TestKpiServiceGetTeamKpiSummary(t *testing.T) {
 	teamID := uuid.New()
 	u1 := &model.User{ID: uuid.New().String()}
 	u2 := &model.User{ID: uuid.New().String()}
@@ -208,7 +211,7 @@ func TestKpiService_GetTeamKpiSummary(t *testing.T) {
 	assert.GreaterOrEqual(t, len(out.Coverage), 1)
 }
 
-func TestKpiService_GetUserKpiSummary_RepoError(t *testing.T) {
+func TestKpiServiceGetUserKpiSummaryRepoError(t *testing.T) {
 	repo := &mockKpiRepo{entries: nil, err: assert.AnError}
 	svc := NewKpiService(repo)
 	uid := uuid.New()
@@ -216,7 +219,7 @@ func TestKpiService_GetUserKpiSummary_RepoError(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestKpiService_GetTeamKpiSummary_RepoError(t *testing.T) {
+func TestKpiServiceGetTeamKpiSummaryRepoError(t *testing.T) {
 	repo := &mockKpiRepo{err: assert.AnError}
 	svc := NewKpiService(repo)
 	_, err := svc.GetTeamKpiSummary(context.Background(), uuid.New(), time.Time{}, time.Time{})
