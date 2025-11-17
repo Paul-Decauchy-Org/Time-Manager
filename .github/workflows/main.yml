@@ -321,17 +321,29 @@ jobs:
   # ============================================
   sonarcloud-scan:
     runs-on: ubuntu-latest
-    environment: secrets
-    name: SonarCloud Scan (backend + frontend)
-    needs: [tests, frontend-build]
-    env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    name: SonarCloud Scan (backend only)
+    needs: [tests]
     steps:
       - name: Checkout
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          cache: true
+          cache-dependency-path: back/go.sum
+
+      - name: Generate backend coverage
+        working-directory: back
+        run: |
+          go mod download
+          go test ./... -coverprofile=coverage.out
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
