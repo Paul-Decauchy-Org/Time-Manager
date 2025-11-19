@@ -15,7 +15,7 @@
 
 </div>
 
-## � Sommaire
+## Sommaire
 
 - [🚀 Présentation](#-présentation)
 - [📁 Structure du projet](#-structure-du-projet)
@@ -33,6 +33,7 @@
   - [Tests Frontend](#tests-frontend-nextjs)
   - [SonarQube](#sonarqube-analyse-statique)
 - [🔄 CI/CD avec GitHub Actions](#-cicd-avec-github-actions)
+- [🌐 Nginx & Reverse Proxy](#-nginx--reverse-proxy)
 - [🛠️ Conseils pour le développement](#-conseils-pour-le-développement)
   - [Tests unitaires du backend](#tests-unitaires-du-backend)
   - [GraphQL Codegen](#graphql-codegen)
@@ -108,6 +109,7 @@ docker compose up -d
 L'application sera disponible sur:
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8084/query
+- Reverse proxy Nginx: http://localhost (redirige vers Front + API)
 
 ### Option 2: Développement local
 
@@ -165,7 +167,7 @@ cd Time-Manager/back
 go test ./... -v
 
 # Générer un rapport de couverture
-go test ./... -coverprofile=coverage.out
+go test ./... -coverprofile=coverage.out -covermode=atomic
 
 # Afficher le rapport de couverture dans le navigateur
 go tool cover -html=coverage.out
@@ -189,13 +191,17 @@ npm run lint
 npm run build
 ```
 
-### SonarQube (analyse statique)
+### SonarCloud / SonarQube (analyse statique)
 
 ```powershell
-# Backend
+# SonarCloud (CI): La couverture utilisée dans SonarCloud provient du backend uniquement.
+# La CI génère un artefact de couverture nommé "backend-coverage" (fichier back/coverage.out)
+# et le job "sonarcloud-scan" l'utilise pour publier la couverture.
+
+# Local (optionnel avec SonarQube self-host):
 cd Time-Manager/back
-# Configuration dans sonar-project.properties
-sonar-scanner
+go test ./... -coverprofile=coverage.out -covermode=atomic
+sonar-scanner  # lit coverage.out si sonar.go.coverage.reportPaths est configuré
 
 # Frontend
 cd Time-Manager/front
@@ -226,7 +232,7 @@ Notre pipeline CI/CD est défini dans `.github/workflows/main.yml` et exécute l
 ### Backend
 - Setup Go 1.25
 - Compilation du code Go
-- Exécution des tests avec rapport de couverture
+- Exécution des tests avec rapport de couverture (artefact `backend-coverage` -> `back/coverage.out`)
 
 ### Frontend
 - Setup Node.js 20
@@ -234,11 +240,44 @@ Notre pipeline CI/CD est défini dans `.github/workflows/main.yml` et exécute l
 - Génération des types GraphQL avec codegen
 - Build Next.js
 
+### Qualité & Analyse
+- Quality Check: `go vet`, format Go, installation deps front (Biome prêt mais optionnel)
+- Génération GraphQL: `gqlgen` côté back, `codegen` côté front
+- SonarCloud: télécharge l'artefact `backend-coverage`, vérifie `back/coverage.out`,
+  puis lance l'action officielle `sonarcloud-github-action` avec `-Dsonar.go.coverage.reportPaths=back/coverage.out`.
+  La couverture SonarCloud est donc basée uniquement sur le backend.
+
 ### Docker
 - Build des images Docker
 - Tests d'intégration (optionnel)
 
 > ⚠️ **Note**: Si le job `build` dépend d'un job `lint` qui est commenté, vous devez soit supprimer `needs: [lint]`, soit réactiver le job `lint` pour éviter l'erreur `The workflow must contain at least one job with no dependencies`.
+
+### Dépannage Couverture SonarCloud
+- Couverture à 0%? Vérifier que `back/coverage.out` est présent dans le job `sonarcloud-scan` (logs). 
+- Les chemins internes du fichier doivent commencer par `back/` (ex: `back/services/...`). La CI normalise ce point automatiquement.
+- Le fichier `sonar-project.properties` à la racine utilise `sonar.sources=back` et déclare explicitement les tests pour 
+  éviter que `*_test.go` soient comptés comme sources.
+
+## 🌐 Nginx & Reverse Proxy
+
+- Fichiers: `nginx/Dockerfile`, `nginx/nginx.conf`.
+- Rôle: reverse proxy devant le Front (port 3000) et l'API GraphQL (port 8084).
+- Par défaut, l’accès via http://localhost redirige les chemins vers les bons services.
+
+Exemple (extrait conceptuel):
+
+```
+location /query {
+    proxy_pass http://back:8084/query;
+}
+
+location / {
+    proxy_pass http://front:3000/;
+}
+```
+
+Pour modifier le routage, édite `nginx/nginx.conf`, puis reconstruis l’image `nginx` ou relance `docker compose up -d --build`.
 
 ## 🛠️ Conseils pour le développement
 
@@ -283,6 +322,12 @@ func TestAdminService_CreateUser(t *testing.T) {
     mockRepo.AssertExpectations(t)
 }
 ```
+
+### Notes Backend/GraphQL
+- Les mutations d'authentification exposent `signUp(input: SignUpInput!): User!`.
+- L’input `SignUpInput` ne contient pas de `role`. Le formulaire d’inscription front envoie 
+  `firstName, lastName, email, phone, password` (sans role).
+  En cas d’erreur "Unknown field 'role'", mettre à jour le front pour retirer ce champ des variables/mutations.
 
 ### GraphQL Codegen
 
