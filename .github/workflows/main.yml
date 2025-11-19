@@ -340,7 +340,7 @@ jobs:
 
       - name: Generate backend coverage
         run: |
-          go mod download
+          go mod tiddy
           # Run tests from repo root against back packages so coverage file naturally contains back/ paths
           go test ./back/... -coverprofile=coverage.out -covermode=atomic
           echo "Coverage file head (first 10 lines):"
