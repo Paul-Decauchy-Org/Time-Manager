@@ -1,7 +1,6 @@
 "use client";
 
-import { graphql } from "@/generated/gql";
-import {SignUpMutation, SignUpMutationVariables, Role, SignUpDocument} from "@/generated/graphql";
+import { SignUpDocument } from "@/generated/graphql";
 import { useMutation } from "@apollo/client/react";
 
 export function useSignUp() {
@@ -13,12 +12,11 @@ export function useSignUp() {
         email: string;
         phone: string;
         password: string;
-        role: Role;
     }) => {
         const result = await signUpMutation({
             variables: { input },
         });
-        return result.data?.createUser;
+        return result.data?.signUp;
     };
 
     return {
