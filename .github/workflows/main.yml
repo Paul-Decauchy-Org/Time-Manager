@@ -336,6 +336,30 @@ jobs:
         with:
           name: backend-coverage
           path: .
+      - name: Normalize coverage file location and paths
+        run: |
+          echo "Checking downloaded coverage artifact..."
+          if [ -f coverage.out ]; then
+            echo "Found coverage.out at repo root; relocating to back/coverage.out"
+            mkdir -p back
+            mv coverage.out back/coverage.out
+          elif [ -f back/coverage.out ]; then
+            echo "Found back/coverage.out directly."
+          else
+            echo "::error::No coverage.out file found after artifact download";
+            exit 1
+          fi
+          echo "Sample BEFORE prefix (first 5 non-mode lines):"
+          grep -v '^mode:' back/coverage.out | head -n 5 || true
+          # Prefix paths with 'back/' if they don't already start with it (skip mode line)
+          if grep -v '^mode:' back/coverage.out | grep -q '^[^b]'; then
+            echo "Applying path prefix 'back/' to coverage entries";
+            sed -i '/^mode:/! s|^|back/|' back/coverage.out
+          else
+            echo "Paths already appear prefixed; skipping sed.";
+          fi
+          echo "Sample AFTER prefix (first 5 non-mode lines):"
+          grep -v '^mode:' back/coverage.out | head -n 5 || true
       - name: Verify downloaded coverage file
         run: |
           echo "Repo root listing (truncated):"
