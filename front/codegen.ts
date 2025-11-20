@@ -1,8 +1,10 @@
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
+const schemaUrl = process.env.NEXT_PUBLIC_SCHEMA_URL || "./schema.graphql";
+
 const config: CodegenConfig = {
   overwrite: true,
-  schema: "./schema.graphql",
+  schema: schemaUrl,
   documents: "apollo/**/*.graphql",
   generates: {
     "generated/": {

@@ -48,6 +48,16 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	CoveragePoint struct {
+		Count func(childComplexity int) int
+		Time  func(childComplexity int) int
+	}
+
+	KpiPoint struct {
+		Date    func(childComplexity int) int
+		Minutes func(childComplexity int) int
+	}
+
 	Mutation struct {
 		AddUserToTeam      func(childComplexity int, userID string, teamID string) int
 		AddUsersToTeam     func(childComplexity int, input model.AddUsersToTeamInput) int
@@ -76,12 +86,14 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetUser          func(childComplexity int, id string) int
+		KpiTeamSummary   func(childComplexity int, teamID string, from *string, to *string) int
+		KpiUserSummary   func(childComplexity int, userID *string, from *string, to *string) int
 		Me               func(childComplexity int) int
 		Roles            func(childComplexity int) int
 		Team             func(childComplexity int, id string) int
 		TeamUsers        func(childComplexity int) int
 		Teams            func(childComplexity int) int
-		TimeTableEntries func(childComplexity int) int
+		TimeTableEntries func(childComplexity int, userID *string, teamID *string, from *string, to *string) int
 		TimeTables       func(childComplexity int) int
 		UserByEmail      func(childComplexity int, email string) int
 		UserWithAllData  func(childComplexity int, id string) int
@@ -108,6 +120,16 @@ type ComplexityRoot struct {
 		ManagerID   func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Users       func(childComplexity int) int
+	}
+
+	TeamKpiSummary struct {
+		ActiveUsers             func(childComplexity int) int
+		AvgWorkedMinutesPerUser func(childComplexity int) int
+		Coverage                func(childComplexity int) int
+		From                    func(childComplexity int) int
+		TeamID                  func(childComplexity int) int
+		To                      func(childComplexity int) int
+		TotalWorkedMinutes      func(childComplexity int) int
 	}
 
 	TeamUser struct {
@@ -141,6 +163,19 @@ type ComplexityRoot struct {
 		Password  func(childComplexity int) int
 		Phone     func(childComplexity int) int
 		Role      func(childComplexity int) int
+	}
+
+	UserKpiSummary struct {
+		CurrentStreakDays func(childComplexity int) int
+		DailyWorked       func(childComplexity int) int
+		DaysPresent       func(childComplexity int) int
+		From              func(childComplexity int) int
+		OvertimeMinutes   func(childComplexity int) int
+		PresentNow        func(childComplexity int) int
+		PunctualityRate   func(childComplexity int) int
+		To                func(childComplexity int) int
+		UserID            func(childComplexity int) int
+		WorkedMinutes     func(childComplexity int) int
 	}
 
 	UserLogged struct {
@@ -193,7 +228,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	TeamUsers(ctx context.Context) ([]*model.TeamUser, error)
 	Roles(ctx context.Context) ([]model.Role, error)
-	TimeTableEntries(ctx context.Context) ([]*model.TimeTableEntry, error)
+	TimeTableEntries(ctx context.Context, userID *string, teamID *string, from *string, to *string) ([]*model.TimeTableEntry, error)
 	TimeTables(ctx context.Context) ([]*model.TimeTable, error)
 	UserByEmail(ctx context.Context, email string) (*model.User, error)
 	UsersByGroup(ctx context.Context, inGroup bool) ([]*model.User, error)
@@ -205,6 +240,8 @@ type QueryResolver interface {
 	GetUser(ctx context.Context, id string) (*model.UserWithAllData, error)
 	Teams(ctx context.Context) ([]*model.Team, error)
 	Team(ctx context.Context, id string) (*model.Team, error)
+	KpiUserSummary(ctx context.Context, userID *string, from *string, to *string) (*model.UserKpiSummary, error)
+	KpiTeamSummary(ctx context.Context, teamID string, from *string, to *string) (*model.TeamKpiSummary, error)
 }
 
 type executableSchema struct {
@@ -225,6 +262,32 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "CoveragePoint.count":
+		if e.complexity.CoveragePoint.Count == nil {
+			break
+		}
+
+		return e.complexity.CoveragePoint.Count(childComplexity), true
+	case "CoveragePoint.time":
+		if e.complexity.CoveragePoint.Time == nil {
+			break
+		}
+
+		return e.complexity.CoveragePoint.Time(childComplexity), true
+
+	case "KpiPoint.date":
+		if e.complexity.KpiPoint.Date == nil {
+			break
+		}
+
+		return e.complexity.KpiPoint.Date(childComplexity), true
+	case "KpiPoint.minutes":
+		if e.complexity.KpiPoint.Minutes == nil {
+			break
+		}
+
+		return e.complexity.KpiPoint.Minutes(childComplexity), true
 
 	case "Mutation.addUserToTeam":
 		if e.complexity.Mutation.AddUserToTeam == nil {
@@ -466,6 +529,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.GetUser(childComplexity, args["id"].(string)), true
+	case "Query.kpiTeamSummary":
+		if e.complexity.Query.KpiTeamSummary == nil {
+			break
+		}
+
+		args, err := ec.field_Query_kpiTeamSummary_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.KpiTeamSummary(childComplexity, args["teamID"].(string), args["from"].(*string), args["to"].(*string)), true
+	case "Query.kpiUserSummary":
+		if e.complexity.Query.KpiUserSummary == nil {
+			break
+		}
+
+		args, err := ec.field_Query_kpiUserSummary_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.KpiUserSummary(childComplexity, args["userID"].(*string), args["from"].(*string), args["to"].(*string)), true
 	case "Query.me":
 		if e.complexity.Query.Me == nil {
 			break
@@ -506,7 +591,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			break
 		}
 
-		return e.complexity.Query.TimeTableEntries(childComplexity), true
+		args, err := ec.field_Query_timeTableEntries_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.TimeTableEntries(childComplexity, args["userID"].(*string), args["teamID"].(*string), args["from"].(*string), args["to"].(*string)), true
 	case "Query.timeTables":
 		if e.complexity.Query.TimeTables == nil {
 			break
@@ -650,6 +740,49 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Team.Users(childComplexity), true
 
+	case "TeamKpiSummary.activeUsers":
+		if e.complexity.TeamKpiSummary.ActiveUsers == nil {
+			break
+		}
+
+		return e.complexity.TeamKpiSummary.ActiveUsers(childComplexity), true
+	case "TeamKpiSummary.avgWorkedMinutesPerUser":
+		if e.complexity.TeamKpiSummary.AvgWorkedMinutesPerUser == nil {
+			break
+		}
+
+		return e.complexity.TeamKpiSummary.AvgWorkedMinutesPerUser(childComplexity), true
+	case "TeamKpiSummary.coverage":
+		if e.complexity.TeamKpiSummary.Coverage == nil {
+			break
+		}
+
+		return e.complexity.TeamKpiSummary.Coverage(childComplexity), true
+	case "TeamKpiSummary.from":
+		if e.complexity.TeamKpiSummary.From == nil {
+			break
+		}
+
+		return e.complexity.TeamKpiSummary.From(childComplexity), true
+	case "TeamKpiSummary.teamID":
+		if e.complexity.TeamKpiSummary.TeamID == nil {
+			break
+		}
+
+		return e.complexity.TeamKpiSummary.TeamID(childComplexity), true
+	case "TeamKpiSummary.to":
+		if e.complexity.TeamKpiSummary.To == nil {
+			break
+		}
+
+		return e.complexity.TeamKpiSummary.To(childComplexity), true
+	case "TeamKpiSummary.totalWorkedMinutes":
+		if e.complexity.TeamKpiSummary.TotalWorkedMinutes == nil {
+			break
+		}
+
+		return e.complexity.TeamKpiSummary.TotalWorkedMinutes(childComplexity), true
+
 	case "TeamUser.teamID":
 		if e.complexity.TeamUser.TeamID == nil {
 			break
@@ -779,6 +912,67 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.User.Role(childComplexity), true
+
+	case "UserKpiSummary.currentStreakDays":
+		if e.complexity.UserKpiSummary.CurrentStreakDays == nil {
+			break
+		}
+
+		return e.complexity.UserKpiSummary.CurrentStreakDays(childComplexity), true
+	case "UserKpiSummary.dailyWorked":
+		if e.complexity.UserKpiSummary.DailyWorked == nil {
+			break
+		}
+
+		return e.complexity.UserKpiSummary.DailyWorked(childComplexity), true
+	case "UserKpiSummary.daysPresent":
+		if e.complexity.UserKpiSummary.DaysPresent == nil {
+			break
+		}
+
+		return e.complexity.UserKpiSummary.DaysPresent(childComplexity), true
+	case "UserKpiSummary.from":
+		if e.complexity.UserKpiSummary.From == nil {
+			break
+		}
+
+		return e.complexity.UserKpiSummary.From(childComplexity), true
+	case "UserKpiSummary.overtimeMinutes":
+		if e.complexity.UserKpiSummary.OvertimeMinutes == nil {
+			break
+		}
+
+		return e.complexity.UserKpiSummary.OvertimeMinutes(childComplexity), true
+	case "UserKpiSummary.presentNow":
+		if e.complexity.UserKpiSummary.PresentNow == nil {
+			break
+		}
+
+		return e.complexity.UserKpiSummary.PresentNow(childComplexity), true
+	case "UserKpiSummary.punctualityRate":
+		if e.complexity.UserKpiSummary.PunctualityRate == nil {
+			break
+		}
+
+		return e.complexity.UserKpiSummary.PunctualityRate(childComplexity), true
+	case "UserKpiSummary.to":
+		if e.complexity.UserKpiSummary.To == nil {
+			break
+		}
+
+		return e.complexity.UserKpiSummary.To(childComplexity), true
+	case "UserKpiSummary.userID":
+		if e.complexity.UserKpiSummary.UserID == nil {
+			break
+		}
+
+		return e.complexity.UserKpiSummary.UserID(childComplexity), true
+	case "UserKpiSummary.workedMinutes":
+		if e.complexity.UserKpiSummary.WorkedMinutes == nil {
+			break
+		}
+
+		return e.complexity.UserKpiSummary.WorkedMinutes(childComplexity), true
 
 	case "UserLogged.email":
 		if e.complexity.UserLogged.Email == nil {
@@ -1271,6 +1465,48 @@ func (ec *executionContext) field_Query_getUser_args(ctx context.Context, rawArg
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_kpiTeamSummary_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "teamID", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["teamID"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "from", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["from"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "to", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["to"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_kpiUserSummary_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "userID", ec.unmarshalOID2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["userID"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "from", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["from"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "to", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["to"] = arg2
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_team_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1279,6 +1515,32 @@ func (ec *executionContext) field_Query_team_args(ctx context.Context, rawArgs m
 		return nil, err
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_timeTableEntries_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "userID", ec.unmarshalOID2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["userID"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "teamID", ec.unmarshalOID2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["teamID"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "from", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["from"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "to", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["to"] = arg3
 	return args, nil
 }
 
@@ -1377,6 +1639,122 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _CoveragePoint_time(ctx context.Context, field graphql.CollectedField, obj *model.CoveragePoint) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CoveragePoint_time,
+		func(ctx context.Context) (any, error) {
+			return obj.Time, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CoveragePoint_time(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CoveragePoint",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CoveragePoint_count(ctx context.Context, field graphql.CollectedField, obj *model.CoveragePoint) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CoveragePoint_count,
+		func(ctx context.Context) (any, error) {
+			return obj.Count, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CoveragePoint_count(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CoveragePoint",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _KpiPoint_date(ctx context.Context, field graphql.CollectedField, obj *model.KpiPoint) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_KpiPoint_date,
+		func(ctx context.Context) (any, error) {
+			return obj.Date, nil
+		},
+		nil,
+		ec.marshalNDate2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_KpiPoint_date(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "KpiPoint",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _KpiPoint_minutes(ctx context.Context, field graphql.CollectedField, obj *model.KpiPoint) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_KpiPoint_minutes,
+		func(ctx context.Context) (any, error) {
+			return obj.Minutes, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_KpiPoint_minutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "KpiPoint",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _Mutation_signUp(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
@@ -2576,7 +2954,8 @@ func (ec *executionContext) _Query_timeTableEntries(ctx context.Context, field g
 		field,
 		ec.fieldContext_Query_timeTableEntries,
 		func(ctx context.Context) (any, error) {
-			return ec.resolvers.Query().TimeTableEntries(ctx)
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().TimeTableEntries(ctx, fc.Args["userID"].(*string), fc.Args["teamID"].(*string), fc.Args["from"].(*string), fc.Args["to"].(*string))
 		},
 		nil,
 		ec.marshalNTimeTableEntry2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTimeTableEntryᚄ,
@@ -2585,7 +2964,7 @@ func (ec *executionContext) _Query_timeTableEntries(ctx context.Context, field g
 	)
 }
 
-func (ec *executionContext) fieldContext_Query_timeTableEntries(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_timeTableEntries(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -2608,6 +2987,17 @@ func (ec *executionContext) fieldContext_Query_timeTableEntries(_ context.Contex
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TimeTableEntry", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_timeTableEntries_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -3187,6 +3577,126 @@ func (ec *executionContext) fieldContext_Query_team(ctx context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_kpiUserSummary(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_kpiUserSummary,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().KpiUserSummary(ctx, fc.Args["userID"].(*string), fc.Args["from"].(*string), fc.Args["to"].(*string))
+		},
+		nil,
+		ec.marshalNUserKpiSummary2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserKpiSummary,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_kpiUserSummary(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "from":
+				return ec.fieldContext_UserKpiSummary_from(ctx, field)
+			case "to":
+				return ec.fieldContext_UserKpiSummary_to(ctx, field)
+			case "userID":
+				return ec.fieldContext_UserKpiSummary_userID(ctx, field)
+			case "workedMinutes":
+				return ec.fieldContext_UserKpiSummary_workedMinutes(ctx, field)
+			case "overtimeMinutes":
+				return ec.fieldContext_UserKpiSummary_overtimeMinutes(ctx, field)
+			case "daysPresent":
+				return ec.fieldContext_UserKpiSummary_daysPresent(ctx, field)
+			case "currentStreakDays":
+				return ec.fieldContext_UserKpiSummary_currentStreakDays(ctx, field)
+			case "punctualityRate":
+				return ec.fieldContext_UserKpiSummary_punctualityRate(ctx, field)
+			case "presentNow":
+				return ec.fieldContext_UserKpiSummary_presentNow(ctx, field)
+			case "dailyWorked":
+				return ec.fieldContext_UserKpiSummary_dailyWorked(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserKpiSummary", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_kpiUserSummary_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_kpiTeamSummary(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_kpiTeamSummary,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().KpiTeamSummary(ctx, fc.Args["teamID"].(string), fc.Args["from"].(*string), fc.Args["to"].(*string))
+		},
+		nil,
+		ec.marshalNTeamKpiSummary2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamKpiSummary,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_kpiTeamSummary(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "from":
+				return ec.fieldContext_TeamKpiSummary_from(ctx, field)
+			case "to":
+				return ec.fieldContext_TeamKpiSummary_to(ctx, field)
+			case "teamID":
+				return ec.fieldContext_TeamKpiSummary_teamID(ctx, field)
+			case "totalWorkedMinutes":
+				return ec.fieldContext_TeamKpiSummary_totalWorkedMinutes(ctx, field)
+			case "avgWorkedMinutesPerUser":
+				return ec.fieldContext_TeamKpiSummary_avgWorkedMinutesPerUser(ctx, field)
+			case "activeUsers":
+				return ec.fieldContext_TeamKpiSummary_activeUsers(ctx, field)
+			case "coverage":
+				return ec.fieldContext_TeamKpiSummary_coverage(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TeamKpiSummary", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_kpiTeamSummary_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -3703,6 +4213,215 @@ func (ec *executionContext) fieldContext_Team_users(_ context.Context, field gra
 				return ec.fieldContext_UserWithAllData_timeTableEntries(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserWithAllData", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamKpiSummary_from(ctx context.Context, field graphql.CollectedField, obj *model.TeamKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamKpiSummary_from,
+		func(ctx context.Context) (any, error) {
+			return obj.From, nil
+		},
+		nil,
+		ec.marshalNDate2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamKpiSummary_from(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamKpiSummary_to(ctx context.Context, field graphql.CollectedField, obj *model.TeamKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamKpiSummary_to,
+		func(ctx context.Context) (any, error) {
+			return obj.To, nil
+		},
+		nil,
+		ec.marshalNDate2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamKpiSummary_to(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamKpiSummary_teamID(ctx context.Context, field graphql.CollectedField, obj *model.TeamKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamKpiSummary_teamID,
+		func(ctx context.Context) (any, error) {
+			return obj.TeamID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamKpiSummary_teamID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamKpiSummary_totalWorkedMinutes(ctx context.Context, field graphql.CollectedField, obj *model.TeamKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamKpiSummary_totalWorkedMinutes,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalWorkedMinutes, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamKpiSummary_totalWorkedMinutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamKpiSummary_avgWorkedMinutesPerUser(ctx context.Context, field graphql.CollectedField, obj *model.TeamKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamKpiSummary_avgWorkedMinutesPerUser,
+		func(ctx context.Context) (any, error) {
+			return obj.AvgWorkedMinutesPerUser, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamKpiSummary_avgWorkedMinutesPerUser(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamKpiSummary_activeUsers(ctx context.Context, field graphql.CollectedField, obj *model.TeamKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamKpiSummary_activeUsers,
+		func(ctx context.Context) (any, error) {
+			return obj.ActiveUsers, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamKpiSummary_activeUsers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamKpiSummary_coverage(ctx context.Context, field graphql.CollectedField, obj *model.TeamKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamKpiSummary_coverage,
+		func(ctx context.Context) (any, error) {
+			return obj.Coverage, nil
+		},
+		nil,
+		ec.marshalNCoveragePoint2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐCoveragePointᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamKpiSummary_coverage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "time":
+				return ec.fieldContext_CoveragePoint_time(ctx, field)
+			case "count":
+				return ec.fieldContext_CoveragePoint_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CoveragePoint", field.Name)
 		},
 	}
 	return fc, nil
@@ -4356,6 +5075,302 @@ func (ec *executionContext) fieldContext_User_role(_ context.Context, field grap
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Role does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserKpiSummary_from(ctx context.Context, field graphql.CollectedField, obj *model.UserKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserKpiSummary_from,
+		func(ctx context.Context) (any, error) {
+			return obj.From, nil
+		},
+		nil,
+		ec.marshalNDate2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserKpiSummary_from(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserKpiSummary_to(ctx context.Context, field graphql.CollectedField, obj *model.UserKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserKpiSummary_to,
+		func(ctx context.Context) (any, error) {
+			return obj.To, nil
+		},
+		nil,
+		ec.marshalNDate2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserKpiSummary_to(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserKpiSummary_userID(ctx context.Context, field graphql.CollectedField, obj *model.UserKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserKpiSummary_userID,
+		func(ctx context.Context) (any, error) {
+			return obj.UserID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserKpiSummary_userID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserKpiSummary_workedMinutes(ctx context.Context, field graphql.CollectedField, obj *model.UserKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserKpiSummary_workedMinutes,
+		func(ctx context.Context) (any, error) {
+			return obj.WorkedMinutes, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserKpiSummary_workedMinutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserKpiSummary_overtimeMinutes(ctx context.Context, field graphql.CollectedField, obj *model.UserKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserKpiSummary_overtimeMinutes,
+		func(ctx context.Context) (any, error) {
+			return obj.OvertimeMinutes, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserKpiSummary_overtimeMinutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserKpiSummary_daysPresent(ctx context.Context, field graphql.CollectedField, obj *model.UserKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserKpiSummary_daysPresent,
+		func(ctx context.Context) (any, error) {
+			return obj.DaysPresent, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserKpiSummary_daysPresent(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserKpiSummary_currentStreakDays(ctx context.Context, field graphql.CollectedField, obj *model.UserKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserKpiSummary_currentStreakDays,
+		func(ctx context.Context) (any, error) {
+			return obj.CurrentStreakDays, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserKpiSummary_currentStreakDays(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserKpiSummary_punctualityRate(ctx context.Context, field graphql.CollectedField, obj *model.UserKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserKpiSummary_punctualityRate,
+		func(ctx context.Context) (any, error) {
+			return obj.PunctualityRate, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserKpiSummary_punctualityRate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserKpiSummary_presentNow(ctx context.Context, field graphql.CollectedField, obj *model.UserKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserKpiSummary_presentNow,
+		func(ctx context.Context) (any, error) {
+			return obj.PresentNow, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserKpiSummary_presentNow(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserKpiSummary_dailyWorked(ctx context.Context, field graphql.CollectedField, obj *model.UserKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserKpiSummary_dailyWorked,
+		func(ctx context.Context) (any, error) {
+			return obj.DailyWorked, nil
+		},
+		nil,
+		ec.marshalNKpiPoint2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐKpiPointᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserKpiSummary_dailyWorked(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "date":
+				return ec.fieldContext_KpiPoint_date(ctx, field)
+			case "minutes":
+				return ec.fieldContext_KpiPoint_minutes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type KpiPoint", field.Name)
 		},
 	}
 	return fc, nil
@@ -6763,6 +7778,94 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 
 // region    **************************** object.gotpl ****************************
 
+var coveragePointImplementors = []string{"CoveragePoint"}
+
+func (ec *executionContext) _CoveragePoint(ctx context.Context, sel ast.SelectionSet, obj *model.CoveragePoint) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, coveragePointImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CoveragePoint")
+		case "time":
+			out.Values[i] = ec._CoveragePoint_time(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "count":
+			out.Values[i] = ec._CoveragePoint_count(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var kpiPointImplementors = []string{"KpiPoint"}
+
+func (ec *executionContext) _KpiPoint(ctx context.Context, sel ast.SelectionSet, obj *model.KpiPoint) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, kpiPointImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("KpiPoint")
+		case "date":
+			out.Values[i] = ec._KpiPoint_date(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "minutes":
+			out.Values[i] = ec._KpiPoint_minutes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -7284,6 +8387,50 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "kpiUserSummary":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_kpiUserSummary(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "kpiTeamSummary":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_kpiTeamSummary(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -7419,6 +8566,75 @@ func (ec *executionContext) _Team(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "users":
 			out.Values[i] = ec._Team_users(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var teamKpiSummaryImplementors = []string{"TeamKpiSummary"}
+
+func (ec *executionContext) _TeamKpiSummary(ctx context.Context, sel ast.SelectionSet, obj *model.TeamKpiSummary) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, teamKpiSummaryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TeamKpiSummary")
+		case "from":
+			out.Values[i] = ec._TeamKpiSummary_from(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "to":
+			out.Values[i] = ec._TeamKpiSummary_to(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "teamID":
+			out.Values[i] = ec._TeamKpiSummary_teamID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalWorkedMinutes":
+			out.Values[i] = ec._TeamKpiSummary_totalWorkedMinutes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "avgWorkedMinutesPerUser":
+			out.Values[i] = ec._TeamKpiSummary_avgWorkedMinutesPerUser(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "activeUsers":
+			out.Values[i] = ec._TeamKpiSummary_activeUsers(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "coverage":
+			out.Values[i] = ec._TeamKpiSummary_coverage(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -7654,6 +8870,90 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "role":
 			out.Values[i] = ec._User_role(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var userKpiSummaryImplementors = []string{"UserKpiSummary"}
+
+func (ec *executionContext) _UserKpiSummary(ctx context.Context, sel ast.SelectionSet, obj *model.UserKpiSummary) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userKpiSummaryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserKpiSummary")
+		case "from":
+			out.Values[i] = ec._UserKpiSummary_from(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "to":
+			out.Values[i] = ec._UserKpiSummary_to(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "userID":
+			out.Values[i] = ec._UserKpiSummary_userID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "workedMinutes":
+			out.Values[i] = ec._UserKpiSummary_workedMinutes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "overtimeMinutes":
+			out.Values[i] = ec._UserKpiSummary_overtimeMinutes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "daysPresent":
+			out.Values[i] = ec._UserKpiSummary_daysPresent(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "currentStreakDays":
+			out.Values[i] = ec._UserKpiSummary_currentStreakDays(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "punctualityRate":
+			out.Values[i] = ec._UserKpiSummary_punctualityRate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "presentNow":
+			out.Values[i] = ec._UserKpiSummary_presentNow(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "dailyWorked":
+			out.Values[i] = ec._UserKpiSummary_dailyWorked(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -8179,6 +9479,60 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNCoveragePoint2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐCoveragePointᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.CoveragePoint) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCoveragePoint2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐCoveragePoint(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNCoveragePoint2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐCoveragePoint(ctx context.Context, sel ast.SelectionSet, v *model.CoveragePoint) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CoveragePoint(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNCreateMassiveUsersInput2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐCreateMassiveUsersInput(ctx context.Context, v any) (model.CreateMassiveUsersInput, error) {
 	res, err := ec.unmarshalInputCreateMassiveUsersInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -8235,6 +9589,22 @@ func (ec *executionContext) marshalNDate2string(ctx context.Context, sel ast.Sel
 	return res
 }
 
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v any) (float64, error) {
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalFloatContext(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return graphql.WrapContextMarshaler(ctx, res)
+}
+
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -8279,6 +9649,86 @@ func (ec *executionContext) marshalNID2ᚕstringᚄ(ctx context.Context, sel ast
 	}
 
 	return ret
+}
+
+func (ec *executionContext) unmarshalNInt2int32(ctx context.Context, v any) (int32, error) {
+	res, err := graphql.UnmarshalInt32(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int32(ctx context.Context, sel ast.SelectionSet, v int32) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalInt32(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNJour2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐJour(ctx context.Context, v any) (model.Jour, error) {
+	var res model.Jour
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNJour2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐJour(ctx context.Context, sel ast.SelectionSet, v model.Jour) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) marshalNKpiPoint2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐKpiPointᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.KpiPoint) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNKpiPoint2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐKpiPoint(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNKpiPoint2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐKpiPoint(ctx context.Context, sel ast.SelectionSet, v *model.KpiPoint) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._KpiPoint(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNRole2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐRole(ctx context.Context, v any) (model.Role, error) {
@@ -8441,6 +9891,20 @@ func (ec *executionContext) marshalNTeam2ᚖgithubᚗcomᚋepitechᚋtimemanager
 		return graphql.Null
 	}
 	return ec._Team(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTeamKpiSummary2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamKpiSummary(ctx context.Context, sel ast.SelectionSet, v model.TeamKpiSummary) graphql.Marshaler {
+	return ec._TeamKpiSummary(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTeamKpiSummary2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamKpiSummary(ctx context.Context, sel ast.SelectionSet, v *model.TeamKpiSummary) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TeamKpiSummary(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNTeamUser2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamUser(ctx context.Context, sel ast.SelectionSet, v model.TeamUser) graphql.Marshaler {
@@ -8709,6 +10173,20 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋepitechᚋtimemanager
 		return graphql.Null
 	}
 	return ec._User(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNUserKpiSummary2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserKpiSummary(ctx context.Context, sel ast.SelectionSet, v model.UserKpiSummary) graphql.Marshaler {
+	return ec._UserKpiSummary(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUserKpiSummary2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserKpiSummary(ctx context.Context, sel ast.SelectionSet, v *model.UserKpiSummary) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UserKpiSummary(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNUserLogged2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserLogged(ctx context.Context, sel ast.SelectionSet, v model.UserLogged) graphql.Marshaler {

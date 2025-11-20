@@ -12,9 +12,11 @@ import (
 	"gorm.io/gorm"
 )
 
+const emailCondition = "email = ?"
+
 func (r *Repository) SignUp(input model.SignUpInput) (*model.User, error) {
 	var existingUser models.User
-	if err := r.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
+	if err := r.DB.Where(emailCondition, input.Email).First(&existingUser).Error; err == nil {
 		return nil, errors.New("email already in use")
 	}
 
@@ -38,7 +40,7 @@ func (r *Repository) SignUp(input model.SignUpInput) (*model.User, error) {
 
 func (r *Repository) Login(email, password string) (*model.User, error) {
 	var user models.User
-	if err := r.DB.Where("email = ?", email).First(&user).Error; err != nil {
+	if err := r.DB.Where(emailCondition, email).First(&user).Error; err != nil {
 		return nil, err
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
@@ -49,7 +51,7 @@ func (r *Repository) Login(email, password string) (*model.User, error) {
 
 func (r *Repository) Me(email string) (*model.SignedUser, error) {
 	var user models.User
-	if err := r.DB.Where("email = ?", email).First(&user).Error; err != nil {
+	if err := r.DB.Where(emailCondition, email).First(&user).Error; err != nil {
 		return nil, err
 	}
 	today := time.Now().Format("2006-01-02")
@@ -75,7 +77,7 @@ func (r *Repository) Me(email string) (*model.SignedUser, error) {
 
 func (r *Repository) UpdateProfile(email string, input model.UpdateProfileInput) (*model.User, error) {
 	var user models.User
-	if err := r.DB.Where("email = ?", email).First(&user).Error; err != nil {
+	if err := r.DB.Where(emailCondition, email).First(&user).Error; err != nil {
 		return nil, errors.New("user not found")
 	}
 	if input.FirstName != nil {
@@ -105,7 +107,7 @@ func (r *Repository) UpdateProfile(email string, input model.UpdateProfileInput)
 
 func (r *Repository) DeleteProfile(email string) (bool, error) {
 	var user models.User
-	if err := r.DB.Where("email = ?", email).First(&user).Error; err != nil {
+	if err := r.DB.Where(emailCondition, email).First(&user).Error; err != nil {
 		return false, errors.New("user not found")
 	}
 	if err := r.DB.Delete(&user).Error; err != nil {

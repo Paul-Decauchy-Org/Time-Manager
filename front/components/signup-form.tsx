@@ -8,9 +8,8 @@ import { Input } from "@/components/ui/input"
 import LoginLink from "./links/login-link"
 import React, { useState } from "react";
 import { useSignUp } from "@/hooks/signup";
-import { Role } from "@/generated/graphql";
 import { useRouter } from "next/navigation";
-import { Clock, Mail, Phone, User, Lock, AlertCircle, Sparkles, CheckCircle2 } from "lucide-react";
+import { Clock, Mail, Phone, User, Lock, AlertCircle, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 export function SignupForm({
@@ -68,7 +67,6 @@ export function SignupForm({
                 email,
                 phone,
                 password,
-                role: Role.User, // or Role.Customer, adjust based on your needs
             });
 
             console.log("User created:", user);
@@ -283,30 +281,12 @@ className = "pl-10 h-11"
                                                 Start managing your time effectively and collaborate with your team seamlessly.
                                 </p>
                                                     </div>
-
-{/* < div className = "space-y-4 pt-4" >
-                                                    {
-                                                        [
-                                                            "Track time across projects",
-                                                            "Manage team schedules",
-                                                            "Generate detailed reports",
-                                                            "Real-time collaboration"
-                                                        ].map((feature, index) => (
-                                                            <div key= { index } className = "flex items-center gap-3 text-sm" >
-                                                            <div className="rounded-full bg-primary/20 p-1" >
-                                                        <CheckCircle2 className="h-4 w-4 text-primary" />
+                                                    </div>
+                                                    < div className = "absolute inset-0 bg-grid-white/10 [mask-image:radial-gradient(white,transparent_85%)]" />
                                                         </div>
-                                                        < span className = "text-muted-foreground" > { feature } </span>
-                                                        </div>
-                                                        ))
-                                                    }
-                                                        </div> */}
-</div>
-    < div className = "absolute inset-0 bg-grid-white/10 [mask-image:radial-gradient(white,transparent_85%)]" />
-        </div>
-        </CardContent>
-        </Card>
+                                                        </CardContent>
+                                                        </Card>
 
-        </div>
+                                                        </div>
     );
 }

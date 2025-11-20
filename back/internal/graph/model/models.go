@@ -15,6 +15,11 @@ type AddUsersToTeamInput struct {
 	TeamID  string   `json:"teamID"`
 }
 
+type CoveragePoint struct {
+	Time  time.Time `json:"time"`
+	Count int32     `json:"count"`
+}
+
 type CreateMassiveUsersInput struct {
 	Users []*CreateUserInput `json:"users"`
 }
@@ -40,6 +45,11 @@ type CreateUserInput struct {
 	Phone     string `json:"phone"`
 	Password  string `json:"password"`
 	Role      Role   `json:"role"`
+}
+
+type KpiPoint struct {
+	Date    string `json:"date"`
+	Minutes int32  `json:"minutes"`
 }
 
 type Mutation struct {
@@ -73,6 +83,16 @@ type Team struct {
 	Description string             `json:"description"`
 	ManagerID   *User              `json:"managerID"`
 	Users       []*UserWithAllData `json:"users"`
+}
+
+type TeamKpiSummary struct {
+	From                    string           `json:"from"`
+	To                      string           `json:"to"`
+	TeamID                  string           `json:"teamID"`
+	TotalWorkedMinutes      int32            `json:"totalWorkedMinutes"`
+	AvgWorkedMinutesPerUser float64          `json:"avgWorkedMinutesPerUser"`
+	ActiveUsers             int32            `json:"activeUsers"`
+	Coverage                []*CoveragePoint `json:"coverage"`
 }
 
 type TeamUser struct {
@@ -137,6 +157,19 @@ type User struct {
 	Phone     string `json:"phone"`
 	Password  string `json:"password"`
 	Role      Role   `json:"role"`
+}
+
+type UserKpiSummary struct {
+	From              string      `json:"from"`
+	To                string      `json:"to"`
+	UserID            string      `json:"userID"`
+	WorkedMinutes     int32       `json:"workedMinutes"`
+	OvertimeMinutes   int32       `json:"overtimeMinutes"`
+	DaysPresent       int32       `json:"daysPresent"`
+	CurrentStreakDays int32       `json:"currentStreakDays"`
+	PunctualityRate   float64     `json:"punctualityRate"`
+	PresentNow        bool        `json:"presentNow"`
+	DailyWorked       []*KpiPoint `json:"dailyWorked"`
 }
 
 type UserLogged struct {

@@ -2,18 +2,30 @@ package services
 
 import (
 	"github.com/epitech/timemanager/internal/graph/model"
-	"github.com/epitech/timemanager/internal/repositories"
 )
 
+// TeamRepository is the minimal contract used by TeamService.
+type TeamRepository interface {
+	GetTeamUsers() []*model.TeamUser
+	CreateTeam(input model.CreateTeamInput) (*model.Team, error)
+	UpdateTeam(id string, input model.UpdateTeamInput) (*model.Team, error)
+	DeleteTeam(id string) (bool, error)
+	GetTeam(id string) (*model.Team, error)
+	GetTeams() ([]*model.Team, error)
+	AddUsersToTeam(input model.AddUsersToTeamInput) ([]*model.TeamUser, error)
+	RemoveUserFromTeam(userID string, teamID string) (bool, error)
+	AddUserToTeam(userID string, teamID string) (*model.TeamUser, error)
+}
+
 type TeamService struct {
-	TeamRepo *repositories.Repository
+	TeamRepo TeamRepository
 }
 
 func (s *TeamService) GetTeamUsers() []*model.TeamUser {
 	return s.TeamRepo.GetTeamUsers()
 }
 
-func NewTeamService(repo *repositories.Repository) *TeamService {
+func NewTeamService(repo TeamRepository) *TeamService {
 	return &TeamService{TeamRepo: repo}
 }
 

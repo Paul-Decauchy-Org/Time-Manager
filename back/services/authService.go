@@ -2,16 +2,24 @@ package services
 
 import (
 	"github.com/epitech/timemanager/internal/graph/model"
-	"github.com/epitech/timemanager/internal/repositories"
 	"github.com/epitech/timemanager/package/middlewares"
 )
 
-type AuthService struct {
-	AuthRepo *repositories.Repository
+type AuthRepository interface {
+	SignUp(input model.SignUpInput) (*model.User, error)
+	Login(email, password string) (*model.User, error)
+	Me(email string) (*model.User, error)
+	UpdateProfile(email string, input model.UpdateProfileInput) (*model.User, error)
+	DeleteProfile(email string) (bool, error)
 }
 
-func NewAuthService(repo *repositories.Repository) *AuthService {
-	return &AuthService{AuthRepo: repo}
+type AuthService struct {
+	AuthRepo AuthRepository
+	TokenGen func(email, id, role string) (string, error)
+}
+
+func NewAuthService(repo AuthRepository) *AuthService {
+	return &AuthService{AuthRepo: repo, TokenGen: middlewares.GenerateToken}
 }
 
 func (s *AuthService) SignUp(input model.SignUpInput) (*model.User, error) {
@@ -23,7 +31,7 @@ func (s *AuthService) Login(email, password string) (*model.UserLogged, error) {
 	if err != nil {
 		return nil, err
 	}
-	token, err := middlewares.GenerateToken(user.Email, user.ID, string(user.Role))
+	token, err := s.TokenGen(user.Email, user.ID, string(user.Role))
 	if err != nil {
 		return nil, err
 	}

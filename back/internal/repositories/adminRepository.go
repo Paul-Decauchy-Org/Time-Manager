@@ -13,6 +13,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var idParsingError = errors.New("error while parsing id")
+var userNotFoundError = errors.New("user not found")
+var teamNotFoundError = errors.New("team not found")
+
+const whereID = "id = ?"
+
 func (r *Repository) CreateUser(input model.CreateUserInput) (*model.User, error) {
 	var existingUser *dbmodels.User
 
@@ -42,10 +48,10 @@ func (r *Repository) UpdateUser(id string, input model.UpdateUserInput) (*model.
 	var existingUser dbmodels.User
 	uID, ok := uuid.Parse(id)
 	if ok != nil {
-		return nil, errors.New("error while parsing id")
+		return nil, idParsingError
 	}
-	if err := r.DB.Where("id = ?", uID).First(&existingUser).Error; err != nil {
-		return nil, errors.New("user not found")
+	if err := r.DB.Where(whereID, uID).First(&existingUser).Error; err != nil {
+		return nil, userNotFoundError
 	}
 	if input.FirstName != nil {
 		existingUser.FirstName = *input.FirstName
@@ -80,10 +86,10 @@ func (r *Repository) DeleteUser(id string) (bool, error) {
 	var existingUser dbmodels.User
 	uID, ok := uuid.Parse(id)
 	if ok != nil {
-		return false, errors.New("error while parsing id")
+		return false, idParsingError
 	}
-	if err := r.DB.Where("id = ?", uID).First(&existingUser).Error; err != nil {
-		return false, errors.New("user not found")
+	if err := r.DB.Where(whereID, uID).First(&existingUser).Error; err != nil {
+		return false, userNotFoundError
 	}
 	if err := r.DB.Delete(&existingUser).Error; err != nil {
 		return false, errors.New("failed to delete user")
@@ -95,14 +101,14 @@ func (r *Repository) GetUser(id string) (*model.UserWithAllData, error) {
 	var existingUser dbmodels.User
 	uID, ok := uuid.Parse(id)
 	if ok != nil {
-		return nil, errors.New("error while parsing id")
+		return nil, idParsingError
 	}
 	if err := r.DB.Preload("TimeTableEntries").
 		Preload("TimeTables").
 		Preload("TeamUsers.Team").
-		Where("id = ?", uID).
+		Where(whereID, uID).
 		First(&existingUser).Error; err != nil {
-		return nil, errors.New("user not found")
+		return nil, userNotFoundError
 	}
 	return userMapper.DBUserToGraphWithAllData(&existingUser), nil
 }
@@ -114,16 +120,16 @@ func (r *Repository) SetManagerTeam(userID string, teamID string) (*model.Team, 
 	}
 	var existingUser *dbmodels.User
 
-	if err := r.DB.Where("id = ?", id).First(&existingUser).Error; err != nil {
-		return nil, errors.New("user not found")
+	if err := r.DB.Where(whereID, id).First(&existingUser).Error; err != nil {
+		return nil, userNotFoundError
 	}
 	idTeam, ok := uuid.Parse(teamID)
 	if ok != nil {
 		return nil, errors.New("error while parsing team id")
 	}
 	var existingTeam *dbmodels.Team
-	if err := r.DB.Where("id = ?", idTeam).First(&existingTeam).Error; err != nil {
-		return nil, errors.New("team not found")
+	if err := r.DB.Where(whereID, idTeam).First(&existingTeam).Error; err != nil {
+		return nil, teamNotFoundError
 	}
 	if existingUser.Role != "MANAGER" {
 		existingUser.Role = dbmodels.RoleManager
@@ -145,8 +151,8 @@ func (r *Repository) SetRole(userID string, role model.Role) (*model.User, error
 	}
 	var existingUser *dbmodels.User
 
-	if err := r.DB.Where("id = ?", id).First(&existingUser).Error; err != nil {
-		return nil, errors.New("user not found")
+	if err := r.DB.Where(whereID, id).First(&existingUser).Error; err != nil {
+		return nil, userNotFoundError
 	}
 	existingUser.Role = dbmodels.Role(role)
 	if err := r.DB.Save(&existingUser).Error; err != nil {

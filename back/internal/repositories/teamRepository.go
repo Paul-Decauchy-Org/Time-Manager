@@ -10,6 +10,11 @@ import (
 	"github.com/google/uuid"
 )
 
+const whereIDs = "id = ?"
+
+var teamIdParsingError = errors.New("error while parsing team ID")
+var teamNotFoundErrors = errors.New("team not found")
+
 func (r *Repository) CreateTeam(input model.CreateTeamInput) (*model.Team, error) {
 	var existingTeam *dbmodels.Team
 
@@ -23,7 +28,7 @@ func (r *Repository) CreateTeam(input model.CreateTeamInput) (*model.Team, error
 		return nil, errors.New("error while parsing manager ID")
 	}
 	var user *dbmodels.User
-	if err := r.DB.Where("id = ?", managerID).First(&user).Error; err != nil {
+	if err := r.DB.Where(whereIDs, managerID).First(&user).Error; err != nil {
 		return nil, errors.New("manager not found")
 	}
 	team := &dbmodels.Team{
@@ -37,7 +42,7 @@ func (r *Repository) CreateTeam(input model.CreateTeamInput) (*model.Team, error
 	}
 
 	// Reload with Manager preloaded
-	if err := r.DB.Preload("Manager").Where("id = ?", team.ID).First(team).Error; err != nil {
+	if err := r.DB.Preload("Manager").Where(whereIDs, team.ID).First(team).Error; err != nil {
 		return nil, errors.New("error while reloading team")
 	}
 
@@ -45,13 +50,13 @@ func (r *Repository) CreateTeam(input model.CreateTeamInput) (*model.Team, error
 }
 
 func (r *Repository) UpdateTeam(id string, input model.UpdateTeamInput) (*model.Team, error) {
-	teamID, ok := uuid.Parse(id)
-	if ok != nil {
-		return nil, errors.New("error while parsing team id")
+	teamID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, teamIdParsingError
 	}
 	var existingTeam *dbmodels.Team
-	if err := r.DB.Preload("Manager").Where("id = ?", teamID).First(&existingTeam).Error; err != nil {
-		return nil, errors.New("team not found")
+	if err := r.DB.Preload("Manager").Where(whereIDs, teamID).First(&existingTeam).Error; err != nil {
+		return nil, teamNotFoundErrors
 	}
 	if input.Name != nil {
 		existingTeam.Name = *input.Name
@@ -71,7 +76,7 @@ func (r *Repository) UpdateTeam(id string, input model.UpdateTeamInput) (*model.
 	}
 
 	// Reload with Manager preloaded
-	if err := r.DB.Preload("Manager").Where("id = ?", existingTeam.ID).First(existingTeam).Error; err != nil {
+	if err := r.DB.Preload("Manager").Where(whereIDs, existingTeam.ID).First(existingTeam).Error; err != nil {
 		return nil, errors.New("error while reloading team")
 	}
 
@@ -81,11 +86,11 @@ func (r *Repository) UpdateTeam(id string, input model.UpdateTeamInput) (*model.
 func (r *Repository) DeleteTeam(id string) (bool, error) {
 	teamID, ok := uuid.Parse(id)
 	if ok != nil {
-		return false, errors.New("error while parsing team id")
+		return false, teamIdParsingError
 	}
 	var existingTeam *dbmodels.Team
-	if err := r.DB.Where("id = ?", teamID).First(&existingTeam).Error; err != nil {
-		return false, errors.New("team not found")
+	if err := r.DB.Where(whereIDs, teamID).First(&existingTeam).Error; err != nil {
+		return false, teamNotFoundErrors
 	}
 
 	// Supprimer d'abord toutes les associations dans team_users
@@ -101,13 +106,13 @@ func (r *Repository) DeleteTeam(id string) (bool, error) {
 }
 
 func (r *Repository) GetTeam(id string) (*model.Team, error) {
-	teamID, ok := uuid.Parse(id)
-	if ok != nil {
-		return nil, errors.New("error while parsing team id")
+	teamID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, teamIdParsingError
 	}
 	var existingTeam *dbmodels.Team
-	if err := r.DB.Preload("Manager").Where("id = ?", teamID).First(&existingTeam).Error; err != nil {
-		return nil, errors.New("team not found")
+	if err := r.DB.Preload("Manager").Where(whereIDs, teamID).First(&existingTeam).Error; err != nil {
+		return nil, teamNotFoundErrors
 	}
 	return teamMapper.DBTeamToGraph(existingTeam), nil
 }
@@ -130,12 +135,12 @@ func (r *Repository) AddUserToTeam(id string, teamID string) (*model.TeamUser, e
 		return nil, errors.New("error while parsing teamID")
 	}
 	var existingUser *dbmodels.User
-	if err := r.DB.Where("id = ?", userID).First(&existingUser).Error; err != nil {
+	if err := r.DB.Where(whereIDs, userID).First(&existingUser).Error; err != nil {
 		return nil, errors.New("user not found")
 	}
 	var existingTeam *dbmodels.Team
-	if err := r.DB.Where("id = ?", idTeam).First(&existingTeam).Error; err != nil {
-		return nil, errors.New("team not found")
+	if err := r.DB.Where(whereIDs, idTeam).First(&existingTeam).Error; err != nil {
+		return nil, teamNotFoundErrors
 	}
 	var existingTeamUser *dbmodels.TeamUser
 	if err := r.DB.Where(&dbmodels.TeamUser{UserID: userID, TeamID: idTeam}).First(&existingTeamUser).Error; err == nil {
@@ -165,8 +170,8 @@ func (r *Repository) AddUsersToTeam(input model.AddUsersToTeamInput) ([]*model.T
 		return nil, errors.New("error while parsing teamID")
 	}
 	var existingTeam *dbmodels.Team
-	if err := r.DB.Where("id = ?", idTeam).First(&existingTeam).Error; err != nil {
-		return nil, errors.New("team not found")
+	if err := r.DB.Where(whereIDs, idTeam).First(&existingTeam).Error; err != nil {
+		return nil, teamNotFoundErrors
 	}
 	var addedUsers []*model.TeamUser
 	for _, userIDStr := range input.UserIDs {
@@ -176,7 +181,7 @@ func (r *Repository) AddUsersToTeam(input model.AddUsersToTeamInput) ([]*model.T
 		}
 
 		var existingUser *dbmodels.User
-		if err := r.DB.Where("id = ?", userID).First(&existingUser).Error; err != nil {
+		if err := r.DB.Where(whereIDs, userID).First(&existingUser).Error; err != nil {
 			return nil, errors.New("error: a user not found")
 		}
 		var existingTeamUser *dbmodels.TeamUser
@@ -204,16 +209,16 @@ func (r *Repository) RemoveUserFromTeam(id string, teamID string) (bool, error) 
 		return false, errors.New("error while parsing user id")
 	}
 	var existingUser *dbmodels.User
-	if err := r.DB.Where("id = ?", userID).First(&existingUser).Error; err != nil {
+	if err := r.DB.Where(whereIDs, userID).First(&existingUser).Error; err != nil {
 		return false, errors.New("user not found")
 	}
-	idTeam, ok := uuid.Parse(teamID)
-	if ok != nil {
-		return false, errors.New("error while parsing team id")
+	idTeam, err := uuid.Parse(teamID)
+	if err != nil {
+		return false, teamIdParsingError
 	}
 	var existingTeam *dbmodels.Team
-	if err := r.DB.Where("id = ?", idTeam).First(&existingTeam).Error; err != nil {
-		return false, errors.New("team not found")
+	if err := r.DB.Where(whereIDs, idTeam).First(&existingTeam).Error; err != nil {
+		return false, teamNotFoundErrors
 	}
 	var existingTeamUser *dbmodels.TeamUser
 	if err := r.DB.Where(&dbmodels.TeamUser{UserID: userID, TeamID: idTeam}).First(&existingTeamUser).Error; err != nil {

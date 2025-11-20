@@ -52,16 +52,19 @@ func main() {
 	adminRepo := repositories.NewRepository(db)
 	teamRepo := repositories.NewRepository(db)
 	timeTableRepo := repositories.NewRepository(db)
+	kpiRepo := repositories.NewRepository(db)
 	authService := services.NewAuthService(authRepo)
 	adminService := services.NewAdminService(adminRepo)
 	teamService := services.NewTeamService(teamRepo)
 	timeTableService := services.NewTimeTableService(timeTableRepo)
+	kpiService := services.NewKpiService(kpiRepo)
 	resolver := &resolvers.Resolver{
 		DB:               db,
 		AuthService:      authService,
 		AdminService:     adminService,
 		TeamService:      teamService,
 		TimeTableService: timeTableService,
+		KpiService:       kpiService,
 	}
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{
