@@ -25,12 +25,12 @@ func (m *MockAuthRepo) Login(email, password string) (*model.User, error) {
 	}
 	return args.Get(0).(*model.User), args.Error(1)
 }
-func (m *MockAuthRepo) Me(email string) (*model.User, error) {
+func (m *MockAuthRepo) Me(email string) (*model.SignedUser, error) {
 	args := m.Called(email)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*model.User), args.Error(1)
+	return args.Get(0).(*model.SignedUser), args.Error(1)
 }
 func (m *MockAuthRepo) UpdateProfile(email string, input model.UpdateProfileInput) (*model.User, error) {
 	args := m.Called(email, input)

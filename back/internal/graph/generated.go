@@ -9667,16 +9667,6 @@ func (ec *executionContext) marshalNInt2int32(ctx context.Context, sel ast.Selec
 	return res
 }
 
-func (ec *executionContext) unmarshalNJour2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐJour(ctx context.Context, v any) (model.Jour, error) {
-	var res model.Jour
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNJour2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐJour(ctx context.Context, sel ast.SelectionSet, v model.Jour) graphql.Marshaler {
-	return v
-}
-
 func (ec *executionContext) marshalNKpiPoint2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐKpiPointᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.KpiPoint) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
