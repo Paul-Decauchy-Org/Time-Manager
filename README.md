@@ -279,6 +279,121 @@ location / {
 
 Pour modifier le routage, édite `nginx/nginx.conf`, puis reconstruis l’image `nginx` ou relance `docker compose up -d --build`.
 
+
+## 🧭 Architecture
+
+### Vue logique (monolithique + reverse proxy)
+
+```mermaid
+flowchart LR
+    user[Utilisateur / Navigateur]
+    proxy[Nginx (Reverse Proxy)\n:80]
+    front[Front Next.js\n:3000]
+    subgraph Back[Go Monolith]
+      back[API GraphQL (gqlgen)\n:8084]
+      routes[Routes / GraphQL]
+      auth[Auth\nLogin / Signup / Logout]
+      kpis[KPIs]
+      time[Pointage\nClock-in / Clock-out]
+      routes --> back
+      auth --> back
+      kpis --> back
+      time --> back
+    end
+    db[(PostgreSQL\n:5432)]
+
+    user --> proxy
+    proxy -- "/" --> front
+    proxy -- "/query" --> back
+    front --> back
+    back --> db
+```
+
+### Vue conteneurs (Docker Compose)
+
+```mermaid
+flowchart LR
+    subgraph compose[Docker Compose: Time-Manager-Network]
+      ng[Nginx\nexpose 80]
+      fe[Front (Next.js)\nexpose 3000]
+      be[Back (Go)\nexpose 8084]
+      pg[(PostgreSQL)\nexpose 5432]
+      vol[(Volume postgres_data)]
+
+      ng -->|/ ->| fe
+      ng -->|/query ->| be
+      fe --> be
+      be --> pg
+      pg --- vol
+    end
+```
+
+Ports & routage:
+- Nginx `:80` route `/` vers `front:3000` et `/query` vers `back:8084`.
+- Le front parle à l'API via `http://localhost/query` (reverse proxy) ou `http://back:8084/query` en réseau interne.
+- PostgreSQL accessible uniquement au backend dans le réseau de compose.
+
+### Vue CI/CD (qualité, tests, sonar, images)
+
+```mermaid
+flowchart LR
+    commit[Commit / PR] --> quality[Quality Check\n(go vet, format, npm ci)]
+    quality --> graphql[Artifacts GraphQL\n(gqlgen + codegen)]
+    graphql --> feBuild[Build Frontend]
+    graphql --> tests[Tests Backend + Coverage]
+    tests --> sonar[SonarCloud Scan\n(coverage back/coverage.out)]
+    feBuild --> docker[Docker Build Images]
+    tests --> docker
+    docker --> push{Branche main ?}
+    push -->|Oui| registry[(GHCR\nback/front/nginx)]
+    push -->|Non| end[Fin (artefacts)]
+```
+
+## 📦 Déploiement des images (Registry)
+
+Les images Docker sont construites puis poussées vers **GitHub Container Registry (GHCR)** lorsque les commits ciblent la branche `main`:
+
+Tags générés par job `docker-push`:
+```
+ghcr.io/<org>/time-manager-back:latest
+ghcr.io/<org>/time-manager-back:<commit-sha>
+ghcr.io/<org>/time-manager-front:latest
+ghcr.io/<org>/time-manager-front:<commit-sha>
+ghcr.io/<org>/time-manager-nginx:latest
+ghcr.io/<org>/time-manager-nginx:<commit-sha>
+```
+
+Pull local:
+```powershell
+docker pull ghcr.io/<org>/time-manager-back:latest
+docker pull ghcr.io/<org>/time-manager-front:latest
+docker pull ghcr.io/<org>/time-manager-nginx:latest
+```
+
+Utilisation dans un autre compose:
+```yaml
+services:
+  back:
+    image: ghcr.io/<org>/time-manager-back:latest
+  front:
+    image: ghcr.io/<org>/time-manager-front:latest
+  nginx:
+    image: ghcr.io/<org>/time-manager-nginx:latest
+```
+
+## 🧪 Étapes Tests & Sonar
+
+Résumé du flux backend:
+1. `go test ./... -coverprofile=coverage.out -covermode=atomic` génère la couverture.
+2. Le fichier est uploadé comme artefact `backend-coverage`.
+3. Le job `sonarcloud-scan` télécharge l'artefact et veille à ce que `back/coverage.out` soit présent (config: `sonar.go.coverage.reportPaths=back/coverage.out`).
+4. SonarCloud scanne uniquement les sources `back/` (tests exclus du dénominateur via configuration). 
+
+Bonnes pratiques pour conserver une couverture fiable:
+- Garder les interfaces de services pour faciliter le mocking.
+- Couvrir les branches d'erreur (nil, durées négatives, parsing date invalide, etc.).
+- Ajouter des tests lorsque de nouvelles métriques KPI ou mutations GraphQL sont introduites.
+
 ## 🛠️ Conseils pour le développement
 
 ### Tests unitaires du backend
