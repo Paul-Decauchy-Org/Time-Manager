@@ -48,9 +48,9 @@ func (r *Repository) GetTimeTableEntriesFiltered(userID *uuid.UUID, teamID *uuid
 }
 
 // GetUserTimeTables fetches planned schedules for a user
-func (r *Repository) GetUserTimeTables(userID uuid.UUID) ([]*dbmodels.TimeTable, error) {
-	var rows []*dbmodels.TimeTable
-	if err := r.DB.Where(&dbmodels.TimeTable{UserID: userID}).Find(&rows).Error; err != nil {
+func (r *Repository) GetUserTimeTables(userID uuid.UUID) ([]*dbmodels.TimeTableEntry, error) {
+	var rows []*dbmodels.TimeTableEntry
+	if err := r.DB.Where(&dbmodels.TimeTableEntry{UserID: userID}).Find(&rows).Error; err != nil {
 		return nil, err
 	}
 	return rows, nil
