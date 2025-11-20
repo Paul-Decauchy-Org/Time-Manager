@@ -85,34 +85,34 @@ VALUES
 WITH user_ids AS (
   SELECT id, email FROM users
 )
-INSERT INTO time_tables (id, user_id, day, start, ends)
-VALUES
-  -- Regular user schedule
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'MONDAY', 
-   NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'TUESDAY', 
-   NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'WEDNESDAY', 
-   NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'THURSDAY', 
-   NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'FRIDAY', 
-   NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
+-- INSERT INTO time_tables (id, user_id, day, start, end)
+-- VALUES
+--   -- Regular user schedule
+--   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'MONDAY', 
+--    NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
+--   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'TUESDAY', 
+--    NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
+--   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'WEDNESDAY', 
+--    NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
+--   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'THURSDAY', 
+--    NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
+--   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'FRIDAY', 
+--    NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
    
-  -- John Doe - part time
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'john.doe@timemanager.com'), 'MONDAY', 
-   NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'john.doe@timemanager.com'), 'WEDNESDAY', 
-   NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'john.doe@timemanager.com'), 'FRIDAY', 
-   NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
+--   -- John Doe - part time
+--   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'john.doe@timemanager.com'), 'MONDAY', 
+--    NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
+--   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'john.doe@timemanager.com'), 'WEDNESDAY', 
+--    NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
+--   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'john.doe@timemanager.com'), 'FRIDAY', 
+--    NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
    
-  -- Jane Smith - flexible hours
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'jane.smith@timemanager.com'), 'MONDAY', 
-   NOW()::date + INTERVAL '10 hours', NOW()::date + INTERVAL '19 hours'),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'jane.smith@timemanager.com'), 'TUESDAY', 
-   NOW()::date + INTERVAL '10 hours', NOW()::date + INTERVAL '19 hours'),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'jane.smith@timemanager.com'), 'THURSDAY', 
-   NOW()::date + INTERVAL '10 hours', NOW()::date + INTERVAL '19 hours'),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'jane.smith@timemanager.com'), 'FRIDAY', 
-   NOW()::date + INTERVAL '10 hours', NOW()::date + INTERVAL '19 hours');
+--   -- Jane Smith - flexible hours
+--   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'jane.smith@timemanager.com'), 'MONDAY', 
+--    NOW()::date + INTERVAL '10 hours', NOW()::date + INTERVAL '19 hours'),
+--   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'jane.smith@timemanager.com'), 'TUESDAY', 
+--    NOW()::date + INTERVAL '10 hours', NOW()::date + INTERVAL '19 hours'),
+--   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'jane.smith@timemanager.com'), 'THURSDAY', 
+--    NOW()::date + INTERVAL '10 hours', NOW()::date + INTERVAL '19 hours'),
+--   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'jane.smith@timemanager.com'), 'FRIDAY', 
+--    NOW()::date + INTERVAL '10 hours', NOW()::date + INTERVAL '19 hours');

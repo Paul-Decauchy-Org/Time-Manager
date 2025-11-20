@@ -8,7 +8,7 @@ import (
 type AuthRepository interface {
 	SignUp(input model.SignUpInput) (*model.User, error)
 	Login(email, password string) (*model.User, error)
-	Me(email string) (*model.User, error)
+	Me(email string) (*model.SignedUser, error)
 	UpdateProfile(email string, input model.UpdateProfileInput) (*model.User, error)
 	DeleteProfile(email string) (bool, error)
 }
@@ -45,7 +45,7 @@ func (s *AuthService) Login(email, password string) (*model.UserLogged, error) {
 	}, nil
 }
 
-func (s *AuthService) Me(email string) (*model.User, error) {
+func (s *AuthService) Me(email string) (*model.SignedUser, error) {
 	return s.AuthRepo.Me(email)
 }
 

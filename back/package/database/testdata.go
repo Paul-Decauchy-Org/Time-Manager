@@ -241,13 +241,11 @@ func createTestTimeTableEntries(users []*dbmodels.User) error {
 
 	var entries []*dbmodels.TimeTable
 
-	// Pour chaque utilisateur (sauf admin et managers)
-	for i := 3; i < len(users); i++ {
-		user := users[i]
-
-		// Créer des entrées pour les 7 derniers jours
-		for day := 0; day < 7; day++ {
-			date := today.AddDate(0, 0, -day)
+    // Pour chaque utilisateur (sauf admin et managers)
+    for i := 3; i < len(users); i++ {
+        // Créer des entrées pour les 7 derniers jours
+        for day := range 7 {
+            date := today.AddDate(0, 0, -day)
 
 			// Morning session (9h-12h)
 			morningStart := date.Add(9 * time.Hour)
@@ -263,35 +261,32 @@ func createTestTimeTableEntries(users []*dbmodels.User) error {
 				afternoonEnd = afternoonEnd.Add(-time.Duration(i*15) * time.Minute)
 			}
 
-			// Ajouter les entrées du matin
-			entries = append(entries, &dbmodels.TimeTable{
-				ID:     uuid.New(),
-				UserID: user.ID,
-				Start:  morningStart,
-				Ends:   morningEnd,
-			})
+            // Ajouter les entrées du matin
+            entries = append(entries, &dbmodels.TimeTable{
+                ID:     uuid.New(),
+                Start: morningStart,
+                Ends:   morningEnd,
+            })
 
-			// Ajouter les entrées de l'après-midi (sauf le vendredi après-midi pour certains)
-			if date.Weekday() != time.Friday || i%3 != 0 {
-				entries = append(entries, &dbmodels.TimeTable{
-					ID:     uuid.New(),
-					UserID: user.ID,
-					Start:  afternoonStart,
-					Ends:   afternoonEnd,
-				})
-			}
-		}
+            // Ajouter les entrées de l'après-midi (sauf le vendredi après-midi pour certains)
+            if date.Weekday() != time.Friday || i%3 != 0 {
+                entries = append(entries, &dbmodels.TimeTable{
+                    ID:     uuid.New(),
+                    Start: afternoonStart,
+                    Ends:   afternoonEnd,
+                })
+            }
+        }
 
-		// Ajouter une entrée "en cours" pour aujourd'hui pour certains utilisateurs
-		if i%2 == 0 && now.Hour() >= 9 && now.Hour() < 18 {
-			entries = append(entries, &dbmodels.TimeTable{
-				ID:     uuid.New(),
-				UserID: user.ID,
-				Start:  today.Add(9 * time.Hour),
-				Ends:   now, // En cours
-			})
-		}
-	}
+        // Ajouter une entrée "en cours" pour aujourd'hui pour certains utilisateurs
+        if i%2 == 0 && now.Hour() >= 9 && now.Hour() < 18 {
+            entries = append(entries, &dbmodels.TimeTable{
+                ID:     uuid.New(),
+                Start: today.Add(9 * time.Hour),
+                Ends:   now, // En cours
+            })
+        }
+    }
 
 	// Insérer en batch
 	if err := DB.Create(&entries).Error; err != nil {

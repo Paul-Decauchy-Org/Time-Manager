@@ -2,9 +2,11 @@ package repositories
 
 import (
 	"errors"
+	"time"
 
 	"github.com/epitech/timemanager/internal/graph/model"
 	teamMapper "github.com/epitech/timemanager/internal/mappers/team"
+	timeTableMapper "github.com/epitech/timemanager/internal/mappers/timeTable"
 	userMapper "github.com/epitech/timemanager/internal/mappers/user"
 	dbmodels "github.com/epitech/timemanager/internal/models"
 	"github.com/google/uuid"
@@ -157,4 +159,36 @@ func (r *Repository) SetRole(userID string, role model.Role) (*model.User, error
 		return nil, errors.New("error while setting user role")
 	}
 	return userMapper.DBUserToGraph(existingUser), nil
+}
+
+func (r *Repository) SetTimeTable(start string, end string)(*model.TimeTable, error){
+	layout := "15:04"
+
+	startTime, err := time.Parse(layout, start)
+	if err != nil {
+		return nil, errors.New("invalid start time format, expected : HH:mm")
+	}
+	endTime, err := time.Parse(layout, end)
+	if err != nil {
+		return nil, errors.New("invalid start time format, excepted : HH:mm")
+	}
+	if err := r.DB.Model(&dbmodels.TimeTable{}).
+		Where("is_active = ?", true).
+		Updates(map[string]any{
+			"is_active":    false,
+			"effective_to": time.Now(),
+		}).Error; err != nil {
+		return nil, errors.New("failed to deactivate previous timetable")
+	}
+	newTimeTable := &dbmodels.TimeTable{
+		Start: startTime,
+		Ends: endTime,
+		EffectiveFrom: time.Now(),
+		IsActive: true,
+	}
+	if err := r.DB.Create(newTimeTable).Error; err != nil {
+        return nil, errors.New("failed to create new timetable")
+    }
+
+    return timeTableMapper.DBTimeTableToGraph(newTimeTable), nil
 }

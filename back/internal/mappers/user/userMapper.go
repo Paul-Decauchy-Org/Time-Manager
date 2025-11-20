@@ -5,7 +5,6 @@ package userMapper
 import (
 	"github.com/epitech/timemanager/internal/graph/model"
 	teamMapper "github.com/epitech/timemanager/internal/mappers/team"
-	timeTableMapper "github.com/epitech/timemanager/internal/mappers/timeTable"
 	timeTableEntriesMapper "github.com/epitech/timemanager/internal/mappers/timeTableEntries"
 	gmodel "github.com/epitech/timemanager/internal/models"
 )
@@ -26,6 +25,24 @@ func DBUserToGraph(u *gmodel.User) *model.User {
 	}
 }
 
+func DBUserToSignedGraph(u *gmodel.User, hasStartedDay bool, startedAt *string) *model.SignedUser {
+	if u == nil {
+		return nil
+	}
+
+	return &model.SignedUser{
+		ID:            u.ID.String(),
+		FirstName:     u.FirstName,
+		LastName:      u.LastName,
+		Email:         u.Email,
+		Password:      "",
+		Role:          model.Role(u.Role),
+		HasStartedDay: hasStartedDay,
+		StartedAt:     startedAt,
+	}
+}
+
+
 func DBUserToGraphWithAllData(u *gmodel.User) *model.UserWithAllData {
 	if u == nil {
 		return nil
@@ -36,10 +53,6 @@ func DBUserToGraphWithAllData(u *gmodel.User) *model.UserWithAllData {
 		timeTableEntries[i] = &u.TimeTableEntries[i]
 	}
 
-	timeTable := make([]*gmodel.TimeTable, len(u.TimeTables))
-	for i := range u.TimeTables {
-		timeTable[i] = &u.TimeTables[i]
-	}
 
 	// Extract []*dbmodels.Team from []dbmodels.TeamUser
 	teams := make([]*gmodel.Team, len(u.Teams))
@@ -56,7 +69,6 @@ func DBUserToGraphWithAllData(u *gmodel.User) *model.UserWithAllData {
 		Role:             model.Role(u.Role),
 		Teams:            teamMapper.DBTeamsToGraph(teams),
 		TimeTableEntries: timeTableEntriesMapper.DBTimeTableEntriesToGraph(timeTableEntries),
-		TimeTables:       timeTableMapper.DBTimeTablesToGraph(timeTable),
 	}
 }
 

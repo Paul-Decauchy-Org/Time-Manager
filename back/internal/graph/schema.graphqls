@@ -22,7 +22,17 @@ type UserWithAllData {
   role: Role!
   teams: [Team!]!
   timeTableEntries: [TimeTableEntry!]!
-  timeTables: [TimeTable!]!
+}
+
+type SignedUser {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
+  role: Role!
+  hasStartedDay: Boolean!
+  startedAt: String
 }
 
 enum Role {
@@ -30,13 +40,7 @@ enum Role {
   ADMIN
   MANAGER
 }
-enum Jour {
-  MONDAY
-  THUSDAY 
-  WEDNESDAY
-  THURSDAY
-  FRIDAY
-}
+
 type Team {
   id: ID!
   name: String!
@@ -65,10 +69,11 @@ type TimeTableEntry {
 
 type TimeTable {
   id: ID!
-  userID: User!
-  day: Jour!
   start: Time!
   ends: Time!
+  effectiveFrom: Time!
+  effectiveTo: Time
+  isActive: Boolean!
 }
 
 type UserLogged {
@@ -91,7 +96,7 @@ type Query {
   userWithAllData(id: ID!): UserWithAllData
   UsersWithAllData: [UserWithAllData!]!
   usersByTeam(teamID: ID!): [UserWithAllData!]!
-  me: User!
+  me: SignedUser!
 
   # queries for admin
   users: [User!]!
@@ -194,6 +199,7 @@ type Mutation {
   deleteUser(id: ID!): Boolean!
   setManagerTeam(userID: ID!, teamID: ID!): Team!
   setRole(userID: ID!, role: Role!): User!
+  setTimeTable(start: String!, end: String!): TimeTable!
   
   
   #user mutations

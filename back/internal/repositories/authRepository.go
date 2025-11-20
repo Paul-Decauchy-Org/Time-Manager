@@ -2,11 +2,14 @@ package repositories
 
 import (
 	"errors"
+	"time"
 
 	"github.com/epitech/timemanager/internal/graph/model"
 	userMapper "github.com/epitech/timemanager/internal/mappers/user"
 	models "github.com/epitech/timemanager/internal/models"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 const emailCondition = "email = ?"
@@ -46,12 +49,30 @@ func (r *Repository) Login(email, password string) (*model.User, error) {
 	return userMapper.DBUserToGraph(&user), nil
 }
 
-func (r *Repository) Me(email string) (*model.User, error) {
+func (r *Repository) Me(email string) (*model.SignedUser, error) {
 	var user models.User
 	if err := r.DB.Where(emailCondition, email).First(&user).Error; err != nil {
 		return nil, err
 	}
-	return userMapper.DBUserToGraph(&user), nil
+	today := time.Now().Format("2006-01-02")
+	var entry models.TimeTableEntry
+
+	err := r.DB.
+		Where("user_id = ? AND DATE(day) = ?", user.ID, today).
+		Order("day DESC").
+		First(&entry).Error
+
+	hasStartedDay := false
+	var startedAt *string = nil
+
+	if err == nil && entry.ID != uuid.Nil && entry.Status {
+		hasStartedDay = true
+		formatted := entry.Arrival.Format("15:04")
+		startedAt = &formatted
+	} else if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	return userMapper.DBUserToSignedGraph(&user, hasStartedDay, startedAt), nil
 }
 
 func (r *Repository) UpdateProfile(email string, input model.UpdateProfileInput) (*model.User, error) {
