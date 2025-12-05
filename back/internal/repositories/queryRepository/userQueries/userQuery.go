@@ -37,7 +37,7 @@ func ListUsersWithAllData() ([]*gmodel.UserWithAllData, error) {
 		return nil, databaseInitializationError
 	}
 	var users []models.User
-	if err := database.DB.Preload("Teams").Preload("TimeTableEntries").Preload("TimeTables").Find(&users).Error; err != nil {
+	if err := database.DB.Preload("Teams").Preload("TimeTableEntries").Find(&users).Error; err != nil {
 		return nil, err
 	}
 	out := make([]*gmodel.UserWithAllData, 0, len(users))

@@ -104,7 +104,6 @@ func (r *Repository) GetUser(id string) (*model.UserWithAllData, error) {
 		return nil, idParsingError
 	}
 	if err := r.DB.Preload("TimeTableEntries").
-		Preload("TimeTables").
 		Preload("TeamUsers.Team").
 		Where(whereID, uID).
 		First(&existingUser).Error; err != nil {
@@ -161,7 +160,7 @@ func (r *Repository) SetRole(userID string, role model.Role) (*model.User, error
 	return userMapper.DBUserToGraph(existingUser), nil
 }
 
-func (r *Repository) SetTimeTable(start string, end string)(*model.TimeTable, error){
+func (r *Repository) SetTimeTable(start string, end string) (*model.TimeTable, error) {
 	layout := "15:04"
 
 	startTime, err := time.Parse(layout, start)
@@ -181,14 +180,14 @@ func (r *Repository) SetTimeTable(start string, end string)(*model.TimeTable, er
 		return nil, errors.New("failed to deactivate previous timetable")
 	}
 	newTimeTable := &dbmodels.TimeTable{
-		Start: startTime,
-		Ends: endTime,
+		Start:         startTime,
+		Ends:          endTime,
 		EffectiveFrom: time.Now(),
-		IsActive: true,
+		IsActive:      true,
 	}
 	if err := r.DB.Create(newTimeTable).Error; err != nil {
-        return nil, errors.New("failed to create new timetable")
-    }
+		return nil, errors.New("failed to create new timetable")
+	}
 
-    return timeTableMapper.DBTimeTableToGraph(newTimeTable), nil
+	return timeTableMapper.DBTimeTableToGraph(newTimeTable), nil
 }

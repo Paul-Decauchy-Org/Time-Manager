@@ -110,6 +110,7 @@ type ComplexityRoot struct {
 		ID            func(childComplexity int) int
 		LastName      func(childComplexity int) int
 		Password      func(childComplexity int) int
+		Phone         func(childComplexity int) int
 		Role          func(childComplexity int) int
 		StartedAt     func(childComplexity int) int
 	}
@@ -696,6 +697,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.SignedUser.Password(childComplexity), true
+	case "SignedUser.phone":
+		if e.complexity.SignedUser.Phone == nil {
+			break
+		}
+
+		return e.complexity.SignedUser.Phone(childComplexity), true
 	case "SignedUser.role":
 		if e.complexity.SignedUser.Role == nil {
 			break
@@ -3366,6 +3373,8 @@ func (ec *executionContext) fieldContext_Query_me(_ context.Context, field graph
 				return ec.fieldContext_SignedUser_password(ctx, field)
 			case "role":
 				return ec.fieldContext_SignedUser_role(ctx, field)
+			case "phone":
+				return ec.fieldContext_SignedUser_phone(ctx, field)
 			case "hasStartedDay":
 				return ec.fieldContext_SignedUser_hasStartedDay(ctx, field)
 			case "startedAt":
@@ -3974,6 +3983,35 @@ func (ec *executionContext) fieldContext_SignedUser_role(_ context.Context, fiel
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Role does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SignedUser_phone(ctx context.Context, field graphql.CollectedField, obj *model.SignedUser) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_SignedUser_phone,
+		func(ctx context.Context) (any, error) {
+			return obj.Phone, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_SignedUser_phone(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SignedUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -8500,6 +8538,11 @@ func (ec *executionContext) _SignedUser(ctx context.Context, sel ast.SelectionSe
 			}
 		case "role":
 			out.Values[i] = ec._SignedUser_role(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "phone":
+			out.Values[i] = ec._SignedUser_phone(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
