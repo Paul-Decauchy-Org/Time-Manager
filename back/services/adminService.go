@@ -46,6 +46,6 @@ func (s *AdminService) SetRole(userID string, role model.Role) (*model.User, err
 	return s.AdminRepo.SetRole(userID, role)
 }
 
-func (s *AdminService) SetTimeTable(start, end string)(*model.TimeTable, error){
+func (s *AdminService) SetTimeTable(start, end string) (*model.TimeTable, error) {
 	return s.AdminRepo.SetTimeTable(start, end)
 }

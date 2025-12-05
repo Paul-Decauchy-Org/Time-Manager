@@ -56,7 +56,7 @@ func ListUsersWithAllDataByTeam(teamID string) ([]*gmodel.UserWithAllData, error
 		Joins("JOIN team_users ON team_users.user_id = users.id").
 		Where("team_users.team_id = ?", teamUUID).
 		Preload("Teams").
-		Preload("TimeTables").
+		Preload("TimeTableEntries").
 		Find(&dbUsers).Error
 	if err != nil {
 		return nil, err

@@ -73,6 +73,7 @@ type SignedUser struct {
 	Email         string  `json:"email"`
 	Password      string  `json:"password"`
 	Role          Role    `json:"role"`
+	Phone         string  `json:"phone"`
 	HasStartedDay bool    `json:"hasStartedDay"`
 	StartedAt     *string `json:"startedAt,omitempty"`
 }
