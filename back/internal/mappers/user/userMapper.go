@@ -42,7 +42,6 @@ func DBUserToSignedGraph(u *gmodel.User, hasStartedDay bool, startedAt *string) 
 	}
 }
 
-
 func DBUserToGraphWithAllData(u *gmodel.User) *model.UserWithAllData {
 	if u == nil {
 		return nil
@@ -52,7 +51,6 @@ func DBUserToGraphWithAllData(u *gmodel.User) *model.UserWithAllData {
 	for i := range u.TimeTableEntries {
 		timeTableEntries[i] = &u.TimeTableEntries[i]
 	}
-
 
 	// Extract []*dbmodels.Team from []dbmodels.TeamUser
 	teams := make([]*gmodel.Team, len(u.Teams))
