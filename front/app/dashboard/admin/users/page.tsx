@@ -1,15 +1,14 @@
-"use client";
+import { Users } from "lucide-react";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
-import { Role, User } from "@/generated/graphql";
 import {useAdminUsers} from "@/hooks/admin/users";
+import UsersData from "./data";
 
 export default function AdminUsers() {
-  const data = useAdminUsers();
 
   return (
-    <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={data} />
-    </div>
+    <>
+    <UsersData />
+    </>
   );
 }
