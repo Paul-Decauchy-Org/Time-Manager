@@ -105,6 +105,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import ExportCSV from "./csv-export"
 
 export const schema = z.object({
   id: z.number(),
@@ -795,6 +796,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
             </div>
           </form>
         </div>
+      
         <DrawerFooter>
           <Button>Submit</Button>
           <DrawerClose asChild>
