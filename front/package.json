@@ -10,7 +10,8 @@
     "format:check": "biome format --check",
     "codegen": "graphql-codegen --config codegen.ts",
     "schema": "rover graph introspect http://localhost:8084/query > schema.graphql",
-    "sonar": "sonar-scanner"
+    "sonar": "sonar-scanner",
+    "test": "jest"
   },
   "dependencies": {
     "@apollo/client": "^4.0.7",
