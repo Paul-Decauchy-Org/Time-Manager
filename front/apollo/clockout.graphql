@@ -1,4 +1,4 @@
-mutation clockOut{
+mutation clockOut {
   clockOut {
     id
     arrival

@@ -5,15 +5,14 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
 
 export default function KpiIndexPage() {
-  const { isAdmin, isManager, user, loading } = useAuth()
+  const { isAdmin, isManager, user} = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (loading) return
     if (isAdmin) router.replace("/dashboard/kpi/admin")
     else if (isManager) router.replace("/dashboard/kpi/team")
     else if (user) router.replace("/dashboard/kpi/user")
-  }, [isAdmin, isManager, user, loading, router])
+  }, [isAdmin, isManager, user, router])
 
   return (
     React.createElement(
