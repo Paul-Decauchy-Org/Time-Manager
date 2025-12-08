@@ -1,4 +1,4 @@
-
+"use client";
 import {useSuspenseQuery} from "@apollo/client/react";
 import {UsersDocument} from "@/generated/graphql";
 
