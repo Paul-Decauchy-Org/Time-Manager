@@ -1,3 +1,5 @@
+"use client";
+
 import { Users } from "lucide-react";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
