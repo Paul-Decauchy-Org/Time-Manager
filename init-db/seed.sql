@@ -1,118 +1,83 @@
--- Additional Users (beyond the default ones in init.sql)
-INSERT INTO users (id, first_name, last_name, email, phone, password, role)
-VALUES 
-  (uuid_generate_v4(), 'John', 'Doe', 'john.doe@timemanager.com', '3333333333', '$2a$10$lAy7kX6nOTnoWeWcZRxVeOkzXEgvjEKOB7IZ3fkglmKJ7Mh1gNqDe', 'USER'),
-  (uuid_generate_v4(), 'Jane', 'Smith', 'jane.smith@timemanager.com', '4444444444', '$2a$10$lAy7kX6nOTnoWeWcZRxVeOkzXEgvjEKOB7IZ3fkglmKJ7Mh1gNqDe', 'USER'),
-  (uuid_generate_v4(), 'Bob', 'Johnson', 'bob.johnson@timemanager.com', '5555555555', '$2a$10$lAy7kX6nOTnoWeWcZRxVeOkzXEgvjEKOB7IZ3fkglmKJ7Mh1gNqDe', 'USER'),
-  (uuid_generate_v4(), 'Alice', 'Williams', 'alice.williams@timemanager.com', '6666666666', '$2a$10$lAy7kX6nOTnoWeWcZRxVeOkzXEgvjEKOB7IZ3fkglmKJ7Mh1gNqDe', 'USER'),
-  (uuid_generate_v4(), 'Michael', 'Brown', 'michael.brown@timemanager.com', '7777777777', '$2a$10$lAy7kX6nOTnoWeWcZRxVeOkzXEgvjEKOB7IZ3fkglmKJ7Mh1gNqDe', 'MANAGER'),
-  (uuid_generate_v4(), 'Admin', 'User', 'admin@timemanager.com', '9999999999', '$2a$10$lAy7kX6nOTnoWeWcZRxVeOkzXEgvjEKOB7IZ3fkglmKJ7Mh1gNqDe', 'ADMIN')
-ON CONFLICT (email) DO NOTHING;
+-- UUID generator 
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- Create Teams
-WITH manager_users AS (
-  SELECT id, email FROM users WHERE role = 'MANAGER'
+-- =======================
+-- 1. USERS
+-- =======================
+INSERT INTO users (id, first_name, last_name, email, phone, password, role)
+VALUES
+(gen_random_uuid(), 'Alice', 'Dupont', 'alice.dupont@example.fr', '0700000001', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'ADMIN'),
+(gen_random_uuid(), 'Bob', 'Sall', 'bob.sall@example.fr', '0700000002', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'Carla', 'Diop', 'carla.diop@example.fr', '0700000003', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'David', 'Fall', 'david.fall@example.fr', '0700000004', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'Eva', 'Smith', 'eva.smith@example.fr', '0700000005', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'Fabrice', 'Ba', 'fabrice.ba@example.fr', '0700000006', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'MANAGER'),
+(gen_random_uuid(), 'Gora', 'Sow', 'gora.sow@example.fr', '0700000007', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'Helene', 'Césaire', 'helene.cesaire@example.fr', '0700000008', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'Ibrahima', 'Sy', 'ibrahima.sy@example.fr', '0700000009', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'Julie', 'Loris', 'julie.loris@example.fr', '0700000010', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'Karim', 'Buchet', 'karim.buchet@example.fr', '0700000011', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'Laura', 'Meron', 'laura.meron@example.fr', '0700000012', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'Moussa', 'Kane', 'moussa.kane@example.fr', '0700000013', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'Nadia', 'Belet', 'nadia.belet@example.fr', '0700000014', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'Julien', 'Gomis', 'julien.gomis@example.fr', '0700000015', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'MANAGER'),
+(gen_random_uuid(), 'Kevin', 'Louis', 'kevin.louis@example.fr', '0700000016', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'Henri', 'Guerin', 'henri.guerin@example.fr', '0700000017', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'Rama', 'Faye', 'rama.faye@example.fr', '0700000018', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'Arthur', 'Ba', 'arthur.ba@example.fr', '0700000019', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'Thomas', 'Gomis', 'thomas.gomis@example.fr', '0700000020', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
+(gen_random_uuid(), 'Jessica', 'Sachi', 'jessica.sachi@example.fr', '0700000021', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'MANAGER'),
+(gen_random_uuid(), 'Paul', 'Varney', 'paul.varney@example.fr', '0700000022', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'MANAGER'),
+(gen_random_uuid(), 'Clara', 'Bob', 'clara.bob@example.fr', '0700000023', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'MANAGER');
+
+-- =======================
+-- 2. TEAMS
+-- =======================
+WITH managers AS (
+  SELECT id FROM users WHERE role = 'MANAGER' LIMIT 5
 )
 INSERT INTO teams (id, name, description, manager_id)
-VALUES
-  (uuid_generate_v4(), 'Marketing Team', 'Marketing specialists', (SELECT id FROM manager_users WHERE email = 'michael.brown@timemanager.com')),
-  (uuid_generate_v4(), 'Sales Team', 'Sales representatives', (SELECT id FROM manager_users WHERE email = 'michael.brown@timemanager.com'));
+SELECT 
+  gen_random_uuid(),
+  CONCAT('Team_', ROW_NUMBER() OVER()),
+  'Équipe générée automatiquement pour les tests',
+  id
+FROM managers;
 
--- Assign users to teams
-WITH 
-  user_ids AS (
-    SELECT id, email FROM users WHERE role = 'USER'
-  ),
-  team_ids AS (
-    SELECT id, name FROM teams
-  )
-INSERT INTO team_users (id, user_id, team_id)
+-- =======================
+-- 3. TIME TABLES
+-- =======================
+INSERT INTO time_tables (id, start, ends, effective_from, effective_to, is_active)
 VALUES
-  -- Development Team
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), (SELECT id FROM team_ids WHERE name = 'Development Team')),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'john.doe@timemanager.com'), (SELECT id FROM team_ids WHERE name = 'Development Team')),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'jane.smith@timemanager.com'), (SELECT id FROM team_ids WHERE name = 'Development Team')),
-  
-  -- Design Team
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'bob.johnson@timemanager.com'), (SELECT id FROM team_ids WHERE name = 'Design Team')),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'alice.williams@timemanager.com'), (SELECT id FROM team_ids WHERE name = 'Design Team')),
-  
-  -- Marketing Team
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), (SELECT id FROM team_ids WHERE name = 'Marketing Team')),
-  
-  -- Sales Team
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'jane.smith@timemanager.com'), (SELECT id FROM team_ids WHERE name = 'Sales Team'))
-ON CONFLICT DO NOTHING;
+(gen_random_uuid(), '08:00', '16:00', '2025-01-01', '2026-06-30', TRUE),
+(gen_random_uuid(), '09:00', '17:00', '2024-07-01', '2024-12-31', FALSE);
 
--- Create time_table_entries (clock in/out data)
-WITH user_ids AS (
-  SELECT id, email FROM users
-)
-INSERT INTO time_table_entries (id, user_id, day, arrival, departure, status)
-VALUES
-  -- Regular User
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'MONDAY', 
-   NOW() - INTERVAL '7 days' + INTERVAL '9 hours', NOW() - INTERVAL '7 days' + INTERVAL '17 hours', true),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'TUESDAY', 
-   NOW() - INTERVAL '6 days' + INTERVAL '8 hours 30 minutes', NOW() - INTERVAL '6 days' + INTERVAL '16 hours 45 minutes', true),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'WEDNESDAY', 
-   NOW() - INTERVAL '5 days' + INTERVAL '9 hours 15 minutes', NOW() - INTERVAL '5 days' + INTERVAL '18 hours', true),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'THURSDAY', 
-   NOW() - INTERVAL '4 days' + INTERVAL '9 hours', NOW() - INTERVAL '4 days' + INTERVAL '17 hours 30 minutes', true),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'FRIDAY', 
-   NOW() - INTERVAL '3 days' + INTERVAL '8 hours 45 minutes', NOW() - INTERVAL '3 days' + INTERVAL '16 hours', true),
-   
-  -- John Doe
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'john.doe@timemanager.com'), 'MONDAY', 
-   NOW() - INTERVAL '7 days' + INTERVAL '9 hours', NOW() - INTERVAL '7 days' + INTERVAL '17 hours 30 minutes', true),
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'john.doe@timemanager.com'), 'WEDNESDAY', 
-   NOW() - INTERVAL '5 days' + INTERVAL '8 hours 30 minutes', NOW() - INTERVAL '5 days' + INTERVAL '16 hours', true),
-   
-  -- Current day (incomplete entry)
-  (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 
-   CASE EXTRACT(DOW FROM NOW())
-     WHEN 0 THEN 'SUNDAY'
-     WHEN 1 THEN 'MONDAY'
-     WHEN 2 THEN 'TUESDAY'
-     WHEN 3 THEN 'WEDNESDAY'
-     WHEN 4 THEN 'THURSDAY'
-     WHEN 5 THEN 'FRIDAY'
-     WHEN 6 THEN 'SATURDAY'
-   END,
-   NOW() - INTERVAL '2 hours', NULL, false);
+-- =======================
+-- 4. TIME TABLE ENTRIES 
+-- =======================
+DO $$
+DECLARE 
+    u RECORD;
+    i INT;
+    random_day DATE;
+    arrival TIMESTAMP;
+    departure TIMESTAMP;
+BEGIN
+    FOR u IN SELECT id FROM users LOOP
+        FOR i IN 1..10 LOOP
+            random_day := (CURRENT_DATE - (i || ' day')::interval)::date;
+            arrival := (random_day || ' 08:0' || (i % 5))::timestamp;
+            departure := (random_day || ' 16:1' || (i % 5))::timestamp;
 
--- Create time_tables (work schedules)
-WITH user_ids AS (
-  SELECT id, email FROM users
-)
--- INSERT INTO time_tables (id, user_id, day, start, end)
--- VALUES
---   -- Regular user schedule
---   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'MONDAY', 
---    NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
---   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'TUESDAY', 
---    NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
---   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'WEDNESDAY', 
---    NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
---   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'THURSDAY', 
---    NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
---   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'user@timemanager.com'), 'FRIDAY', 
---    NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
-   
---   -- John Doe - part time
---   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'john.doe@timemanager.com'), 'MONDAY', 
---    NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
---   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'john.doe@timemanager.com'), 'WEDNESDAY', 
---    NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
---   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'john.doe@timemanager.com'), 'FRIDAY', 
---    NOW()::date + INTERVAL '9 hours', NOW()::date + INTERVAL '17 hours'),
-   
---   -- Jane Smith - flexible hours
---   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'jane.smith@timemanager.com'), 'MONDAY', 
---    NOW()::date + INTERVAL '10 hours', NOW()::date + INTERVAL '19 hours'),
---   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'jane.smith@timemanager.com'), 'TUESDAY', 
---    NOW()::date + INTERVAL '10 hours', NOW()::date + INTERVAL '19 hours'),
---   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'jane.smith@timemanager.com'), 'THURSDAY', 
---    NOW()::date + INTERVAL '10 hours', NOW()::date + INTERVAL '19 hours'),
---   (uuid_generate_v4(), (SELECT id FROM user_ids WHERE email = 'jane.smith@timemanager.com'), 'FRIDAY', 
---    NOW()::date + INTERVAL '10 hours', NOW()::date + INTERVAL '19 hours');
+            INSERT INTO time_table_entries (id, user_id, day, arrival, departure, status)
+            VALUES (
+                gen_random_uuid(),
+                u.id,
+                random_day::text,
+                arrival,
+                departure,
+                TRUE
+            );
+        END LOOP;
+    END LOOP;
+END $$;
