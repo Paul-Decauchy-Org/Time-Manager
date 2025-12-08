@@ -4,7 +4,7 @@ import {useFragment, useQuery, useSuspenseQuery} from '@apollo/client/react';
 import {MeDocument, Role, User} from "@/generated/graphql";
 
 interface AuthContextType {
-    user: User;
+    user: User | undefined;
     hasRole: (roles: Role | Role[]) => boolean;
     loading: boolean;
     isAdmin: boolean;
@@ -44,3 +44,4 @@ export function useAuth() {
         throw new Error('useAuth must be used within an AuthProvider');
     }
     return context;
+}
