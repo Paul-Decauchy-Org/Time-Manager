@@ -53,22 +53,22 @@ const adminItems: links = {
 }
 
 export function AppSidebar() {
-    const { isManager, isAdmin, loading } = useAuth()
+    const { isManager, isAdmin} = useAuth()
     const { logout } = useLogout()
     const router = useRouter()
     async function handleLogout() {
         await logout()
         router.push("/login")
     }
-    if (loading) {
-        return (
-            <Sidebar>
-            <SidebarContent>
-            {/* Loader ou rien pendant le chargement */ }
-            </SidebarContent>
-            </Sidebar>
-        )
-    }
+    // if (loading) {
+    //     return (
+    //         <Sidebar>
+    //         <SidebarContent>
+    //         {/* Loader ou rien pendant le chargement */ }
+    //         </SidebarContent>
+    //         </Sidebar>
+    //     )
+    // }
     return (
         <Sidebar>
         <SidebarContent>
