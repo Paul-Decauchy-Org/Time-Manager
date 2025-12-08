@@ -1,34 +1,26 @@
-"use client";
-import { createContext, useContext, ReactNode } from "react";
-import { useBackgroundQuery, useReadQuery, QueryRef } from "@apollo/client/react";
-import { MeDocument, MeQuery, Role, User} from "@/generated/graphql";
+'use client';
+import { createContext, useContext, ReactNode } from 'react';
+import {useFragment, useQuery, useSuspenseQuery} from '@apollo/client/react';
+import {MeDocument, Role, User} from "@/generated/graphql";
 
 interface AuthContextType {
-    user: User;
+    user: User | undefined;
     hasRole: (roles: Role | Role[]) => boolean;
+    loading: boolean;
     isAdmin: boolean;
     isManager: boolean;
 }
 
-const AuthContext = createContext<QueryRef<MeQuery>| undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Provider component - starts fetching immediately
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [queryRef] = useBackgroundQuery(MeDocument);
+    const { data, loading, error } = useQuery(MeDocument, {
+        // Don't show errors for unauthenticated users
+        errorPolicy: 'ignore',
+    });
 
-    return <AuthContext.Provider value={queryRef}>{children}</AuthContext.Provider>;
-}
-
-// Custom hook to use auth context
-export function useAuth(): AuthContextType {
-    const queryRef = useContext(AuthContext);
-    if (queryRef === undefined) {
-        throw new Error("useAuth must be used within an AuthProvider");
-    }
-
-    // Read the prefetched data
-    const { data } = useReadQuery(queryRef);
-    const user = data.me;
+    const user = data?.me
 
     const hasRole = (roles: Role | Role[]): boolean => {
         if (!user) return false;
@@ -36,10 +28,20 @@ export function useAuth(): AuthContextType {
         return roleArray.includes(user.role);
     };
 
-    return {
+    const value : AuthContextType = {
         user,
+        loading,
         hasRole,
         isAdmin: user?.role === Role.Admin,
-        isManager: user?.role === Role.Manager || user?.role === Role.Admin,
-    };
+        isManager: user?.role === Role.Manager|| user?.role === Role.Admin,
+    }
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth() {
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
 }
