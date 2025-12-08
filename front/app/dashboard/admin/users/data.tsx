@@ -7,7 +7,7 @@ export default function UsersData() {
 
   return (
     <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={data ?? []} />
     </div>
   );
 }
