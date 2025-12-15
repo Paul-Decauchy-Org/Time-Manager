@@ -65,24 +65,34 @@ func (r *queryResolver) ExportUserKpiCSV(ctx context.Context, userID *string, fr
 	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
 		return "", err
 	}
-	var uid *uuid.UUID
+	var userUUID *uuid.UUID
 	if userID != nil && *userID != "" {
-		if parsed, err := uuid.Parse(*userID); err == nil {
-			uid = &parsed
+		parsed, err := uuid.Parse(*userID)
+		if err != nil {
+			return "", errors.New("invalid userID")
 		}
+		userUUID = &parsed
 	}
-	var fromT, toT time.Time
+
+	var fromDate time.Time
 	if from != nil && *from != "" {
-		if t, err := time.Parse(layoutISO, *from); err == nil {
-			fromT = t
+		t, err := time.Parse(layoutISO, *from)
+		if err != nil {
+			return "", errors.New("invalid from date, expected YYYY-MM-DD")
 		}
+		fromDate = t
 	}
+
+	var toDate time.Time
 	if to != nil && *to != "" {
-		if t, err := time.Parse(layoutISO, *to); err == nil {
-			toT = t
+		t, err := time.Parse(layoutISO, *to)
+		if err != nil {
+			return "", errors.New("invalid to date, expected YYYY-MM-DD")
 		}
+		toDate = t
 	}
-	csvData, err := r.KpiService.ExportUserKpiCSV(ctx, uid, fromT, toT)
+
+	csvData, err := r.KpiService.ExportUserKpiCSV(ctx, userUUID, fromDate, toDate)
 	if err != nil {
 		return "", err
 	}
