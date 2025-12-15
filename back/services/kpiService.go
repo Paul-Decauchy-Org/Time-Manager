@@ -1,8 +1,12 @@
 package services
 
 import (
+	"bytes"
 	"context"
+	"encoding/csv"
+	"fmt"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/epitech/timemanager/internal/graph/model"
@@ -73,6 +77,45 @@ func (s *KpiService) GetUserKpiSummary(ctx context.Context, userID *uuid.UUID, f
 		DailyWorked:       points,
 	}
 	return res, nil
+}
+
+func (s *KpiService) ExportUserKpiCSV(ctx context.Context, userID *uuid.UUID, from, to time.Time) ([]byte, error) {
+	summary, err := s.GetUserKpiSummary(ctx, userID, from, to)
+	if err != nil {
+		return nil, err
+	}
+	var buf bytes.Buffer
+	writer := csv.NewWriter(&buf)
+
+	writer.Write([]string{
+		"UserID",
+		"From",
+		"To",
+		"WorkedMinutes",
+		"OvertimeMinutes",
+		"DaysPresent",
+		"CurrentStreakDays",
+		"PunctualityRate",
+		"PresentNow",
+	})
+	
+	writer.Write([]string{
+		summary.UserID,
+		summary.From,
+		summary.To,
+		strconv.Itoa(int(summary.WorkedMinutes)),
+		strconv.Itoa(int(summary.OvertimeMinutes)),
+		strconv.Itoa(int(summary.DaysPresent)),
+		strconv.Itoa(int(summary.CurrentStreakDays)),
+		fmt.Sprintf("%.2f", summary.PunctualityRate),
+		strconv.FormatBool(summary.PresentNow),
+	})
+
+	writer.Write([]string{}) 
+
+	writer.Flush()
+	return buf.Bytes(), nil
+
 }
 
 func normalizeWindow(from, to time.Time) (time.Time, time.Time) {
