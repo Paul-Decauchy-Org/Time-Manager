@@ -98,7 +98,7 @@ func (s *KpiService) ExportUserKpiCSV(ctx context.Context, userID *uuid.UUID, fr
 		"PunctualityRate",
 		"PresentNow",
 	})
-	
+
 	writer.Write([]string{
 		summary.UserID,
 		summary.From,
@@ -111,7 +111,7 @@ func (s *KpiService) ExportUserKpiCSV(ctx context.Context, userID *uuid.UUID, fr
 		strconv.FormatBool(summary.PresentNow),
 	})
 
-	writer.Write([]string{}) 
+	writer.Write([]string{})
 
 	writer.Flush()
 	return buf.Bytes(), nil

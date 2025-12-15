@@ -61,7 +61,7 @@ func (r *queryResolver) KpiTeamSummary(ctx context.Context, teamID string, from 
 	return r.KpiService.GetTeamKpiSummary(ctx, tid, fromT, toT)
 }
 
-func (r *queryResolver) ExportUserKpiCSV(ctx context.Context, userID *string, from *string, to *string)(string, error){
+func (r *queryResolver) ExportUserKpiCSV(ctx context.Context, userID *string, from *string, to *string) (string, error){
 	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
 		return "", err
 	}
