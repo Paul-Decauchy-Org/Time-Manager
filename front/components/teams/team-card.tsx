@@ -26,7 +26,6 @@ interface TeamCardProps {
 export function TeamCard({ team, onEdit, onDelete, isManager = false }: TeamCardProps) {
   const [showModal, setShowModal] = useState(false);
   
-  // Utiliser le hook avec l'ID de l'équipe
   const {
     members,
     loading,
