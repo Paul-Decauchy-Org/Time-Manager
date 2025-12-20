@@ -65,13 +65,16 @@ func (r *Repository) Me(email string) (*model.SignedUser, error) {
 	hasStartedDay := false
 	var startedAt *string = nil
 
-	if err == nil && entry.ID != uuid.Nil && entry.Status {
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, err
+		}
+	} else if entry.ID != uuid.Nil && entry.Status {
 		hasStartedDay = true
 		formatted := entry.Arrival.Format("15:04")
 		startedAt = &formatted
-	} else if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, err
 	}
+
 	return userMapper.DBUserToSignedGraph(&user, hasStartedDay, startedAt), nil
 }
 

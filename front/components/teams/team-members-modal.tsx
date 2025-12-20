@@ -67,7 +67,6 @@ export function TeamMembersModal({
 
   const handleAddMembers = async (userIds: string[]) => {
     await onAddMembers(userIds);
-    // Rafraîchir la liste après ajout
     await refetch();
     setAddMemberOpen(false);
   };
@@ -80,7 +79,7 @@ export function TeamMembersModal({
     <>
       <Dialog open={open} onOpenChange={onOpenChange} modal>
         <DialogContent 
-          className="max-w-4xl max-h-[80vh] overflow-auto"
+          className="max-w-4xl max-h-[80vh]"
           onEscapeKeyDown={handleClose}
           onPointerDownOutside={handleClose}
           onInteractOutside={handleClose}
