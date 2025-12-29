@@ -42,7 +42,7 @@ export function ClockOut({ className, disabled = false, onSuccess, onError, ...p
                         <SquarePower className="size-5 text-rose-500" />
                             Finir ma journée
                                 </CardTitle>
-                                < CardDescription > Enregistrez votre départ et terminez votre session.</CardDescription>
+                                < CardDescription > Enregistrez votre départ en un clic.</CardDescription>
                                     </CardHeader>
                                     < CardContent className = "pt-4" >
                                         <Field>
