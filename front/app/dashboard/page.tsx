@@ -233,7 +233,7 @@ export default function Page() {
             <ClockIn
                         disabled={ hasClockedInToday }
     onSuccess = { async() => {
-        toast.success("Arrivée enregistrée ✅")
+        toast.success("Arrivée enregistrée")
         try { await refetch() } catch { }
     }
 }
@@ -242,7 +242,7 @@ onError = {() => toast.error("Échec de l'arrivée")}
     < ClockOut
 disabled = {!hasClockedInToday || hasClockedOutToday}
 onSuccess = { async() => {
-    toast.success("Départ enregistré 👌")
+    toast.success("Départ enregistré")
     try { await refetch() } catch { }
 }}
 onError = {() => toast.error("Échec du départ")}

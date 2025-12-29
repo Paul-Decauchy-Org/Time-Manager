@@ -46,10 +46,9 @@ export function TeamMembersModal({
   const [addMemberOpen, setAddMemberOpen] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
-  // Récupérer les membres de l'équipe via la query UsersByTeam
   const { data, loading, error, refetch } = useQuery(UsersByTeamDocument, {
     variables: { teamID: team.id },
-    skip: !open, // Ne charger que quand le modal est ouvert
+    skip: !open,
   });
 
   const members = data?.usersByTeam || [];
@@ -58,7 +57,6 @@ export function TeamMembersModal({
     setRemovingId(userId);
     try {
       await onRemoveMember(userId);
-      // Rafraîchir la liste après suppression
       await refetch();
     } finally {
       setRemovingId(null);

@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
@@ -10,9 +10,11 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUpdateProfile } from "@/hooks/update-profile";
+import { User, Mail, Phone, Lock, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export function ProfileInfo({
   className,
@@ -20,165 +22,288 @@ export function ProfileInfo({
 }: React.ComponentProps<"div">) {
   const { user } = useAuth();
   const { updateProfile, loading, error } = useUpdateProfile();
-  const [passwordError, setPasswordError] = useState("");
-  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setPasswordError("");
 
-    const formData = new FormData(e.currentTarget);
-    const password = formData.get("password") as string;
-    const confirmPassword = formData.get("confirm-password") as string;
+  const [formData, setFormData] = useState({
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    password: "",
+    confirmPassword: "",
+  });
 
-    // Validate passwords match
-    if (password !== confirmPassword) {
-      setPasswordError("Passwords do not match");
-      return;
+  const validation = useMemo(() => {
+    const errors: Record<string, string> = {};
+
+    if (formData.password && formData.password.length < 8) {
+      errors.password = "Le mot de passe doit contenir au moins 8 caractères";
     }
 
-    // Validate password length
-    if (password.length < 8 && password != "") {
-      setPasswordError("Password must be at least 8 characters long");
+    if (formData.password !== formData.confirmPassword) {
+      errors.confirmPassword = "Les mots de passe ne correspondent pas";
+    }
+
+    return errors;
+  }, [formData.password, formData.confirmPassword]);
+
+  const isFormValid = useMemo(() => {
+    return (
+      formData.firstName.trim() !== "" &&
+      formData.lastName.trim() !== "" &&
+      formData.email.trim() !== "" &&
+      formData.phone.trim() !== "" &&
+      Object.keys(validation).length === 0
+    );
+  }, [formData, validation]);
+
+  const handleInputChange = useCallback((field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  }, []);
+
+  const handleUpdate = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!isFormValid) {
+      toast.error("Veuillez corriger les erreurs du formulaire", {
+        position: "bottom-right",
+      });
       return;
     }
 
     try {
-      console.log(formData.get("phone")?.toString());
-      const user = await updateProfile({
-        firstName: formData.get("firstName") as string,
-        lastName: formData.get("lastName") as string,
-        email: formData.get("email") as string,
-        phone: formData.get("phone") as string,
-        password: password,
+      await updateProfile({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
       });
 
-      console.log("User updated:", user);
+      toast.success("Profil mis à jour avec succès !", {
+        position: "bottom-right",
+        icon: <CheckCircle2 className="h-4 w-4" />,
+      });
+
+      setFormData(prev => ({ ...prev, password: "", confirmPassword: "" }));
     } catch (err) {
       console.error("Update profile failed:", err);
+      toast.error("Échec de la mise à jour du profil", {
+        position: "bottom-right",
+      });
     }
-  };
+  }, [formData, isFormValid, updateProfile]);
 
   return (
-    <div className={cn("flex flex-col gap-6 min-w-max", className)} {...props}>
-      <Card className="overflow-hidden p-0">
-        <CardContent className="gap-2">
-          <form className="p-6 md:p-8" onSubmit={handleUpdate}>
-            <FieldGroup>
-              <div className="flex flex-col items-center gap-2 text-center">
-                <h1 className="text-2xl font-bold">Update your account</h1>
-                <p className="text-muted-foreground text-sm text-balance">
-                  Profile Info
-                </p>
-              </div>
-
-              {error && (
-                <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-                  {error.message}
+    <div className= { cn("flex flex-col gap-6 w-full max-w-4xl mx-auto", className) } {...props }>
+      <Card className="overflow-hidden border shadow-lg" >
+        <CardHeader className="space-y-1 bg-gradient-to-br from-primary/5 via-primary/3 to-background border-b" >
+          <div className="flex items-center gap-3" >
+            <div className="rounded-full bg-primary/10 p-3" >
+              <User className="h-6 w-6 text-primary" />
                 </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-4">
-                <Field>
-                  <FieldLabel htmlFor="firstName">First Name</FieldLabel>
-                  <Input
-                    id="firstName"
-                    name="firstName"
-                    type="text"
-                    placeholder="John"
-                    required
-                    defaultValue={user?.firstName}
-                    disabled={loading}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="lastName">Last Name</FieldLabel>
-                  <Input
-                    id="lastName"
-                    name="lastName"
-                    type="text"
-                    placeholder="Doe"
-                    required
-                    defaultValue={user?.lastName}
-                    disabled={loading}
-                  />
-                </Field>
-              </div>
-
-              <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  defaultValue={user?.email}
-                  disabled={loading}
-                />
-                <FieldDescription>
-                  We&apos;ll use this to contact you. We will not share your
-                  email with anyone else.
-                </FieldDescription>
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor="phone">Phone</FieldLabel>
-                <Input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  placeholder="+1 (555) 000-0000"
-                  required
-                  defaultValue={user?.phone}
-                  disabled={loading}
-                />
-              </Field>
-
-              <Field>
-                <div className="grid grid-cols-2 gap-4">
-                  <Field>
-                    <FieldLabel htmlFor="password">Password</FieldLabel>
-                    <Input
-                      id="password"
-                      name="password"
-                      type="password"
-                      disabled={loading}
-                    />
-                    <FieldDescription>
-                      Leave it empty to only update other fields.
-                    </FieldDescription>
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="confirm-password">
-                      Confirm Password
-                    </FieldLabel>
-                    <Input
-                      id="confirm-password"
-                      name="confirm-password"
-                      type="password"
-                      disabled={loading}
-                    />
-                  </Field>
-                </div>
-                {passwordError ? (
-                  <FieldDescription className="text-destructive">
-                    {passwordError}
-                  </FieldDescription>
-                ) : (
-                  <FieldDescription>
-                    Must be at least 8 characters long.
-                  </FieldDescription>
-                )}
-              </Field>
-
-              <Field>
-                <Button type="submit" disabled={loading} className="w-full">
-                  {loading ? "Updating Account..." : "Update Profile"}
-                </Button>
-              </Field>
-            </FieldGroup>
-          </form>
-        </CardContent>
-      </Card>
+                < div >
+                <CardTitle className="text-2xl" > Informations du profil </CardTitle>
+                  <CardDescription>
+                Mettez à jour vos informations personnelles
+    </CardDescription>
     </div>
+    </div>
+    </CardHeader>
+
+    < CardContent className = "p-6 md:p-8" >
+      <form onSubmit={ handleUpdate } className = "space-y-6" >
+        { error && (
+          <div className="flex items-center gap-2 p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive animate-in fade-in slide-in-from-top-2" >
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+              <p className="text-sm font-medium" > { error.message } </p>
+                </div>
+            )
+}
+
+<FieldGroup className="space-y-6" >
+  <div className = "grid grid-cols-1 md:grid-cols-2 gap-4" >
+    <Field>
+    <FieldLabel htmlFor="firstName" className = "text-sm font-medium" >
+      Prénom
+      </FieldLabel>
+      < div className = "relative" >
+        <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+                      id="firstName"
+name = "firstName"
+type = "text"
+placeholder = "John"
+required
+value = { formData.firstName }
+onChange = {(e) => handleInputChange("firstName", e.target.value)}
+disabled = { loading }
+className = "pl-10 h-11"
+  />
+  </div>
+  </Field>
+
+  < Field >
+  <FieldLabel htmlFor="lastName" className = "text-sm font-medium" >
+    Nom
+    </FieldLabel>
+    < div className = "relative" >
+      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+        <Input
+                      id="lastName"
+name = "lastName"
+type = "text"
+placeholder = "Doe"
+required
+value = { formData.lastName }
+onChange = {(e) => handleInputChange("lastName", e.target.value)}
+disabled = { loading }
+className = "pl-10 h-11"
+  />
+  </div>
+  </Field>
+  </div>
+
+  < Field >
+  <FieldLabel htmlFor="email" className = "text-sm font-medium" >
+    Adresse Email
+      </FieldLabel>
+      < div className = "relative" >
+        <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+                    id="email"
+name = "email"
+type = "email"
+placeholder = "email@example.com"
+required
+value = { formData.email }
+onChange = {(e) => handleInputChange("email", e.target.value)}
+disabled = { loading }
+className = "pl-10 h-11"
+  />
+  </div>
+  < FieldDescription className = "text-xs" >
+    Nous utiliserons cette adresse pour vous contacter.Votre email ne sera pas partagé.
+                </FieldDescription>
+      </Field>
+
+      < Field >
+      <FieldLabel htmlFor="phone" className = "text-sm font-medium" >
+        Numéro de téléphone
+          </FieldLabel>
+          < div className = "relative" >
+            <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                    id="phone"
+name = "phone"
+type = "tel"
+placeholder = "+33 6 12 34 56 78"
+required
+value = { formData.phone }
+onChange = {(e) => handleInputChange("phone", e.target.value)}
+disabled = { loading }
+className = "pl-10 h-11"
+  />
+  </div>
+  </Field>
+
+  < div className = "relative" >
+    <div className="absolute inset-0 flex items-center" >
+      <span className="w-full border-t" />
+        </div>
+        < div className = "relative flex justify-center text-xs uppercase" >
+          <span className="bg-background px-2 text-muted-foreground" >
+            Changement de mot de passe(optionnel)
+              </span>
+              </div>
+              </div>
+
+              < div className = "grid grid-cols-1 md:grid-cols-2 gap-4" >
+                <Field>
+                <FieldLabel htmlFor="password" className = "text-sm font-medium" >
+                  Nouveau mot de passe
+                    </FieldLabel>
+                    < div className = "relative" >
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                      id="password"
+name = "password"
+type = "password"
+placeholder = "********"
+value = { formData.password }
+onChange = {(e) => handleInputChange("password", e.target.value)}
+disabled = { loading }
+className = "pl-10 h-11"
+  />
+  </div>
+{
+  validation.password && (
+    <FieldDescription className="text-destructive text-xs flex items-center gap-1" >
+      <AlertCircle className="h-3 w-3" />
+        { validation.password }
+        </FieldDescription>
+                  )
+}
+</Field>
+
+  < Field >
+  <FieldLabel htmlFor="confirm-password" className = "text-sm font-medium" >
+    Confirmer le mot de passe
+      </FieldLabel>
+      < div className = "relative" >
+        <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+                      id="confirm-password"
+name = "confirm-password"
+type = "password"
+placeholder = "********"
+value = { formData.confirmPassword }
+onChange = {(e) => handleInputChange("confirmPassword", e.target.value)}
+disabled = { loading }
+className = "pl-10 h-11"
+  />
+  </div>
+{
+  validation.confirmPassword && (
+    <FieldDescription className="text-destructive text-xs flex items-center gap-1" >
+      <AlertCircle className="h-3 w-3" />
+        { validation.confirmPassword }
+        </FieldDescription>
+                  )
+}
+</Field>
+  </div>
+
+{
+  !validation.password && !validation.confirmPassword && formData.password === "" && (
+    <FieldDescription className="text-xs text-muted-foreground" >
+      Laissez vide pour conserver votre mot de passe actuel.Le mot de passe doit contenir au moins 8 caractères.
+                </FieldDescription>
+              )
+}
+
+{/* Bouton de soumission */ }
+<Button
+                type="submit"
+disabled = {!isFormValid || loading}
+className = "w-full h-11 text-base font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+  >
+{
+  loading?(
+                  <>
+  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+    Mise à jour en cours...
+</>
+                ) : (
+  <>
+  <CheckCircle2 className= "mr-2 h-4 w-4" />
+  Mettre à jour le profil
+    </>
+                )}
+</Button>
+  </FieldGroup>
+  </form>
+  </CardContent>
+  </Card>
+  </div>
   );
 }

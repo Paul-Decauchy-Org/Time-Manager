@@ -37,10 +37,9 @@ export function AddMemberDialog({
   const [searchQuery, setSearchQuery] = useState('');
   const [isAdding, setIsAdding] = useState(false);
 
-  // Récupérer les utilisateurs sans groupe
   const { data, loading, error } = useQuery(GetUsersWithoutGroupDocument, {
     variables: { input: false },
-    skip: !open, // Ne charger que quand le dialog est ouvert
+    skip: !open,
   });
 
   const availableUsers = data?.usersByGroup || [];
