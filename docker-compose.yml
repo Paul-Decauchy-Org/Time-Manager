@@ -82,10 +82,6 @@ services:
       - "4566:4566"            # LocalStack Gateway
       - "4510-4559:4510-4559"  # Services externes
     environment:
-      # variables d'environnement pour LocalStack Pro
-      # - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN}
-      # - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY}
-
       # services LocalStack
       - SERVICES=s3,dynamodb,lambda,sts,iam,sqs,sns,cloudwatch,apigateway
       - DEBUG=1
