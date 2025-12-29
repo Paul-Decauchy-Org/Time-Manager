@@ -18,7 +18,6 @@ interface ModalProps {
     children: React.ReactNode;
 }
 
-// Modal is used for route interceptions
 export default function Modal({ title, description, onOpenChange, children }: ModalProps) {
     return (
         <Dialog defaultOpen={true} open={true} onOpenChange={onOpenChange}>

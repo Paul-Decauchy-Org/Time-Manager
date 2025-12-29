@@ -44,13 +44,13 @@ export default function TeamsPage() {
     : teams;
 
   const handleCreateTeam = async (data: { name: string; description: string; managerId: string }) => {
-    console.log('📝 Creating team:', data);
+    console.log('Creating team:', data);
     const result = await createTeam({
       name: data.name,
       description: data.description,
       managerID: data.managerId,
     });
-    console.log('✅ Team creation result:', result);
+    console.log('Team creation result:', result);
     
     if (result) {
       toast.success("Équipe créée avec succès", {

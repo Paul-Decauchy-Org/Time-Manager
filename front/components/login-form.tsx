@@ -35,7 +35,6 @@ export function LoginForm({
     const formData = new FormData(e.currentTarget);
     const password = formData.get("password") as string;
 
-    // Validate password length
     if (password.length < 8) {
       toast.error("Le mot de passe doit contenir au moins 8 caractères.", {
         position: "bottom-right",
