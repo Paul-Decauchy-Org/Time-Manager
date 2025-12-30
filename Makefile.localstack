@@ -1,0 +1,45 @@
+# Makefile pour LocalStack
+
+.PHONY: localstack-start localstack-stop localstack-logs localstack-test localstack-clean
+
+# Démarrer LocalStack
+localstack-start:
+	@echo "Démarrage de LocalStack..."
+	docker-compose up localstack -d
+	@echo "Attente de l'initialisation (30s)..."
+	@timeout /t 30 /nobreak > nul
+	@echo "LocalStack démarré !"
+	@echo "Dashboard : http://localhost:4566"
+
+# Arrêter LocalStack
+localstack-stop:
+	@echo "Arrêt de LocalStack..."
+	docker-compose stop localstack
+	@echo "LocalStack arrêté !"
+
+# Voir les logs
+localstack-logs:
+	docker logs -f localstack_timemanager
+
+# Tester LocalStack
+localstack-test:
+	@echo "Test de LocalStack..."
+	@awslocal s3 ls || echo "Erreur : Installez awscli-local avec 'pip install awscli-local'"
+	@awslocal dynamodb list-tables
+	@awslocal sqs list-queues
+
+# Nettoyer les données LocalStack
+localstack-clean:
+	@echo "Nettoyage des données LocalStack..."
+	docker-compose down localstack
+	rmdir /s /q localstack-data
+	mkdir localstack-data
+	@echo "Données nettoyées !"
+
+# Vérifier le statut
+localstack-health:
+	@curl -s http://localhost:4566/_localstack/health | jq '.'
+
+# Réinitialiser complètement
+localstack-reset: localstack-stop localstack-clean localstack-start
+	@echo "LocalStack réinitialisé !"

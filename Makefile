@@ -1,7 +1,7 @@
 .PHONY: up down logs clean restart dev
 
 up:
-	docker compose up back database nginx sonarQube --build --wait
+	docker compose up back database nginx sonarQube localstack --build --wait
 
 dev:
 	docker compose up --build
