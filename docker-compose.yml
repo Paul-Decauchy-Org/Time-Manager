@@ -99,7 +99,7 @@ services:
     volumes:
       - "./localstack-data:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./aws-init:/etc/localstack/init/ready.d"  # Scripts d'init
+      - "./aws-init:/etc/localstack/init/ready.d"  # Scripts d'initialisation
     networks:
       - Time-Manager-Network
     healthcheck:
