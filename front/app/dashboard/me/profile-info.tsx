@@ -14,7 +14,7 @@ import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUpdateProfile } from "@/hooks/update-profile";
 
-export function ProfileInfo({
+export async function ProfileInfo({
   className,
   ...props
 }: React.ComponentProps<"div">) {
