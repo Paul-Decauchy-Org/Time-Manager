@@ -41,7 +41,7 @@ describe('LoginForm', () =>{
       },
     },
     result: {
-     data: UserLogged  
+    data: UserLogged  
     },
   },
 ]
