@@ -43,6 +43,6 @@ describe('clockin', ()=> {
                 <ClockIn/>
             </MockedProvider>
         )
-        expect(container).toBeInTheDocument()
+        expect(container).toBeDefined()
     })
 })

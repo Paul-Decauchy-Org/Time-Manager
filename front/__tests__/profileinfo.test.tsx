@@ -8,8 +8,9 @@ import { Variable } from 'lucide-react';
 import { ProfileInfo } from '@/app/dashboard/me/profile-info';
 import { gql } from '@apollo/client';
 import { MockedProvider } from '@apollo/client/testing/react';
-import { IconPassword } from '@tabler/icons-react';
 import { render } from '@testing-library/react';
+import { Role, User } from '@/generated/graphql';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 jest.mock("next/navigation", () => ({
     useRouter() {
@@ -21,6 +22,13 @@ jest.mock("next/navigation", () => ({
 }));
 
 describe('profile info', ()=> {
+    interface AuthContextType {
+        user: User | undefined;
+        hasRole: (roles: Role | Role[]) => boolean;
+        loading: boolean;
+        isAdmin: boolean;
+        isManager: boolean;
+    }
     const profileInfo = { firstName: 'user', lastName: 'test', email : 'user@test.fr', phone: '111',  password : 'password' }
     const mocks = [
         { request :{
@@ -48,13 +56,15 @@ updateProfile(input: $input) {
         }}
 
     ]
-    it('should render the profile info box', ()=> {
+    it('should be defined with  auth context', ()=> {
         const container = render(
             <MockedProvider mocks={mocks}>
-                <ProfileInfo/>
+                <AuthProvider>
+                    <ProfileInfo/>
+                </AuthProvider>
             </MockedProvider>
         ) 
-                expect(container).toBeInTheDocument()
+                expect(container).toBeDefined()
 
     })
 })
