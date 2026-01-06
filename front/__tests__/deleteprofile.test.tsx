@@ -33,5 +33,7 @@ deleteProfile
                     <DeleteAccount/>
                 </MockedProvider>
             ) 
+            expect(container).toBeInTheDocument()
+
         })
 })

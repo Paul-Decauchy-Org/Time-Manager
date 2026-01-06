@@ -43,5 +43,6 @@ describe('clockout', ()=> {
                 <ClockOut/>
             </MockedProvider>
         )
+        expect(container).toBeInTheDocument()
     })
 })

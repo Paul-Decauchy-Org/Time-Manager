@@ -54,5 +54,7 @@ updateProfile(input: $input) {
                 <ProfileInfo/>
             </MockedProvider>
         ) 
+                expect(container).toBeInTheDocument()
+
     })
 })
