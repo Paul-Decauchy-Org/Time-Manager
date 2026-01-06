@@ -10,7 +10,7 @@ import { gql } from '@apollo/client';
 import { MockedProvider } from '@apollo/client/testing/react';
 import { render } from '@testing-library/react';
 import { Role, User } from '@/generated/graphql';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
 jest.mock("next/navigation", () => ({
     useRouter() {
@@ -22,13 +22,9 @@ jest.mock("next/navigation", () => ({
 }));
 
 describe('profile info', ()=> {
-    interface AuthContextType {
-        user: User | undefined;
-        hasRole: (roles: Role | Role[]) => boolean;
-        loading: boolean;
-        isAdmin: boolean;
-        isManager: boolean;
-    }
+   beforeEach(() => {
+    jest.resetAllMocks()
+   })
     const profileInfo = { firstName: 'user', lastName: 'test', email : 'user@test.fr', phone: '111',  password : 'password' }
     const mocks = [
         { request :{
@@ -67,4 +63,5 @@ updateProfile(input: $input) {
                 expect(container).toBeDefined()
 
     })
+    
 })

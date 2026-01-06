@@ -1,3 +1,4 @@
+
 import { ProfileInfo } from "@/app/dashboard/me/profile-info";
 import { DeleteAccount } from "@/app/dashboard/me/delete-account";
 
@@ -8,7 +9,7 @@ export default async function Me() {
         <ProfileInfo />
       </div>
       <div className="max-w-4/5 min-w-4/5 m-auto">
-        <DeleteAccount />
+    <DeleteAccount />
       </div>
     </div>
   );
