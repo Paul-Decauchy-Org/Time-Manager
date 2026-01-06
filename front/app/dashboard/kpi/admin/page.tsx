@@ -69,7 +69,7 @@ function StatCard(IconComp: any, label: string, value: string | number, colorKey
   )
 }
 
-export default async function AdminKpiPage() {
+export default  async function AdminKpiPage() {
   const { user, isManager } = useAuth()
   const [preset, setPreset] = React.useState<string>("30d")
   const { from, to } = rangeFromPreset(preset)

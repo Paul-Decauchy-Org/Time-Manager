@@ -16,7 +16,7 @@ function formatMinutes(mins: number) {
   return `${h}h${m.toString().padStart(2, "0")}`
 }
 
-export default async function UserKpiPage() {
+export default  async function UserKpiPage() {
   const { user } = useAuth()
   const [preset, setPreset] = React.useState<Preset>("30d")
   const { summary, loading, error, from, to } = useUserKpi({ userID: user?.id, preset: preset as any })
