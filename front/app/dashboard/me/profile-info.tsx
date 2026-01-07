@@ -170,8 +170,8 @@ export  function ProfileInfo({
                 )}
               </Field>
 
-              <Field>
-                <Button type="submit" disabled={loading} className="w-full">
+              <Field role="field">
+                <Button type="submit" role = 'submit' disabled={loading} className="w-full">
                   {loading ? "Updating Account..." : "Update Profile"}
                 </Button>
               </Field>

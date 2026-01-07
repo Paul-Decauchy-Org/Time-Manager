@@ -8,7 +8,7 @@ import { Variable } from 'lucide-react';
 import { ProfileInfo } from '@/app/dashboard/me/profile-info';
 import { gql } from '@apollo/client';
 import { MockedProvider } from '@apollo/client/testing/react';
-import { render } from '@testing-library/react';
+import { fireEvent, getByLabelText, render, screen } from '@testing-library/react';
 import { Role, User } from '@/generated/graphql';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
@@ -62,6 +62,36 @@ updateProfile(input: $input) {
         ) 
                 expect(container).toBeDefined()
 
+    })
+    it('it should be able to submit with correct info', () =>{
+        render(
+            <MockedProvider mocks={mocks}>
+                <AuthProvider>
+                    <ProfileInfo/>
+                </AuthProvider>
+            </MockedProvider>
+        ) 
+        fireEvent.change(screen.getByLabelText('First Name'), {
+                target : { value : 'test' }
+            })
+        fireEvent.change(screen.getByLabelText('Last Name'), {
+                target : { value : 'test' }
+            })
+        fireEvent.change(screen.getByLabelText('Password'), {
+                target : { value : 'Password' }
+            })
+        fireEvent.change(screen.getByLabelText('Confirm Password'), {
+                target : { value : 'Password' }
+            })
+        fireEvent.change(screen.getByLabelText('Email'), {
+                target : { value : 'u@test.fr' }
+            })
+        fireEvent.change(screen.getByLabelText('Phone'), {
+                target : { value : '111' }
+            })
+        fireEvent.click(screen.getByRole('submit'))
+        
+        expect(screen.getByRole('field')).toHaveTextContent('Updating Account...')
     })
     
 })

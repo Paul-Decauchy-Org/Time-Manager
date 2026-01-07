@@ -25,7 +25,11 @@ describe('delete profile', () => {
 deleteProfile
 }
 `
-            }
+
+            },
+            result: {
+                data: null
+}
         }
     ]
     it('should render the deleting account component', ()=> {
