@@ -3,10 +3,14 @@
  */
 
 import '@testing-library/jest-dom'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {fireEvent, render, renderHook, screen} from '@testing-library/react'
 import { SignupForm } from '@/components/signup-form'
 import { MockedProvider } from "@apollo/client/testing/react";
 import { gql } from '@apollo/client';
+import React from 'react';
+import { useMutation, useQuery } from '@apollo/client/react';
+import { useSignUp } from '@/hooks/signup';
+
 
 jest.mock("next/navigation", () => ({
     useRouter() {
@@ -97,6 +101,37 @@ describe( 'Signup form', () => {
         fireEvent.click(screen.getByRole('submit'))
 
         expect(handleSubmit).toHaveBeenCalledTimes(1);
+    })
+    it('should fail with non matching password', () => {
+        const handleSubmit = jest.fn()
+        
+        render(
+            <MockedProvider mocks={mocks}>
+            <SignupForm onSubmit={handleSubmit}/>
+            </MockedProvider>
+        )
+        
+        fireEvent.change(screen.getByLabelText('First Name'), {
+            target : { value : 'test' }
+        })
+        fireEvent.change(screen.getByLabelText('Last Name'), {
+            target : { value : 'test' }
+        })
+        fireEvent.change(screen.getByLabelText('Password'), {
+            target : { value : 'Password' }
+        })
+        fireEvent.change(screen.getByLabelText('Confirm Password'), {
+            target : { value : 'PasTword' }
+        })
+        fireEvent.change(screen.getByLabelText('Email address'), {
+            target : { value : 'u@test.fr' }
+        })
+        fireEvent.change(screen.getByLabelText('Phone number'), {
+            target : { value : '111' }
+        })
+        fireEvent.click(screen.getByRole('submit'))
+
+        expect(screen.getByRole('alert')).toHaveTextContent('Passwords do not match');
     })
 
 })

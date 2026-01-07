@@ -235,12 +235,12 @@ className = "pl-10 h-11"
 
 {
     passwordError ? (
-        <FieldDescription className= "text-destructive text-xs flex items-center gap-1" >
+        <FieldDescription role="alert" className= "text-destructive text-xs flex items-center gap-1" >
         <AlertCircle className="h-3 w-3" />
             { passwordError }
             </FieldDescription>
                             ) : (
-        <FieldDescription className= "text-xs text-muted-foreground" >
+        <FieldDescription className= "text-xs text-muted-foreground"  >
         Le mot de passe doit contenir au moins 8 caractères
             </FieldDescription>
                             )
