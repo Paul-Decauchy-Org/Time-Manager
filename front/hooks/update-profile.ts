@@ -6,7 +6,7 @@ import {
   SignUpMutationVariables,
   Role,
   SignUpDocument,
-  UpdateProfileDocument,
+  UpdateProfileDocument, UpdateProfileInput,
 } from "@/generated/graphql";
 import { useMutation } from "@apollo/client/react";
 
@@ -22,7 +22,8 @@ export function useUpdateProfile() {
     phone: string;
     password: string;
   }) => {
-    const variables: any = {
+
+    const variables: UpdateProfileInput = {
       firstName: input.firstName,
       lastName: input.lastName,
       email: input.email,
@@ -32,8 +33,9 @@ export function useUpdateProfile() {
     if (input.password !== "") {
       variables.password = input.password;
     }
+
     const result = await updateProfileMutation({
-      variables: { input },
+      variables: { input: variables },
     });
     return result.data?.updateProfile;
   };
