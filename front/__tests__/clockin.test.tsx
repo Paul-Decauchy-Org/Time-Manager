@@ -6,7 +6,7 @@ import '@testing-library/jest-dom'
 import { ClockIn } from '@/components/clock-in';
 import { gql } from '@apollo/client';
 import { MockedProvider } from '@apollo/client/testing/react';
-import { render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 jest.mock("next/navigation", () => ({
     useRouter() {
@@ -44,5 +44,14 @@ describe('clockin', ()=> {
             </MockedProvider>
         )
         expect(container).toBeDefined()
+    })
+    it('should be able to clock', () => {
+        render(
+            <MockedProvider mocks={mocks}>
+                <ClockIn/>
+            </MockedProvider>
+        )
+        fireEvent.click(screen.getByRole('clockin'))
+        expect(screen.getByRole('field')).toHaveTextContent('Pointage en cours…Raccourci: Alt + I')
     })
 })

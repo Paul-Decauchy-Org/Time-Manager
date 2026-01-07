@@ -45,13 +45,13 @@ export function ClockIn({ className, disabled = false, onSuccess, onError, ...pr
           <CardDescription>Enregistrez votre arrivée en un clic.</CardDescription>
         </CardHeader>
         <CardContent className="pt-4">
-          <Field>
+          <Field role="field">
             {(() => {
               let label = "Commencer ma journée (Alt+I)"
               if (loading) label = "Pointage en cours…"
               else if (disabled) label = "Déjà pointé aujourd'hui"
               return (
-                <Button onClick= { handleClockIn } disabled = { disabled || loading
+                <Button onClick= { handleClockIn } role = 'clockin' disabled = { disabled || loading
             } className ="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
                   {label}
                 </Button>
