@@ -167,7 +167,7 @@ jobs:
       - name: Generate backend GraphQL
         working-directory: back
         run: |
-          gqlgen generate
+          go run github.com/99designs/gqlgen@v0.17.81 generate
 
       - name: Run backend tests with coverage and JSON report (best-effort)
         working-directory: back
