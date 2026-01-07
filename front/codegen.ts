@@ -1,4 +1,4 @@
-import type { CodegenConfig } from '@graphql-codegen/cli';
+import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const schemaUrl = process.env.NEXT_PUBLIC_SCHEMA_URL || "./schema.graphql";
 
@@ -9,9 +9,9 @@ const config: CodegenConfig = {
   generates: {
     "generated/": {
       preset: "client",
-      plugins: []
-    }
-  }
+      plugins: [],
+    },
+  },
 };
 
 export default config;

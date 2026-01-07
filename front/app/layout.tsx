@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import {ApolloWrapper} from "@/apollo/client/ApolloWrapper";
-import {AuthProvider} from "@/contexts/AuthContext";
-import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
-import {AppSidebar} from "@/components/app-sidebar";
+import { ApolloWrapper } from "@/apollo/client/ApolloWrapper";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
@@ -19,7 +19,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Time Manager",
-  description: "A time manager app buit by Henri Levraut, Wilfried Djoum, Ibrahima Bila and Paul Decauchy",
+  description:
+    "A time manager app buit by Henri Levraut, Wilfried Djoum, Ibrahima Bila and Paul Decauchy",
 };
 
 export default function RootLayout({
@@ -32,12 +33,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
       >
-      <ApolloWrapper>
+        <ApolloWrapper>
           <AuthProvider>
-              {children}
-              <Toaster />
+            {children}
+            <Toaster />
           </AuthProvider>
-      </ApolloWrapper>
+        </ApolloWrapper>
       </body>
     </html>
   );

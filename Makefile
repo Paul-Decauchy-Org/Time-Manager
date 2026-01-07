@@ -1,7 +1,7 @@
 .PHONY: up down logs clean restart dev
 
 up:
-	docker compose up back database nginx sonarQube --build --wait
+	docker compose up back database nginx sonarQube localstack --build --wait
 
 dev:
 	docker compose up --build
@@ -45,8 +45,8 @@ back-test:
 	cd back; go test ./...
 
 back-coverage:
-	@echo Generating Go coverage profile at back/coverage
-	cd back; go test ./... -coverprofile=coverage -covermode=atomic
+	@echo Generating Go coverage profile at back/coverage.out
+	cd back; go test ./... -coverprofile=coverage.out -covermode=atomic
 
 sonar-back:
 	@echo Scanning backend with SonarQube config in back/sonar-project.properties

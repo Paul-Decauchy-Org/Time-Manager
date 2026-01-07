@@ -1,20 +1,26 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MemberAvatar } from './member-avatar';
-import { Button } from '@/components/ui/button';
-import { MoreVertical, Users, Edit, Trash2 } from 'lucide-react';
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { MemberAvatar } from "./member-avatar";
+import { Button } from "@/components/ui/button";
+import { MoreVertical, Users, Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
-import { TeamMembersModal } from './team-members-modal';
-import { useTeamMembers } from '@/hooks/teams/use-team-members';
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { TeamMembersModal } from "./team-members-modal";
+import { useTeamMembers } from "@/hooks/teams/use-team-members";
 
 interface TeamCardProps {
   team: any;
@@ -23,17 +29,16 @@ interface TeamCardProps {
   isManager?: boolean;
 }
 
-export function TeamCard({ team, onEdit, onDelete, isManager = false }: TeamCardProps) {
+export function TeamCard({
+  team,
+  onEdit,
+  onDelete,
+  isManager = false,
+}: TeamCardProps) {
   const [showModal, setShowModal] = useState(false);
-  
-  // Utiliser le hook avec l'ID de l'équipe
-  const {
-    members,
-    loading,
-    isUserPresent,
-    addMembers,
-    removeMember,
-  } = useTeamMembers(team.id);
+
+  const { members, loading, isUserPresent, addMembers, removeMember } =
+    useTeamMembers(team.id);
 
   const handleAddMembers = async (userIds: string[]) => {
     const result = await addMembers(userIds);
@@ -63,15 +68,21 @@ export function TeamCard({ team, onEdit, onDelete, isManager = false }: TeamCard
 
   const displayedMembers = members.slice(0, 5);
   const remainingCount = members.length - 5;
-  const presentCount = members.filter(m => isUserPresent(m.id) === 'present').length;
-  const absentCount = members.filter(m => isUserPresent(m.id) === 'absent').length;
-  const workingCount = members.filter(m => isUserPresent(m.id) === 'working').length;
+  const presentCount = members.filter(
+    (m) => isUserPresent(m.id) === "present",
+  ).length;
+  const absentCount = members.filter(
+    (m) => isUserPresent(m.id) === "absent",
+  ).length;
+  const workingCount = members.filter(
+    (m) => isUserPresent(m.id) === "working",
+  ).length;
 
   return (
     <>
       <Card className="hover:shadow-lg transition-all cursor-pointer group relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-        
+
         <CardHeader className="relative">
           <div className="flex items-start justify-between">
             <div className="flex-1" onClick={() => setShowModal(true)}>
@@ -80,7 +91,7 @@ export function TeamCard({ team, onEdit, onDelete, isManager = false }: TeamCard
                 {team.description}
               </CardDescription>
             </div>
-            
+
             {isManager && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -93,7 +104,10 @@ export function TeamCard({ team, onEdit, onDelete, isManager = false }: TeamCard
                     <Edit className="mr-2 h-4 w-4" />
                     Modifier
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={onDelete} className="text-destructive">
+                  <DropdownMenuItem
+                    onClick={onDelete}
+                    className="text-destructive"
+                  >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Supprimer
                   </DropdownMenuItem>
@@ -104,16 +118,20 @@ export function TeamCard({ team, onEdit, onDelete, isManager = false }: TeamCard
 
           <div className="flex items-center gap-2 mt-3 text-sm text-muted-foreground">
             <Users className="h-4 w-4" />
-            <span>Manager: {team.managerID?.firstName} {team.managerID?.lastName}</span>
+            <span>
+              Manager: {team.managerID?.firstName} {team.managerID?.lastName}
+            </span>
           </div>
         </CardHeader>
 
         <CardContent className="relative" onClick={() => setShowModal(true)}>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-muted-foreground">Membres de l'équipe</span>
+              <span className="text-sm font-medium text-muted-foreground">
+                Membres de l'équipe
+              </span>
               <Badge variant="secondary" className="font-semibold">
-                {members.length} {members.length > 1 ? 'membres' : 'membre'}
+                {members.length} {members.length > 1 ? "membres" : "membre"}
               </Badge>
             </div>
 
@@ -156,13 +174,14 @@ export function TeamCard({ team, onEdit, onDelete, isManager = false }: TeamCard
       </Card>
 
       <TeamMembersModal
-              open={showModal}
-              onOpenChange={setShowModal}
-              team={team}
-              onMemberPresence={isUserPresent}
-              onRemoveMember={handleRemoveMember}
-              onAddMembers={handleAddMembers}
-              isManager={isManager}/>
+        open={showModal}
+        onOpenChange={setShowModal}
+        team={team}
+        onMemberPresence={isUserPresent}
+        onRemoveMember={handleRemoveMember}
+        onAddMembers={handleAddMembers}
+        isManager={isManager}
+      />
     </>
   );
 }

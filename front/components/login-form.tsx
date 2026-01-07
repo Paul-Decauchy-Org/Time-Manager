@@ -1,22 +1,21 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import SignupLink from "./links/signup-link"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import SignupLink from "./links/signup-link";
 import { useLogin } from "@/hooks/login";
 import { useRouter } from "next/navigation";
 import { Clock, Mail, Lock, AlertCircle, Sparkles } from "lucide-react";
-import { toast } from "sonner"
-
+import { toast } from "sonner";
 
 export function LoginForm({
   className,
@@ -26,7 +25,7 @@ export function LoginForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const router = useRouter()
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,7 +34,6 @@ export function LoginForm({
     const formData = new FormData(e.currentTarget);
     const password = formData.get("password") as string;
 
-    // Validate password length
     if (password.length < 8) {
       toast.error("Le mot de passe doit contenir au moins 8 caractères.", {
         position: "bottom-right",
@@ -45,20 +43,15 @@ export function LoginForm({
     }
 
     try {
-      const user = await login(
-        formData.get("email") as string,
-        password,
-      );
-
+      const user = await login(email, password);
       console.log("User logged:", user);
-      router.push("/dashboard")
+      router.push("/dashboard");
     } catch (err) {
       console.error("Log in failed:", err);
     }
   };
 
   const isFormValid = email.trim() !== "" && password.trim() !== "";
-
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -71,22 +64,28 @@ export function LoginForm({
                   <Clock className="h-6 w-6 text-primary" />
                 </div>
               </div>
-              <h1 className="text-3xl font-bold tracking-tight text-center">BIENVENUE</h1>
+              <h1 className="text-3xl font-bold tracking-tight text-center">
+                {" "}
+                BIENVENUE{" "}
+              </h1>
               <p className="text-muted-foreground text-center text-balance">
-                Connectez-vous à votre compte Time Manager
+                Connectez - vous à votre compte Time Manager
               </p>
             </div>
 
             {error?.message && (
               <div className="flex items-center gap-2 p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive animate-in fade-in slide-in-from-top-2">
                 <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                <p className="text-sm font-medium">{error.message}</p>
+                <p className="text-sm font-medium"> {error.message} </p>
               </div>
             )}
 
             <FieldGroup className="space-y-2">
               <Field>
-                <FieldLabel htmlFor="email" className="text-sm font-medium">Adresse Mail</FieldLabel>
+                <FieldLabel htmlFor="email" className="text-sm font-medium">
+                  {" "}
+                  Adresse Mail{" "}
+                </FieldLabel>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -105,7 +104,13 @@ export function LoginForm({
 
               <Field>
                 <div className="flex items-center justify-between mb-2">
-                  <FieldLabel htmlFor="password" className="text-sm font-medium">Mot de passe</FieldLabel>
+                  <FieldLabel
+                    htmlFor="password"
+                    className="text-sm font-medium"
+                  >
+                    {" "}
+                    Mot de passe{" "}
+                  </FieldLabel>
                   <a
                     href="#"
                     className="text-xs text-primary hover:underline underline-offset-2 font-medium"
@@ -122,7 +127,7 @@ export function LoginForm({
                     required
                     disabled={loading}
                     value={password}
-                    onChange={(e)=> setPassword(e.target.value)}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="********"
                     className="pl-10 h-11"
                   />
@@ -172,8 +177,7 @@ export function LoginForm({
 
             <div className="mt-8 text-center">
               <p className="text-sm text-muted-foreground">
-                Pas de compte ?{" "}
-                <SignupLink />
+                Pas de compte ? <SignupLink />
               </p>
             </div>
           </form>
@@ -186,10 +190,11 @@ export function LoginForm({
               <h2 className="text-3xl font-bold tracking-tight">
                 Time Management
                 <br />
-                <span className="text-primary">Faire Simple</span>
+                <span className="text-primary"> Faire Simple </span>
               </h2>
               <p className="text-muted-foreground text-balance leading-relaxed">
-                Suivez votre temps, gérez vos équipes et boostez votre productivité avec notre plateforme intuitive.
+                Suivez votre temps, gérez vos équipes et boostez votre
+                productivité avec notre plateforme intuitive.
               </p>
             </div>
             <div className="absolute inset-0 bg-grid-white/10 [mask-image:radial-gradient(white,transparent_85%)]" />
@@ -197,5 +202,5 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

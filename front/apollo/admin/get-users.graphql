@@ -1,11 +1,11 @@
-query Users{
-    users {
-        id
-        firstName
-        lastName
-        email
-        phone
-        password
-        role
-    }
+query Users {
+  users {
+    id
+    firstName
+    lastName
+    email
+    phone
+    password
+    role
+  }
 }

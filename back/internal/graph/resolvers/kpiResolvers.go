@@ -60,3 +60,41 @@ func (r *queryResolver) KpiTeamSummary(ctx context.Context, teamID string, from 
 	}
 	return r.KpiService.GetTeamKpiSummary(ctx, tid, fromT, toT)
 }
+
+func (r *queryResolver) ExportUserKpiCSV(ctx context.Context, userID *string, from *string, to *string) (string, error) {
+	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
+		return "", err
+	}
+	var userUUID *uuid.UUID
+	if userID != nil && *userID != "" {
+		parsed, err := uuid.Parse(*userID)
+		if err != nil {
+			return "", errors.New("invalid userID")
+		}
+		userUUID = &parsed
+	}
+
+	var fromDate time.Time
+	if from != nil && *from != "" {
+		t, err := time.Parse(layoutISO, *from)
+		if err != nil {
+			return "", errors.New("invalid from date, expected YYYY-MM-DD")
+		}
+		fromDate = t
+	}
+
+	var toDate time.Time
+	if to != nil && *to != "" {
+		t, err := time.Parse(layoutISO, *to)
+		if err != nil {
+			return "", errors.New("invalid to date, expected YYYY-MM-DD")
+		}
+		toDate = t
+	}
+
+	csvData, err := r.KpiService.ExportUserKpiCSV(ctx, userUUID, fromDate, toDate)
+	if err != nil {
+		return "", err
+	}
+	return string(csvData), nil
+}

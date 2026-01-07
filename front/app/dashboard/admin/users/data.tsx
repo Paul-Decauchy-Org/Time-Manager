@@ -1,6 +1,6 @@
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
-import {useAdminUsers} from "@/hooks/admin/users";
+import { useAdminUsers } from "@/hooks/admin/users";
 
 export default function UsersData() {
   const data = useAdminUsers();

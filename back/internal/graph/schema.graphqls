@@ -110,6 +110,7 @@ type Query {
   # KPI queries
   kpiUserSummary(userID: ID, from: Date, to: Date): UserKpiSummary!
   kpiTeamSummary(teamID: ID!, from: Date, to: Date): TeamKpiSummary!
+  exportUserKpiCSV(userID: ID, from: Date, to: Date): String!
 
 }
 

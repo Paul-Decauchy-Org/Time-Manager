@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { MemberAvatar } from './member-avatar';
-import { Badge } from '@/components/ui/badge';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { MemberAvatar } from "./member-avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -18,17 +18,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Trash2, UserPlus, Mail, Phone, Loader2, X } from 'lucide-react';
-import { AddMemberDialog } from './add-member-dialog';
-import { UsersByTeamDocument } from '@/generated/graphql';
-import { useQuery } from '@apollo/client/react';
+} from "@/components/ui/table";
+import { Trash2, UserPlus, Mail, Phone, Loader2, X } from "lucide-react";
+import { AddMemberDialog } from "./add-member-dialog";
+import { UsersByTeamDocument } from "@/generated/graphql";
+import { useQuery } from "@apollo/client/react";
 
 interface TeamMembersModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   team: any;
-  onMemberPresence: (userId: string) => 'present' | 'absent' | 'working';
+  onMemberPresence: (userId: string) => "present" | "absent" | "working";
   onRemoveMember: (userId: string) => Promise<void>;
   onAddMembers: (userIds: string[]) => Promise<void>;
   isManager?: boolean;
@@ -46,10 +46,9 @@ export function TeamMembersModal({
   const [addMemberOpen, setAddMemberOpen] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
-  // Récupérer les membres de l'équipe via la query UsersByTeam
   const { data, loading, error, refetch } = useQuery(UsersByTeamDocument, {
     variables: { teamID: team.id },
-    skip: !open, // Ne charger que quand le modal est ouvert
+    skip: !open,
   });
 
   const members = data?.usersByTeam || [];
@@ -58,7 +57,6 @@ export function TeamMembersModal({
     setRemovingId(userId);
     try {
       await onRemoveMember(userId);
-      // Rafraîchir la liste après suppression
       await refetch();
     } finally {
       setRemovingId(null);
@@ -67,7 +65,6 @@ export function TeamMembersModal({
 
   const handleAddMembers = async (userIds: string[]) => {
     await onAddMembers(userIds);
-    // Rafraîchir la liste après ajout
     await refetch();
     setAddMemberOpen(false);
   };
@@ -79,8 +76,8 @@ export function TeamMembersModal({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange} modal>
-        <DialogContent 
-          className="max-w-4xl max-h-[80vh] overflow-auto"
+        <DialogContent
+          className="max-w-4xl max-h-[80vh]"
           onEscapeKeyDown={handleClose}
           onPointerDownOutside={handleClose}
           onInteractOutside={handleClose}
@@ -128,29 +125,42 @@ export function TeamMembersModal({
                     <TableHead>Contact</TableHead>
                     <TableHead>Rôle</TableHead>
                     <TableHead>Statut</TableHead>
-                    {isManager && <TableHead className="text-right">Actions</TableHead>}
+                    {isManager && (
+                      <TableHead className="text-right">Actions</TableHead>
+                    )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={isManager ? 5 : 4} className="text-center py-8">
+                      <TableCell
+                        colSpan={isManager ? 5 : 4}
+                        className="text-center py-8"
+                      >
                         <div className="flex items-center justify-center gap-2">
                           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                          <span className="text-muted-foreground">Chargement des membres...</span>
+                          <span className="text-muted-foreground">
+                            Chargement des membres...
+                          </span>
                         </div>
                       </TableCell>
                     </TableRow>
                   ) : error ? (
                     <TableRow>
-                      <TableCell colSpan={isManager ? 5 : 4} className="text-center py-8 text-destructive">
+                      <TableCell
+                        colSpan={isManager ? 5 : 4}
+                        className="text-center py-8 text-destructive"
+                      >
                         <p>Erreur lors du chargement des membres</p>
                         <p className="text-sm mt-2">{error.message}</p>
                       </TableCell>
                     </TableRow>
                   ) : members.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={isManager ? 5 : 4} className="text-center py-8 text-muted-foreground">
+                      <TableCell
+                        colSpan={isManager ? 5 : 4}
+                        className="text-center py-8 text-muted-foreground"
+                      >
                         Aucun membre dans cette équipe
                       </TableCell>
                     </TableRow>
@@ -187,17 +197,26 @@ export function TeamMembersModal({
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className='bg-violet-500 text-white border-violet-600'>
+                          <Badge
+                            variant="outline"
+                            className="bg-violet-500 text-white border-violet-600"
+                          >
                             {member.role}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {onMemberPresence(member.id) === 'present' ? (
-                            <Badge className="bg-green-400 text-white">Présent</Badge>
-                          ) : onMemberPresence(member.id) === 'working' ? (
-                            <Badge className="bg-blue-400 text-white">En activité</Badge>
+                          {onMemberPresence(member.id) === "present" ? (
+                            <Badge className="bg-green-400 text-white">
+                              Présent
+                            </Badge>
+                          ) : onMemberPresence(member.id) === "working" ? (
+                            <Badge className="bg-blue-400 text-white">
+                              En activité
+                            </Badge>
                           ) : (
-                            <Badge className="bg-orange-500 text-white">Absent</Badge>
+                            <Badge className="bg-orange-500 text-white">
+                              Absent
+                            </Badge>
                           )}
                         </TableCell>
                         {isManager && (

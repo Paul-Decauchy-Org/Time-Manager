@@ -1,32 +1,32 @@
 query KpiUserSummary($userID: ID, $from: Date, $to: Date) {
-	kpiUserSummary(userID: $userID, from: $from, to: $to) {
-		from
-		to
-		userID
-		workedMinutes
-		overtimeMinutes
-		daysPresent
-		currentStreakDays
-		punctualityRate
-		presentNow
-		dailyWorked {
-			date
-			minutes
-		}
-	}
+  kpiUserSummary(userID: $userID, from: $from, to: $to) {
+    from
+    to
+    userID
+    workedMinutes
+    overtimeMinutes
+    daysPresent
+    currentStreakDays
+    punctualityRate
+    presentNow
+    dailyWorked {
+      date
+      minutes
+    }
+  }
 }
 
 query KpiTeamSummary($teamID: ID!, $from: Date, $to: Date) {
-	kpiTeamSummary(teamID: $teamID, from: $from, to: $to) {
-		from
-		to
-		teamID
-		totalWorkedMinutes
-		avgWorkedMinutesPerUser
-		activeUsers
-		coverage {
-			time
-			count
-		}
-	}
+  kpiTeamSummary(teamID: $teamID, from: $from, to: $to) {
+    from
+    to
+    teamID
+    totalWorkedMinutes
+    avgWorkedMinutesPerUser
+    activeUsers
+    coverage {
+      time
+      count
+    }
+  }
 }

@@ -39,7 +39,7 @@ type Query {
   UsersWithAllData: [UserWithAllData!]!
   usersByTeam(teamID: ID!): [UserWithAllData!]!
   me: User!
-    # KPI queries
+  # KPI queries
   kpiUserSummary(userID: ID, from: Date, to: Date): UserKpiSummary!
   kpiTeamSummary(teamID: ID!, from: Date, to: Date): TeamKpiSummary!
 }

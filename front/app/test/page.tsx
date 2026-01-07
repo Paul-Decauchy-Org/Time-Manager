@@ -32,15 +32,15 @@ async function getData(): Promise<User[]> {
       password: "",
       role: Role.User,
     },
-      {
-          id: "1",
-          phone: "10022",
-          firstName: "test2",
-          email: "m2@example.com",
-          lastName: "test2",
-          password: "",
-          role: Role.User,
-      },
+    {
+      id: "1",
+      phone: "10022",
+      firstName: "test2",
+      email: "m2@example.com",
+      lastName: "test2",
+      password: "",
+      role: Role.User,
+    },
   ];
 }
 

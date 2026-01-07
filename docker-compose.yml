@@ -74,6 +74,41 @@ services:
         condition: service_healthy
     networks:
       - Time-Manager-Network
+
+  localstack:
+    container_name: localstack
+    image: localstack/localstack:latest
+    ports: 
+      - "4566:4566"           
+      - "4510-4559:4510-4559"  
+    environment:
+      # services LocalStack
+      - SERVICES=s3,dynamodb,lambda,sts,iam,sqs,sns,cloudwatch,apigateway
+      - DEBUG=1
+      - PERSISTENCE=1
+      - LAMBDA_EXECUTOR=docker
+      - DOCKER_HOST=unix:///var/run/docker.sock
+
+      # configuration AWS
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+      - EDGE_PORT=4566
+      - DATA_DIR=/tmp/localstack/data
+      - EAGER_SERVICE_LOADING=1     
+    volumes:
+      - "./localstack-data:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./aws-init:/etc/localstack/init/ready.d"  # Scripts d'initialisation
+    networks:
+      - Time-Manager-Network
+    healthcheck:
+      test: ["CMD", "awslocal", "s3", "ls"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
       
 networks:
   Time-Manager-Network:

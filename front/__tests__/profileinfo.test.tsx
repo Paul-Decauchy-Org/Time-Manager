@@ -14,22 +14,29 @@ import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { act } from 'react';
 
 jest.mock("next/navigation", () => ({
-    useRouter() {
-        return {
-            push: jest.fn(),
-            prefetch: jest.fn(),
-            };
-        },
+  useRouter() {
+    return {
+      push: jest.fn(),
+      prefetch: jest.fn(),
+    };
+  },
 }));
 
-describe('profile info', ()=> {
-   beforeEach(() => {
-    jest.resetAllMocks()
-   })
-    const profileInfo = { firstName: 'user', lastName: 'test', email : 'user@test.fr', phone: '111',  password : 'password' }
-    const mocks = [
-        { request :{
-            query: gql`mutation updateProfile($input: UpdateProfileInput!) {
+describe("profile info", () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+  const profileInfo = {
+    firstName: "user",
+    lastName: "test",
+    email: "user@test.fr",
+    phone: "111",
+    password: "password",
+  };
+  const mocks = [
+    {
+      request: {
+        query: gql`mutation updateProfile($input: UpdateProfileInput!) {
 updateProfile(input: $input) {
     firstName
     lastName

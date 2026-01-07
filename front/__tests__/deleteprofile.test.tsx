@@ -2,21 +2,21 @@
  * @jest-environment jsdom
  */
 
-import '@testing-library/jest-dom' 
-import { DeleteAccount } from '@/app/dashboard/me/delete-account';
-import { gql } from '@apollo/client';
+import "@testing-library/jest-dom";
+import { DeleteAccount } from "@/app/dashboard/me/delete-account";
+import { gql } from "@apollo/client";
 import { MockedProvider } from "@apollo/client/testing/react";
 import { fireEvent, render, screen } from '@testing-library/react';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { act } from 'react';
 
 jest.mock("next/navigation", () => ({
-    useRouter() {
-        return {
-            push: jest.fn(),
-            prefetch: jest.fn(),
-            };
-        },
+  useRouter() {
+    return {
+      push: jest.fn(),
+      prefetch: jest.fn(),
+    };
+  },
 }));
 describe('delete profile', () => {
     beforeEach(() => {

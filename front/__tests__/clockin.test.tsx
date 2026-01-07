@@ -11,12 +11,12 @@ import { access } from 'fs';
 import { act } from 'react';
 
 jest.mock("next/navigation", () => ({
-    useRouter() {
-        return {
-            push: jest.fn(),
-            prefetch: jest.fn(),
-            };
-        },
+  useRouter() {
+    return {
+      push: jest.fn(),
+      prefetch: jest.fn(),
+    };
+  },
 }));
 
 describe('clockin', ()=> {

@@ -13,12 +13,12 @@ import { useSignUp } from '@/hooks/signup';
 
 
 jest.mock("next/navigation", () => ({
-    useRouter() {
-        return {
-            push: jest.fn(),
-            prefetch: jest.fn(),
-            };
-        },
+  useRouter() {
+    return {
+      push: jest.fn(),
+      prefetch: jest.fn(),
+    };
+  },
 }));
 describe( 'Signup form', () => {
     beforeEach(() => {
@@ -140,4 +140,6 @@ describe( 'Signup form', () => {
         expect(screen.getByRole('alert')).toHaveTextContent('Passwords do not match');
     })
 
-})
+    expect(handleSubmit).toHaveBeenCalledTimes(1);
+  });
+});

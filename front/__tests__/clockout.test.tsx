@@ -10,12 +10,12 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { act } from 'react';
 
 jest.mock("next/navigation", () => ({
-    useRouter() {
-        return {
-            push: jest.fn(),
-            prefetch: jest.fn(),
-            };
-        },
+  useRouter() {
+    return {
+      push: jest.fn(),
+      prefetch: jest.fn(),
+    };
+  },
 }));
 
 describe('clockout', ()=> {
