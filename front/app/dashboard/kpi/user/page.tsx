@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { useUserKpi } from "@/hooks/useUserKpi"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
@@ -16,9 +16,9 @@ function formatMinutes(mins: number) {
   return `${h}h${m.toString().padStart(2, "0")}`
 }
 
-export default  async function UserKpiPage() {
+export default function UserKpiPage() {
   const { user } = useAuth()
-  const [preset, setPreset] = React.useState<Preset>("30d")
+  const [preset, setPreset] = useState<Preset>("30d")
   const { summary, loading, error, from, to } = useUserKpi({ userID: user?.id, preset: preset as any })
 
   const daily = (summary?.dailyWorked ?? []).map((p: any) => ({ date: String(p.date), minutes: Number(p.minutes) }))

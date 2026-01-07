@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { AreaChart, Area, XAxis, CartesianGrid } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
@@ -69,23 +69,23 @@ function StatCard(IconComp: any, label: string, value: string | number, colorKey
   )
 }
 
-export default  async function AdminKpiPage() {
+export default function AdminKpiPage() {
   const { user, isManager } = useAuth()
-  const [preset, setPreset] = React.useState<string>("30d")
+  const [preset, setPreset] = useState<string>("30d")
   const { from, to } = rangeFromPreset(preset)
 
-  const [loading, setLoading] = React.useState(false)
-  const [error, setError] = React.useState<string | null>(null)
-  const [usersCount, setUsersCount] = React.useState<number>(0)
-  const [teamsCount, setTeamsCount] = React.useState<number>(0)
-  const [managersCount, setManagersCount] = React.useState<number>(0)
-  const [adminsCount, setAdminsCount] = React.useState<number>(0)
-  const [basicUsersCount, setBasicUsersCount] = React.useState<number>(0)
-  const [coverage, setCoverage] = React.useState<Array<{ time: string; count: number }>>([])
-  const [teams, setTeams] = React.useState<any[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [usersCount, setUsersCount] = useState<number>(0)
+  const [teamsCount, setTeamsCount] = useState<number>(0)
+  const [managersCount, setManagersCount] = useState<number>(0)
+  const [adminsCount, setAdminsCount] = useState<number>(0)
+  const [basicUsersCount, setBasicUsersCount] = useState<number>(0)
+  const [coverage, setCoverage] = useState<Array<{ time: string; count: number }>>([])
+  const [teams, setTeams] = useState<any[]>([])
 
   // Load base counts and teams
-  React.useEffect(() => {
+  useEffect(() => {
     let cancelled = false
     async function run() {
       setLoading(true)
@@ -125,7 +125,7 @@ export default  async function AdminKpiPage() {
   }, [user?.id, isManager])
 
   // Load merged coverage for selected period
-  React.useEffect(() => {
+  useEffect(() => {
     let cancelled = false
     async function teamCoverage(endpoint: string, kpiQuery: string, teamID: string, from: string, to: string) {
       const r = await fetch(endpoint, {
@@ -213,17 +213,17 @@ export default  async function AdminKpiPage() {
           (coverage.length === 0)
             ? React.createElement("div", { className: "flex h-full items-center justify-center text-sm text-muted-foreground" }, "Aucune donnée sur la période sélectionnée")
             : React.createElement(AreaChart as any, { data: coverage },
-                React.createElement("defs", null,
-                  React.createElement("linearGradient", { id: "fillAdminCount", x1: "0", y1: "0", x2: "0", y2: "1" },
-                    React.createElement("stop", { offset: "5%", stopColor: "var(--color-count)", stopOpacity: 0.8 }),
-                    React.createElement("stop", { offset: "95%", stopColor: "var(--color-count)", stopOpacity: 0.1 }),
-                  )
-                ),
-                React.createElement(CartesianGrid as any, { vertical: false }),
-                React.createElement(XAxis as any, { dataKey: "time", tickLine: false, axisLine: false, tickMargin: 8, minTickGap: 16, tickFormatter: fmtTick }),
-                React.createElement(ChartTooltip as any, { cursor: false, content: React.createElement(ChartTooltipContent as any, { indicator: "dot" }) }),
-                React.createElement(Area as any, { dataKey: "count", type: "natural", fill: "url(#fillAdminCount)", stroke: "var(--color-count)" })
-              )
+              React.createElement("defs", null,
+                React.createElement("linearGradient", { id: "fillAdminCount", x1: "0", y1: "0", x2: "0", y2: "1" },
+                  React.createElement("stop", { offset: "5%", stopColor: "var(--color-count)", stopOpacity: 0.8 }),
+                  React.createElement("stop", { offset: "95%", stopColor: "var(--color-count)", stopOpacity: 0.1 }),
+                )
+              ),
+              React.createElement(CartesianGrid as any, { vertical: false }),
+              React.createElement(XAxis as any, { dataKey: "time", tickLine: false, axisLine: false, tickMargin: 8, minTickGap: 16, tickFormatter: fmtTick }),
+              React.createElement(ChartTooltip as any, { cursor: false, content: React.createElement(ChartTooltipContent as any, { indicator: "dot" }) }),
+              React.createElement(Area as any, { dataKey: "count", type: "natural", fill: "url(#fillAdminCount)", stroke: "var(--color-count)" })
+            )
         )
       ),
       status ? React.createElement("div", { className: "pt-3 text-destructive" }, status) : null

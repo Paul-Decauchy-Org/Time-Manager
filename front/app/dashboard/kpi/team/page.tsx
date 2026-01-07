@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
@@ -113,9 +113,9 @@ type Preset = "7d" | "30d" | "90d"
 const PRESETS: Preset[] = ["7d", "30d", "90d"]
 const PRESET_LABELS: Record<Preset, string> = { "7d": "7 jours", "30d": "30 jours", "90d": "90 jours" }
 
-export default  async function TeamKpiPage() {
+export default function TeamKpiPage() {
     const { user, isManager } = useAuth()
-    const clientRef = React.useRef<any>(null)
+    const clientRef = useRef<any>(null)
     if (!clientRef.current) {
         clientRef.current = new ApolloClient({
             link: new HttpLink({ uri: process.env.NEXT_PUBLIC_SCHEMA_URL as string, credentials: "include", fetchOptions: { cache: "no-store", mode: "cors", credentials: "include" } }),
@@ -123,16 +123,16 @@ export default  async function TeamKpiPage() {
             defaultOptions: { query: { fetchPolicy: "no-cache" }, watchQuery: { fetchPolicy: "no-cache" } },
         })
     }
-    const [preset, setPreset] = React.useState<Preset>("30d")
+    const [preset, setPreset] = useState<Preset>("30d")
     const { from, to } = rangeFromPreset(preset)
 
     // Local UI state
-    const [error, setError] = React.useState<string | null>(null)
-    const [loading, setLoading] = React.useState<boolean>(false)
-    const [teams, setTeams] = React.useState<any[]>([])
-    const [teamID, setTeamID] = React.useState<string | null>(null)
+    const [error, setError] = useState<string | null>(null)
+    const [loading, setLoading] = useState<boolean>(false)
+    const [teams, setTeams] = useState<any[]>([])
+    const [teamID, setTeamID] = useState<string | null>(null)
 
-    React.useEffect(() => {
+    useEffect(() => {
         let cancelled = false
         async function run() {
             try {
@@ -155,9 +155,9 @@ export default  async function TeamKpiPage() {
         return () => { cancelled = true }
     }, [isManager, user?.id, teamID])
 
-    const [summary, setSummary] = React.useState<any>(null)
-    const [teamEntries, setTeamEntries] = React.useState<any[]>([])
-    React.useEffect(() => {
+    const [summary, setSummary] = useState<any>(null)
+    const [teamEntries, setTeamEntries] = useState<any[]>([])
+    useEffect(() => {
         let cancelled = false
         async function run() {
             if (!teamID) return
@@ -184,10 +184,10 @@ export default  async function TeamKpiPage() {
     const { latenessRate, topLateName, dailyArr, heatCells } = computeTeamDerived(teamEntries)
 
     const teamsToShow = teams.filter((t) => !isManager || t.managerID?.id === user?.id)
-    const selectedTeamId: string | undefined = React.useMemo(() => {
+    const selectedTeamId: string | undefined = useMemo(() => {
         return teamID ?? teamsToShow[0]?.id
     }, [teamID, teamsToShow]) || undefined
-    const teamName = React.useMemo(() => {
+    const teamName = useMemo(() => {
         const t = teams.find((x) => x.id === selectedTeamId)
         return t?.name || ""
     }, [teams, selectedTeamId])

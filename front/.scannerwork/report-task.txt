@@ -2,5 +2,5 @@ projectKey=timeManagerFront
 serverUrl=http://localhost:9000
 serverVersion=25.12.0.117093
 dashboardUrl=http://localhost:9000/dashboard?id=timeManagerFront
-ceTaskId=101109a2-aa97-4e54-aa78-fe61efb672a5
-ceTaskUrl=http://localhost:9000/api/ce/task?id=101109a2-aa97-4e54-aa78-fe61efb672a5
+ceTaskId=90890c8f-e2b7-488d-afd2-f85c4d064c28
+ceTaskUrl=http://localhost:9000/api/ce/task?id=90890c8f-e2b7-488d-afd2-f85c4d064c28
