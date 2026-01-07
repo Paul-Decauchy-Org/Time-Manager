@@ -19,6 +19,9 @@ jest.mock("next/navigation", () => ({
         },
 }));
 describe('LoginForm', () =>{
+  beforeEach(() => {
+    jest.resetAllMocks()
+   })
     const UserLogged = { firstName: 'user', lastName: 'test', email : 'user@test.fr', phone: '111',role: 't', token:'jijon' }
     const mocks = [ 
         {

@@ -7,7 +7,7 @@ import {fireEvent, render, renderHook, screen} from '@testing-library/react'
 import { SignupForm } from '@/components/signup-form'
 import { MockedProvider } from "@apollo/client/testing/react";
 import { gql } from '@apollo/client';
-import React from 'react';
+import React, { act } from 'react';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { useSignUp } from '@/hooks/signup';
 
@@ -21,6 +21,9 @@ jest.mock("next/navigation", () => ({
         },
 }));
 describe( 'Signup form', () => {
+    beforeEach(() => {
+    jest.resetAllMocks()
+   })
     const UserSigned = { firstName: 'user', lastName: 'test', email : 'user@test.fr', phone: '111',  password : 'password', id : '1' }
     const mocks = [
         {
@@ -37,12 +40,14 @@ describe( 'Signup form', () => {
     }
 }`,
     variables: {
-        SignUpInput: {
-            email:'user@test.fr',
+        input: {
+            
             firstName: 'user',
             lastName: 'test',
-            password: 'password',
-            phone: '111'
+            email:'user@test.fr',
+            phone: '111',
+            password: 'password'
+            
         }}
     },
     result:  {
@@ -80,26 +85,27 @@ describe( 'Signup form', () => {
             <SignupForm onSubmit={handleSubmit}/>
             </MockedProvider>
         )
+        act(() => {
         fireEvent.change(screen.getByLabelText('First Name'), {
-            target : { value : 'test' }
+            target : { value : 'user' }
         })
         fireEvent.change(screen.getByLabelText('Last Name'), {
             target : { value : 'test' }
         })
         fireEvent.change(screen.getByLabelText('Password'), {
-            target : { value : 'Password' }
+            target : { value : 'password' }
         })
         fireEvent.change(screen.getByLabelText('Confirm Password'), {
-            target : { value : 'Password' }
+            target : { value : 'password' }
         })
         fireEvent.change(screen.getByLabelText('Email address'), {
-            target : { value : 'u@test.fr' }
+            target : { value : 'user@test.fr' }
         })
         fireEvent.change(screen.getByLabelText('Phone number'), {
             target : { value : '111' }
         })
         fireEvent.click(screen.getByRole('submit'))
-
+    })
         expect(handleSubmit).toHaveBeenCalledTimes(1);
     })
     it('should fail with non matching password', () => {
@@ -110,9 +116,9 @@ describe( 'Signup form', () => {
             <SignupForm onSubmit={handleSubmit}/>
             </MockedProvider>
         )
-        
+        act(() => {
         fireEvent.change(screen.getByLabelText('First Name'), {
-            target : { value : 'test' }
+            target : { value : 'user' }
         })
         fireEvent.change(screen.getByLabelText('Last Name'), {
             target : { value : 'test' }
@@ -130,7 +136,7 @@ describe( 'Signup form', () => {
             target : { value : '111' }
         })
         fireEvent.click(screen.getByRole('submit'))
-
+        })
         expect(screen.getByRole('alert')).toHaveTextContent('Passwords do not match');
     })
 

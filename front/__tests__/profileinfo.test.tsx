@@ -11,6 +11,7 @@ import { MockedProvider } from '@apollo/client/testing/react';
 import { fireEvent, getByLabelText, render, screen } from '@testing-library/react';
 import { Role, User } from '@/generated/graphql';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { act } from 'react';
 
 jest.mock("next/navigation", () => ({
     useRouter() {
@@ -38,9 +39,10 @@ updateProfile(input: $input) {
     }
 }`, variables :{
     UpdateProfileInput : {
-        email : 'user@test.fr',
+        
         firstName : 'user',
         lastName : 'test',
+        email : 'user@test.fr',
         password: 'password',
         phone: '111'
     }
@@ -71,26 +73,27 @@ updateProfile(input: $input) {
                 </AuthProvider>
             </MockedProvider>
         ) 
+        act(() => {
         fireEvent.change(screen.getByLabelText('First Name'), {
-                target : { value : 'test' }
+                target : { value : 'user' }
             })
         fireEvent.change(screen.getByLabelText('Last Name'), {
                 target : { value : 'test' }
             })
         fireEvent.change(screen.getByLabelText('Password'), {
-                target : { value : 'Password' }
+                target : { value : 'password' }
             })
         fireEvent.change(screen.getByLabelText('Confirm Password'), {
-                target : { value : 'Password' }
+                target : { value : 'password' }
             })
         fireEvent.change(screen.getByLabelText('Email'), {
-                target : { value : 'u@test.fr' }
+                target : { value : 'user@test.fr' }
             })
         fireEvent.change(screen.getByLabelText('Phone'), {
                 target : { value : '111' }
             })
         fireEvent.click(screen.getByRole('submit'))
-        
+        })
         expect(screen.getByRole('field')).toHaveTextContent('Updating Account...')
     })
     it('should not be able to submit if the password do not match', () => {
@@ -100,7 +103,8 @@ updateProfile(input: $input) {
                     <ProfileInfo/>
                 </AuthProvider>
             </MockedProvider>
-        ) 
+        )
+        act(() => { 
         fireEvent.change(screen.getByLabelText('First Name'), {
                 target : { value : 'test' }
             })
@@ -120,6 +124,7 @@ updateProfile(input: $input) {
                 target : { value : '111' }
             })
         fireEvent.click(screen.getByRole('submit'))
+        })
         expect(screen.getByRole('alert')).toHaveTextContent('Passwords do not match')
     })
     

@@ -8,6 +8,7 @@ import { gql } from '@apollo/client';
 import { MockedProvider } from "@apollo/client/testing/react";
 import { fireEvent, render, screen } from '@testing-library/react';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { act } from 'react';
 
 jest.mock("next/navigation", () => ({
     useRouter() {
@@ -18,6 +19,9 @@ jest.mock("next/navigation", () => ({
         },
 }));
 describe('delete profile', () => {
+    beforeEach(() => {
+    jest.resetAllMocks()
+   })
     const mocks = [
         {
             request: {
@@ -51,10 +55,12 @@ deleteProfile
                     </AuthProvider>
                 </MockedProvider>
         ) 
+        act(() => {
         fireEvent.change(screen.getByLabelText('Type DELETE to confirm'), {
             target: {value : 'DELETE'}
         })
         fireEvent.click(screen.getByRole('delete'))
+        })
         expect(screen.getByRole('field')).toHaveTextContent('Deleting Account...')
 
     })

@@ -7,6 +7,8 @@ import { ClockIn } from '@/components/clock-in';
 import { gql } from '@apollo/client';
 import { MockedProvider } from '@apollo/client/testing/react';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { access } from 'fs';
+import { act } from 'react';
 
 jest.mock("next/navigation", () => ({
     useRouter() {
@@ -18,6 +20,9 @@ jest.mock("next/navigation", () => ({
 }));
 
 describe('clockin', ()=> {
+    beforeEach(() => {
+    jest.resetAllMocks()
+   })
     const clockIn = { id : '1', arrival : '10:10', departure :'12:00', status : 'unfinished' }
     const mocks = [
         {
@@ -51,7 +56,9 @@ describe('clockin', ()=> {
                 <ClockIn/>
             </MockedProvider>
         )
+        act(() => {
         fireEvent.click(screen.getByRole('clockin'))
+        })
         expect(screen.getByRole('field')).toHaveTextContent('Pointage en cours…Raccourci: Alt + I')
     })
 })

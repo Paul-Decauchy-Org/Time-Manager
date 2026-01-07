@@ -7,6 +7,7 @@ import { ClockOut } from '@/components/clock-out';
 import { gql } from '@apollo/client';
 import { MockedProvider } from '@apollo/client/testing/react';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { act } from 'react';
 
 jest.mock("next/navigation", () => ({
     useRouter() {
@@ -18,6 +19,9 @@ jest.mock("next/navigation", () => ({
 }));
 
 describe('clockout', ()=> {
+    beforeEach(() => {
+    jest.resetAllMocks()
+   })
     const clockout  = { id : '1', arrival : '10:10', departure :'12:00', status : 'unfinished' }
     const mocks = [
         {
@@ -51,7 +55,9 @@ describe('clockout', ()=> {
                 <ClockOut/>
             </MockedProvider>
         )
+        act(() =>{
         fireEvent.click(screen.getByRole('clockout'))
+        })
         expect(screen.getByRole('field')).toHaveTextContent('Pointage en cours… Raccourci: Alt + O')
     })
 })
