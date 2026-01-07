@@ -52,8 +52,8 @@ query AllUsers {
   }
 }
 
-query UsersByTeam($teamID: ID!){
-  usersByTeam(teamID: $teamID){
+query UsersByTeam($teamID: ID!) {
+  usersByTeam(teamID: $teamID) {
     id
     firstName
     lastName

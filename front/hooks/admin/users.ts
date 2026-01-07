@@ -1,10 +1,10 @@
 "use client";
-import {useQuery} from "@apollo/client/react";
-import {UsersDocument} from "@/generated/graphql";
+import { useQuery } from "@apollo/client/react";
+import { UsersDocument } from "@/generated/graphql";
 
 export function useAdminUsers() {
-    const { data } = useQuery(UsersDocument);
-    return data?.users;
+  const { data } = useQuery(UsersDocument);
+  return data?.users;
 }
 
 // export function useAdminUser({id}: {id: string}) {

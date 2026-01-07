@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useTeams } from '@/hooks/teams/use-teams';
-import { TeamCard } from '@/components/teams/team-card';
-import { TeamFormDialog } from '@/components/teams/team-form-dialog';
-import { Button } from '@/components/ui/button';
-import { Plus, Users, Loader2 } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useTeams } from "@/hooks/teams/use-teams";
+import { TeamCard } from "@/components/teams/team-card";
+import { TeamFormDialog } from "@/components/teams/team-form-dialog";
+import { Button } from "@/components/ui/button";
+import { Plus, Users, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -17,11 +17,18 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 
 export default function TeamsPage() {
   const { user, isManager } = useAuth();
-  const { teams, loading: loadingTeams, createTeam, updateTeam, deleteTeam, error: teamsError } = useTeams();
+  const {
+    teams,
+    loading: loadingTeams,
+    createTeam,
+    updateTeam,
+    deleteTeam,
+    error: teamsError,
+  } = useTeams();
 
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [editingTeam, setEditingTeam] = useState<any | null>(null);
@@ -29,7 +36,7 @@ export default function TeamsPage() {
 
   // Debug logging
   useEffect(() => {
-    console.log('🔍 Teams Debug:', {
+    console.log("🔍 Teams Debug:", {
       user,
       isManager,
       teams,
@@ -43,15 +50,19 @@ export default function TeamsPage() {
     ? teams.filter((team) => team.managerID?.id === user?.id)
     : teams;
 
-  const handleCreateTeam = async (data: { name: string; description: string; managerId: string }) => {
-    console.log('Creating team:', data);
+  const handleCreateTeam = async (data: {
+    name: string;
+    description: string;
+    managerId: string;
+  }) => {
+    console.log("Creating team:", data);
     const result = await createTeam({
       name: data.name,
       description: data.description,
       managerID: data.managerId,
     });
-    console.log('Team creation result:', result);
-    
+    console.log("Team creation result:", result);
+
     if (result) {
       toast.success("Équipe créée avec succès", {
         description: `L'équipe "${data.name}" a été créée.`,
@@ -63,13 +74,17 @@ export default function TeamsPage() {
     }
   };
 
-  const handleUpdateTeam = async (data: { name: string; description: string; managerId: string }) => {
+  const handleUpdateTeam = async (data: {
+    name: string;
+    description: string;
+    managerId: string;
+  }) => {
     if (!editingTeam) return;
     const result = await updateTeam(editingTeam.id, {
       name: data.name,
       description: data.description,
     });
-    
+
     if (result) {
       toast.success("Équipe modifiée", {
         description: `Les modifications ont été enregistrées.`,
@@ -85,7 +100,7 @@ export default function TeamsPage() {
   const handleDeleteTeam = async () => {
     if (!deletingTeam) return;
     const result = await deleteTeam(deletingTeam.id);
-    
+
     if (result) {
       toast.success("Équipe supprimée", {
         description: `L'équipe "${deletingTeam.name}" a été supprimée.`,
@@ -125,10 +140,12 @@ export default function TeamsPage() {
           </p>
         </div>
         {isManager && (
-          <Button onClick={() => {
-            setEditingTeam(null);
-            setFormDialogOpen(true);
-          }}>
+          <Button
+            onClick={() => {
+              setEditingTeam(null);
+              setFormDialogOpen(true);
+            }}
+          >
             <Plus className="mr-2 h-4 w-4" />
             Créer une équipe
           </Button>
@@ -143,7 +160,9 @@ export default function TeamsPage() {
               <Users className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Total d'équipes</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                Total d'équipes
+              </p>
               <p className="text-2xl font-bold">{myTeams.length}</p>
             </div>
           </div>
@@ -155,7 +174,9 @@ export default function TeamsPage() {
               <Users className="h-5 w-5 text-green-500" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Équipes actives</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                Équipes actives
+              </p>
               <p className="text-2xl font-bold">{myTeams.length}</p>
             </div>
           </div>
@@ -167,7 +188,9 @@ export default function TeamsPage() {
               <Users className="h-5 w-5 text-orange-500" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Vos équipes</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                Vos équipes
+              </p>
               <p className="text-2xl font-bold">{myTeams.length}</p>
             </div>
           </div>
@@ -181,8 +204,8 @@ export default function TeamsPage() {
           <h3 className="text-lg font-semibold mb-2">Aucune équipe</h3>
           <p className="text-muted-foreground mb-4">
             {isManager
-              ? 'Commencez par créer votre première équipe'
-              : 'Vous n\'êtes membre d\'aucune équipe pour le moment'}
+              ? "Commencez par créer votre première équipe"
+              : "Vous n'êtes membre d'aucune équipe pour le moment"}
           </p>
           {isManager && (
             <Button onClick={() => setFormDialogOpen(true)}>
@@ -195,11 +218,12 @@ export default function TeamsPage() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {myTeams.map((team) => (
             <TeamCard
-                  key={team.id}
-                  team={team}
-                  onEdit={() => handleEdit(team)}
-                  onDelete={() => setDeletingTeam(team)}
-                  isManager={isManager}/>
+              key={team.id}
+              team={team}
+              onEdit={() => handleEdit(team)}
+              onDelete={() => setDeletingTeam(team)}
+              isManager={isManager}
+            />
           ))}
         </div>
       )}
@@ -209,22 +233,28 @@ export default function TeamsPage() {
         open={formDialogOpen}
         onOpenChange={setFormDialogOpen}
         team={editingTeam}
-        managerId={user?.id || ''}
+        managerId={user?.id || ""}
         onSubmit={editingTeam ? handleUpdateTeam : handleCreateTeam}
       />
 
-      <AlertDialog open={!!deletingTeam} onOpenChange={() => setDeletingTeam(null)}>
+      <AlertDialog
+        open={!!deletingTeam}
+        onOpenChange={() => setDeletingTeam(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
             <AlertDialogDescription>
-              Cette action supprimera définitivement l'équipe "{deletingTeam?.name}".
-              Cette action est irréversible.
+              Cette action supprimera définitivement l'équipe "
+              {deletingTeam?.name}". Cette action est irréversible.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteTeam} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={handleDeleteTeam}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               Supprimer
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -128,7 +128,6 @@ button {
 }
 
 @layer utilities {
-
   /* Blob animations for auth pages */
   .animate-blob {
     animation: blob 7s infinite;

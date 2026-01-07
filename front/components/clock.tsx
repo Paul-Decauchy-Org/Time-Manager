@@ -1,20 +1,24 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
-import { cn } from "@/lib/utils"
-import { useEffect, useState } from "react"
-import { CalendarDays, Clock3 } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { CalendarDays, Clock3 } from "lucide-react";
 
 export function Clock({ className, ...props }: React.ComponentProps<"div">) {
-  const [now, setNow] = useState(new Date())
+  const [now, setNow] = useState(new Date());
 
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000)
-    return () => clearInterval(id)
-  }, [])
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
-  const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })
-  const date = now.toLocaleDateString()
+  const time = now.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+  const date = now.toLocaleDateString();
 
   return (
     <div className={cn(className)} {...props}>
@@ -36,5 +40,5 @@ export function Clock({ className, ...props }: React.ComponentProps<"div">) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
