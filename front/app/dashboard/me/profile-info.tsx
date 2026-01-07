@@ -286,9 +286,8 @@ className = "pl-10 h-11"
 
 {
   !validation.password && !validation.confirmPassword && formData.password === "" && (
-    <F{/* NOSONAR - UI help text */ }
-      ieldDescription className = "text-xs text-muted-foreground" >
-    Laissez vide pour conserver votre mot de passe actuel.Le mot de passe doit contenir au moins { MIN_PASSWORD_LENGTH } caractères.
+    <FieldDescription className = "text-xs text-muted-foreground" >
+      Laissez vide pour conserver votre mot de passe actuel.Le mot de passe doit contenir au moins { MIN_PASSWORD_LENGTH } caractères.
                 </FieldDescription>
               )
 }
