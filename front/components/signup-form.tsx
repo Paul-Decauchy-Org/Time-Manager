@@ -297,13 +297,6 @@ export function SignupForm({
 </Button>
     </FieldGroup>
 
-    < div className = "mt-4 text-center" >
-        <p className="text-sm text-muted-foreground" >
-            Already have an account ? { " "}
-                < LoginLink />
-                </p>
-                </div>
-                </form>
 
             <div className="mt-4 text-center">
               <p className="text-sm text-muted-foreground">
