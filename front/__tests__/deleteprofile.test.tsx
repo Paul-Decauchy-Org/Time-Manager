@@ -6,7 +6,7 @@ import '@testing-library/jest-dom'
 import { DeleteAccount } from '@/app/dashboard/me/delete-account';
 import { gql } from '@apollo/client';
 import { MockedProvider } from "@apollo/client/testing/react";
-import { render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { AuthProvider } from '@/contexts/AuthContext';
 
 jest.mock("next/navigation", () => ({
@@ -39,4 +39,29 @@ deleteProfile
             expect(container).toBeInTheDocument()
 
         })
+    it('should delete the account with confirmation', () => {
+        render(
+                <MockedProvider mocks={mocks}>
+                    <AuthProvider>
+                    <DeleteAccount/>
+                    </AuthProvider>
+                </MockedProvider>
+        ) 
+        fireEvent.change(screen.getByLabelText('Type DELETE to confirm'), {
+            target: {value : 'DELETE'}
+        })
+        fireEvent.click(screen.getByRole('delete'))
+        expect(screen.getByRole('field')).toHaveTextContent('Deleting Account...')
+
+    })
+    it('should not delete the account without confirmation', () => {
+        render(
+                <MockedProvider mocks={mocks}>
+                    <AuthProvider>
+                    <DeleteAccount/>
+                    </AuthProvider>
+                </MockedProvider>
+        ) 
+        expect(screen.getByRole('delete')).toBeDisabled()
+    })
 })

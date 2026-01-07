@@ -64,7 +64,7 @@ export function DeleteAccount({
               </div>
 
               {errorPass && (
-                <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
+                <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm" >
                   {errorPass}
                 </div>
               )}
@@ -88,9 +88,10 @@ export function DeleteAccount({
                 </FieldDescription>
               </Field>
 
-              <Field>
+              <Field role="field">
                 <Button
                   type="submit"
+                  role="delete"
                   disabled={loading || confirmText !== "DELETE"}
                   variant="destructive"
                   className="w-full"
