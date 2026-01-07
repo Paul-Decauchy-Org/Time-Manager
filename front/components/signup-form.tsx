@@ -245,7 +245,7 @@ className = "pl-10 h-11"
             </FieldDescription>
                             )
 }
-<Button type="submit" disabled = { !isFormValid || loading } className = "w-full h-11 text-base font-semibold shadow-lg hover:shadow-xl transition-all" >
+<Button role="submit" type="submit" disabled = { !isFormValid || loading } className = "w-full h-11 text-base font-semibold shadow-lg hover:shadow-xl transition-all" >
 {
     loading?(
                                     <>

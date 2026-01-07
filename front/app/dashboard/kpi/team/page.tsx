@@ -113,7 +113,7 @@ type Preset = "7d" | "30d" | "90d"
 const PRESETS: Preset[] = ["7d", "30d", "90d"]
 const PRESET_LABELS: Record<Preset, string> = { "7d": "7 jours", "30d": "30 jours", "90d": "90 jours" }
 
-export default function TeamKpiPage() {
+export default  async function TeamKpiPage() {
     const { user, isManager } = useAuth()
     const clientRef = React.useRef<any>(null)
     if (!clientRef.current) {
