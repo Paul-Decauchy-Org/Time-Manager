@@ -6,7 +6,7 @@ import '@testing-library/jest-dom'
 import { ClockOut } from '@/components/clock-out';
 import { gql } from '@apollo/client';
 import { MockedProvider } from '@apollo/client/testing/react';
-import { render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 jest.mock("next/navigation", () => ({
     useRouter() {
@@ -44,5 +44,14 @@ describe('clockout', ()=> {
             </MockedProvider>
         )
         expect(container).toBeDefined()
+    })
+    it('should get to loading after click (and so take in consideration the click)', () =>{
+        render(
+            <MockedProvider mocks = {mocks}>
+                <ClockOut/>
+            </MockedProvider>
+        )
+        fireEvent.click(screen.getByRole('clockout'))
+        expect(screen.getByRole('field')).toHaveTextContent('Pointage en cours… Raccourci: Alt + O')
     })
 })

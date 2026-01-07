@@ -45,13 +45,13 @@ export function ClockOut({ className, disabled = false, onSuccess, onError, ...p
                                 < CardDescription > Enregistrez votre départ et terminez votre session.</CardDescription>
                                     </CardHeader>
                                     < CardContent className = "pt-4" >
-                                        <Field>
+                                        <Field role="field">
                                         {(() => {
                                             let label = "Finir ma journée (ALT+O)"
                                             if (loading) label = "Pointage en cours…"
                                             else if (disabled) label = "Déjà clôturé aujourd'hui"
                                             return (
-                                                <Button onClick= { handleClockOut } disabled = { disabled || loading
+                                                <Button onClick= { handleClockOut } role = 'clockout' disabled = { disabled || loading
                                         } className = "w-full bg-gradient-to-r from-red-500 to-pink-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300" >
                                         { label }
                                         </Button>
