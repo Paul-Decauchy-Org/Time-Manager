@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,14 +8,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
-import { Search, Loader2 } from 'lucide-react';
-import { GetUsersWithoutGroupDocument } from '@/generated/graphql';
-import { useQuery } from '@apollo/client/react';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Search, Loader2 } from "lucide-react";
+import { GetUsersWithoutGroupDocument } from "@/generated/graphql";
+import { useQuery } from "@apollo/client/react";
 import { toast } from "sonner";
 
 interface AddMemberDialogProps {
@@ -34,7 +34,7 @@ export function AddMemberDialog({
   onAddMembers,
 }: AddMemberDialogProps) {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [isAdding, setIsAdding] = useState(false);
 
   const { data, loading, error } = useQuery(GetUsersWithoutGroupDocument, {
@@ -47,14 +47,14 @@ export function AddMemberDialog({
   const filteredUsers = availableUsers.filter(
     (user) =>
       user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchQuery.toLowerCase())
+      user.lastName.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleToggleUser = (userId: string) => {
     setSelectedUsers((prev) =>
       prev.includes(userId)
         ? prev.filter((id) => id !== userId)
-        : [...prev, userId]
+        : [...prev, userId],
     );
   };
 
@@ -65,12 +65,12 @@ export function AddMemberDialog({
       });
       return;
     }
-    
+
     setIsAdding(true);
     try {
       await onAddMembers(selectedUsers);
       setSelectedUsers([]);
-      setSearchQuery('');
+      setSearchQuery("");
       onOpenChange(false);
     } catch (error) {
       toast.error("Erreur", {
@@ -83,7 +83,7 @@ export function AddMemberDialog({
 
   const handleClose = () => {
     setSelectedUsers([]);
-    setSearchQuery('');
+    setSearchQuery("");
     onOpenChange(false);
   };
 
@@ -125,8 +125,8 @@ export function AddMemberDialog({
             ) : filteredUsers.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">
                 {searchQuery
-                  ? 'Aucun utilisateur trouvé'
-                  : 'Aucun utilisateur disponible sans équipe'}
+                  ? "Aucun utilisateur trouvé"
+                  : "Aucun utilisateur disponible sans équipe"}
               </div>
             ) : (
               <div className="divide-y">
@@ -180,7 +180,7 @@ export function AddMemberDialog({
                 Ajout en cours...
               </>
             ) : (
-              `Ajouter ${selectedUsers.length > 0 ? `(${selectedUsers.length})` : ''}`
+              `Ajouter ${selectedUsers.length > 0 ? `(${selectedUsers.length})` : ""}`
             )}
           </Button>
         </DialogFooter>
