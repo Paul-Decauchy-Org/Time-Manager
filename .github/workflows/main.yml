@@ -183,13 +183,12 @@ jobs:
           cp .env.example .env || true
           set -o pipefail || true
           # Single invocation to produce both coverage and JSON report
-          go test ./... -coverprofile=coverage.out -covermode=atomic -v -json | tee test-report.json
-
+          go test ./... -coverprofile=coverage -covermode=atomic -v -json | tee test-report.json
       - name: Check backend coverage
         id: check_back_cov
         working-directory: back
         run: |
-          if [ -f coverage.out ]; then
+          if [ -f coverage ]; then
             echo "coverage_exists=true" >> $GITHUB_OUTPUT
           else
             echo "coverage_exists=false" >> $GITHUB_OUTPUT
