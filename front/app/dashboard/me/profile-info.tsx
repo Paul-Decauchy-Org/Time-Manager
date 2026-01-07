@@ -16,7 +16,7 @@ import { useUpdateProfile } from "@/hooks/update-profile";
 import { User, Mail, Phone, Lock, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-export function ProfileInfo({
+export  function ProfileInfo({
   className,
   ...props
 }: React.ComponentProps<"div">) {
