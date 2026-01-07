@@ -63,7 +63,7 @@ updateProfile(input: $input) {
                 expect(container).toBeDefined()
 
     })
-    it('it should be able to submit with correct info', () =>{
+    it(' should be able to submit with correct info', () =>{
         render(
             <MockedProvider mocks={mocks}>
                 <AuthProvider>
@@ -92,6 +92,35 @@ updateProfile(input: $input) {
         fireEvent.click(screen.getByRole('submit'))
         
         expect(screen.getByRole('field')).toHaveTextContent('Updating Account...')
+    })
+    it('should not be able to submit if the password do not match', () => {
+        render(
+            <MockedProvider mocks={mocks}>
+                <AuthProvider>
+                    <ProfileInfo/>
+                </AuthProvider>
+            </MockedProvider>
+        ) 
+        fireEvent.change(screen.getByLabelText('First Name'), {
+                target : { value : 'test' }
+            })
+        fireEvent.change(screen.getByLabelText('Last Name'), {
+                target : { value : 'test' }
+            })
+        fireEvent.change(screen.getByLabelText('Password'), {
+                target : { value : 'Password' }
+            })
+        fireEvent.change(screen.getByLabelText('Confirm Password'), {
+                target : { value : 'Pastword' }
+            })
+        fireEvent.change(screen.getByLabelText('Email'), {
+                target : { value : 'u@test.fr' }
+            })
+        fireEvent.change(screen.getByLabelText('Phone'), {
+                target : { value : '111' }
+            })
+        fireEvent.click(screen.getByRole('submit'))
+        expect(screen.getByRole('alert')).toHaveTextContent('Passwords do not match')
     })
     
 })

@@ -160,7 +160,7 @@ export  function ProfileInfo({
                   </Field>
                 </div>
                 {passwordError ? (
-                  <FieldDescription className="text-destructive">
+                  <FieldDescription role='alert' className="text-destructive">
                     {passwordError}
                   </FieldDescription>
                 ) : (
