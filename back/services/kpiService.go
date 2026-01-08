@@ -79,15 +79,15 @@ func (s *KpiService) GetUserKpiSummary(ctx context.Context, userID *uuid.UUID, f
 	return res, nil
 }
 
-func (s *KpiService) ExportUserKpiCSV(ctx context.Context, userID *uuid.UUID, from, to time.Time) ([]byte, error) {
+func (s *KpiService) ExportUserKpiCSV(ctx context.Context, userID *uuid.UUID, from, to time.Time) (string, error) {
 	summary, err := s.GetUserKpiSummary(ctx, userID, from, to)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	var buf bytes.Buffer
 	writer := csv.NewWriter(&buf)
 
-	writer.Write([]string{
+	if err := writer.Write([]string{
 		"UserID",
 		"From",
 		"To",
@@ -97,9 +97,11 @@ func (s *KpiService) ExportUserKpiCSV(ctx context.Context, userID *uuid.UUID, fr
 		"CurrentStreakDays",
 		"PunctualityRate",
 		"PresentNow",
-	})
+	}); err != nil {
+		return "", err
+	}
 
-	writer.Write([]string{
+	if err := writer.Write([]string{
 		summary.UserID,
 		summary.From,
 		summary.To,
@@ -109,12 +111,12 @@ func (s *KpiService) ExportUserKpiCSV(ctx context.Context, userID *uuid.UUID, fr
 		strconv.Itoa(int(summary.CurrentStreakDays)),
 		fmt.Sprintf("%.2f", summary.PunctualityRate),
 		strconv.FormatBool(summary.PresentNow),
-	})
-
-	writer.Write([]string{})
+	}); err != nil {
+		return "", err
+	}
 
 	writer.Flush()
-	return buf.Bytes(), nil
+	return buf.String(), nil
 
 }
 
