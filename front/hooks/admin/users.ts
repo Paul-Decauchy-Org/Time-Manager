@@ -1,6 +1,8 @@
 "use client";
 import {useMutation, useQuery} from "@apollo/client/react";
 import {
+    DeleteUserDocument,
+    GetUserDocument,
     GetUsersWithoutGroupDocument,
     UpdateProfileInput,
     UpdateUserDocument,
@@ -10,7 +12,10 @@ import {
 
 export function useAdminUsers() {
     const { data } = useQuery(UsersDocument);
-    return data?.users;
+    if (data?.users == undefined) {
+        return [];
+    }
+    return data.users;
 }
 
 export function useAdminUpdateUser() {
@@ -43,8 +48,24 @@ export function useAdminUpdateUser() {
 }
 
 export function useAdminUser({id}: {id: string}) {
-    const {data} = useQuery(UserDocument, {
+    const {data} = useQuery(GetUserDocument, {
         variables: {id}
     })
-    return data.getUser
+    return data?.getUser
+ }
+ export function useAdminDeleteUser() {
+    const [adminDeleteUserMutation] = useMutation(DeleteUserDocument)
+     const adminDeleteUser = async (input: {
+         id: string;
+     }) => {
+
+         const result = await adminDeleteUserMutation({
+             variables: { id: input.id},
+         });
+         return result.data?.deleteUser;
+     };
+
+     return {
+         adminDeleteUser,
+     };
  }

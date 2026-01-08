@@ -1,6 +1,7 @@
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
 import { Role, User } from "@/generated/graphql";
+import {useAdminUsers} from "@/hooks/admin/users";
 
 async function getData(): Promise<User[]> {
   // Fetch data from your API here.
@@ -44,12 +45,13 @@ async function getData(): Promise<User[]> {
   ];
 }
 
-export default async function DemoPage() {
+export default async function AdminUsers() {
+  const users = useAdminUsers()
   const data = await getData();
 
   return (
     <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={users} />
     </div>
   );
 }

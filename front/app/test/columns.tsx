@@ -25,6 +25,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import Link from "next/link";
+import {useAdminDeleteUser} from "@/hooks/admin/users";
+import {toast} from "sonner";
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -93,6 +95,16 @@ export const columns: ColumnDef<User>[] = [
     id: "actions",
     cell: ({ row }) => {
       const user = row.original;
+
+      const {adminDeleteUser} = useAdminDeleteUser()
+      async function deleteUser() {
+        const res = await adminDeleteUser({id: user.id});
+        if (res) {
+          toast.success("user deleted")
+        } else {
+          toast.error("deletion error");
+        }
+      }
       return (
         <Dialog>
           <DropdownMenu>
@@ -137,7 +149,7 @@ export const columns: ColumnDef<User>[] = [
             </DialogHeader>
             <DialogFooter>
               <DialogClose asChild>
-                <Button type="button" variant="destructive">
+                <Button type="button" variant="destructive" onClick={deleteUser}>
                   Delete
                 </Button>
               </DialogClose>
