@@ -114,7 +114,7 @@ func (s *KpiService) ExportUserKpiCSV(ctx context.Context, userID *uuid.UUID, fr
 	}); err != nil {
 		return "", err
 	}
-	
+
 	writer.Flush()
 	return buf.String(), nil
 
