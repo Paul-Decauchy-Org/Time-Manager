@@ -138,7 +138,7 @@ describe( 'Signup form', () => {
         fireEvent.click(screen.getByRole('submit'))
         })
         expect(screen.getByRole('alert')).toHaveTextContent('Passwords do not match');
-    })
+    
 
     expect(handleSubmit).toHaveBeenCalledTimes(1);
   });
