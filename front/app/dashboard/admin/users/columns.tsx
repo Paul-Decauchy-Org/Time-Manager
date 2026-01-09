@@ -123,8 +123,7 @@ export const columns: ColumnDef<User>[] = [
                 <Link
                   className="card"
                   key={user.id}
-                  href={`/test/${user.id}`}
-                  passHref
+                  href={`/dashboard/admin/users/${user.id}`}
                 >
                   Edit
                 </Link>

@@ -1,3 +1,4 @@
+"use client";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
 import { Role, User } from "@/generated/graphql";
@@ -45,7 +46,7 @@ async function getData(): Promise<User[]> {
   ];
 }
 
-export default async function AdminUsers() {
+export default function AdminUsers() {
   const users = useAdminUsers()
   // const data = await getData();
 
