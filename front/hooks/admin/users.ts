@@ -49,14 +49,12 @@ export function useAdminUpdateUser() {
     };
 }
 
-export function useAdminUser({id}: {id: string}) {
-    const {data} = useQuery(GetUserDocument, {
-        variables: {id}
+export function useAdminUser(id: string) {
+    const {data, loading} = useQuery(GetUserDocument, {
+        variables: {id: id},
     })
-    if (data?.getUser == null) {
-        return 
-    }
-    return data?.getUser
+    
+    return  {data, loading};
  }
  export function useAdminDeleteUser() {
     const [adminDeleteUserMutation] = useMutation(DeleteUserDocument)
