@@ -3,17 +3,19 @@
 import { type ComponentRef, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import {
-    Dialog, DialogClose,
-    DialogContent,
-    DialogDescription, DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
-import {Button} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {} from "@/components/ui/input";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Modal from "@/components/modal";
 import type { User, UserWithAllData } from "@/generated/graphql";
 import UpdateForm from "@/components/user/update";

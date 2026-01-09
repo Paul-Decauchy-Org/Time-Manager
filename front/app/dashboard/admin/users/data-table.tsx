@@ -77,7 +77,7 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-36"
         />
-        <DeleteUserDialog/>
+        <DeleteUserDialog />
       </div>
 
       <div className="overflow-hidden rounded-md border">

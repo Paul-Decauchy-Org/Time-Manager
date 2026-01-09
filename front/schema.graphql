@@ -47,11 +47,8 @@ type Query {
   userWithAllData(id: ID!): UserWithAllData
   UsersWithAllData: [UserWithAllData!]!
   usersByTeam(teamID: ID!): [UserWithAllData!]!
-  me: SignedUser!
-  users: [User!]!
-  getUser(id: ID!): UserWithAllData
-  teams: [Team!]!
-  team(id: ID!): Team!
+  me: User!
+    # KPI queries
   kpiUserSummary(userID: ID, from: Date, to: Date): UserKpiSummary!
   kpiTeamSummary(teamID: ID!, from: Date, to: Date): TeamKpiSummary!
   exportUserKpiCSV(userID: ID, from: Date, to: Date): String!

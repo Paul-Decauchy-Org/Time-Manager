@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,18 +8,22 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface TeamFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   team?: any | null;
   managerId: string;
-  onSubmit: (data: { name: string; description: string; managerId: string }) => Promise<void>;
+  onSubmit: (data: {
+    name: string;
+    description: string;
+    managerId: string;
+  }) => Promise<void>;
 }
 
 export function TeamFormDialog({
@@ -29,8 +33,8 @@ export function TeamFormDialog({
   managerId,
   onSubmit,
 }: TeamFormDialogProps) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -38,8 +42,8 @@ export function TeamFormDialog({
       setName(team.name);
       setDescription(team.description);
     } else {
-      setName('');
-      setDescription('');
+      setName("");
+      setDescription("");
     }
   }, [team, open]);
 
@@ -58,11 +62,13 @@ export function TeamFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{team ? 'Modifier l\'équipe' : 'Créer une équipe'}</DialogTitle>
+          <DialogTitle>
+            {team ? "Modifier l'équipe" : "Créer une équipe"}
+          </DialogTitle>
           <DialogDescription>
             {team
-              ? 'Modifiez les informations de votre équipe'
-              : 'Créez une nouvelle équipe pour organiser vos collaborateurs'}
+              ? "Modifiez les informations de votre équipe"
+              : "Créez une nouvelle équipe pour organiser vos collaborateurs"}
           </DialogDescription>
         </DialogHeader>
 
@@ -93,17 +99,24 @@ export function TeamFormDialog({
           </div>
 
           <DialogFooter className="mt-6">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Annuler
             </Button>
-            <Button type="submit" disabled={isSubmitting || !name || !description}>
+            <Button
+              type="submit"
+              disabled={isSubmitting || !name || !description}
+            >
               {isSubmitting
                 ? team
-                  ? 'Modification...'
-                  : 'Création...'
+                  ? "Modification..."
+                  : "Création..."
                 : team
-                  ? 'Modifier'
-                  : 'Créer'}
+                  ? "Modifier"
+                  : "Créer"}
             </Button>
           </DialogFooter>
         </form>

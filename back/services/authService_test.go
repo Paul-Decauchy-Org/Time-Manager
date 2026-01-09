@@ -95,10 +95,11 @@ func TestAuthServicePassThroughs(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, u, got)
 
-	mockRepo.On("Me", "e").Return(u, nil)
+	signedUser := &model.SignedUser{Email: "e", FirstName: "A"}
+	mockRepo.On("Me", "e").Return(signedUser, nil)
 	me, err := svc.Me("e")
 	assert.NoError(t, err)
-	assert.Equal(t, u, me)
+	assert.Equal(t, signedUser, me)
 
 	up := model.UpdateProfileInput{FirstName: func() *string { s := "Z"; return &s }()}
 	u2 := &model.User{FirstName: "Z"}

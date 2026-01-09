@@ -1,7 +1,7 @@
-mutation CreateUser($input: CreateUserInput!){
-    createUser(input: $input){
-        firstName
-        lastName
-        role
-    }
+mutation CreateUser($input: CreateUserInput!) {
+  createUser(input: $input) {
+    firstName
+    lastName
+    role
+  }
 }

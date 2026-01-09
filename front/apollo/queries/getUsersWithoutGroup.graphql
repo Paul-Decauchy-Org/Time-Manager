@@ -1,5 +1,5 @@
-query GetUsersWithoutGroup($input: Boolean!){
-  usersByGroup(inGroup: $input){
+query GetUsersWithoutGroup($input: Boolean!) {
+  usersByGroup(inGroup: $input) {
     id
     lastName
     firstName

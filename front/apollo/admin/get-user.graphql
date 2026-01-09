@@ -1,14 +1,18 @@
-query GetUser ($id: ID!) {
-  getUser(id: $id) {
-    id
-    firstName
-    lastName
-    email
-    phone
-    teams {
-      name
-    }
-    password
-    role
-  }
-}
+#query GetUser($id: ID!){
+#    getUser(id: $id){
+#        firstName
+#        lastName
+#        teams{
+#            name
+#        }
+#        timeTables{
+#            start
+#            ends
+#        }
+#        timeTableEntries{
+#            arrival
+#            departure
+#            day
+#        }
+#    }
+#}

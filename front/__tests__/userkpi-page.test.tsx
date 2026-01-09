@@ -4,11 +4,12 @@
 
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen } from "@testing-library/react";
-import LoginPage from "@/app/login/page";
+import UserKpiPage from "@/app/dashboard/kpi/user/page";
+import { AuthProvider } from "@/contexts/AuthContext";
 
-describe("LoginPage", () => {
+describe("user kpi page", () => {
   it("should render the page", () => {
-    const { container } = render(<LoginPage />);
+    const { container } = render(<UserKpiPage />);
     expect(container).toBeInTheDocument();
   });
 });

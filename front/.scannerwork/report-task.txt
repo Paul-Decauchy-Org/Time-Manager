@@ -1,6 +1,6 @@
-projectKey=front
+projectKey=timeManagerFront
 serverUrl=http://localhost:9000
-serverVersion=9.9.8.100196
-dashboardUrl=http://localhost:9000/dashboard?id=front
-ceTaskId=AZshe5KIofPTi0ZlmZVt
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AZshe5KIofPTi0ZlmZVt
+serverVersion=25.12.0.117093
+dashboardUrl=http://localhost:9000/dashboard?id=timeManagerFront
+ceTaskId=90890c8f-e2b7-488d-afd2-f85c4d064c28
+ceTaskUrl=http://localhost:9000/api/ce/task?id=90890c8f-e2b7-488d-afd2-f85c4d064c28
