@@ -62,7 +62,7 @@ func (r *queryResolver) KpiTeamSummary(ctx context.Context, teamID string, from 
 }
 
 func (r *queryResolver) ExportUserKpiCSV(ctx context.Context, userID *string, from *string, to *string) (string, error) {
-	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
+	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER", "USER"); err != nil {
 		return "", err
 	}
 	var userUUID *uuid.UUID
