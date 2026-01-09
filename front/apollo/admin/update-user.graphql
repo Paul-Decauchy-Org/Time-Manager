@@ -2,6 +2,7 @@ mutation UpdateUser($id: ID!, $input: UpdateUserInput!){
     updateUser(id:$id, input: $input){
         firstName
         lastName
+        email
         role
     }
 }

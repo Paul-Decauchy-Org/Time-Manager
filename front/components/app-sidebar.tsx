@@ -53,7 +53,7 @@ const adminItems: links = {
 }
 
 export function AppSidebar() {
-    const { isManager, isAdmin} = useAuth()
+    const { isManager, isAdmin } = useAuth()
     const { logout } = useLogout()
     const router = useRouter()
     async function handleLogout() {
@@ -71,45 +71,45 @@ export function AppSidebar() {
     // }
     return (
         <Sidebar>
-        <SidebarContent>
-        <SidebarLinks name= { items.name } links = { items.links } />
-            { isManager && (
-                <SidebarLinks name={ managerItems.name } links = { managerItems.links } />
+            <SidebarContent>
+                <SidebarLinks name={items.name} links={items.links} />
+                {isManager && (
+                    <SidebarLinks name={managerItems.name} links={managerItems.links} />
                 )
-}
-{
-    isAdmin && (
-        <SidebarLinks name={ adminItems.name } links = { adminItems.links } />
-                )
-}
-</SidebarContent>
-    < SidebarFooter >
-    <SidebarGroup>
-    <SidebarGroupLabel>
-    <span>Profile </span>
-    </SidebarGroupLabel>
-    < SidebarGroupContent >
-    <SidebarMenu>
-    <SidebarMenuItem key={ "Profile" }>
-        <SidebarMenuButton asChild >
-        <Link href="/dashboard/me" >
-            <Settings/>
-            < span > Settings </span>
-            </Link>
-            </SidebarMenuButton>
-            </SidebarMenuItem>
-            < SidebarMenuItem key = { "Logout"} >
-                <SidebarMenuButton asChild onClick = { handleLogout } >
-                    <div>
-                    <IconLogout/>
-                    < span > { "Logout"} </span>
-                    </div>
-                    </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    </SidebarMenu>
+                }
+                {
+                    isAdmin && (
+                        <SidebarLinks name={adminItems.name} links={adminItems.links} />
+                    )
+                }
+            </SidebarContent>
+            < SidebarFooter >
+                <SidebarGroup>
+                    <SidebarGroupLabel>
+                        <span>Profile </span>
+                    </SidebarGroupLabel>
+                    < SidebarGroupContent >
+                        <SidebarMenu>
+                            <SidebarMenuItem key={"Profile"}>
+                                <SidebarMenuButton asChild >
+                                    <Link href="/dashboard/me" >
+                                        <Settings />
+                                        < span > Settings </span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            < SidebarMenuItem key={"Logout"} >
+                                <SidebarMenuButton asChild onClick={handleLogout} >
+                                    <div>
+                                        <IconLogout />
+                                        < span > {"Logout"} </span>
+                                    </div>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
                     </SidebarGroupContent>
-                    </SidebarGroup>
-                    </SidebarFooter>
-                    </Sidebar>
+                </SidebarGroup>
+            </SidebarFooter>
+        </Sidebar>
     )
 }

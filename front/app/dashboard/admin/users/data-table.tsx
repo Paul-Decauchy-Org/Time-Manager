@@ -37,7 +37,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { DeleteUserDialog} from "@/app/test/delete-user-dialog";
+import { DeleteUserDialog} from "@/app/dashboard/admin/users/delete-user-dialog";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

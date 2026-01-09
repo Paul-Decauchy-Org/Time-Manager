@@ -19,7 +19,7 @@ export function useAdminUsers() {
 }
 
 export function useAdminUpdateUser() {
-    const [adminUpdateUserMutation] = useMutation(UpdateUserDocument)
+    const [adminUpdateUserMutation, { loading, error }] = useMutation(UpdateUserDocument)
     const adminUpdateUser = async (input: {
         id: string;
         firstName: string;
@@ -44,6 +44,8 @@ export function useAdminUpdateUser() {
 
     return {
         adminUpdateUser,
+        loading,
+        error,
     };
 }
 
@@ -51,6 +53,9 @@ export function useAdminUser({id}: {id: string}) {
     const {data} = useQuery(GetUserDocument, {
         variables: {id}
     })
+    if (data?.getUser == null) {
+        return 
+    }
     return data?.getUser
  }
  export function useAdminDeleteUser() {

@@ -26,7 +26,7 @@ export function DeleteUserDialog() {
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription>
             This action cannot be undone. Are you sure you want to permanently
-            delete from our servers?
+            delete somthinfrom our servers?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
