@@ -128,7 +128,6 @@ export const columns: ColumnDef<User>[] = [
                   Edit
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>Make a copy</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DialogTrigger asChild>
                 <DropdownMenuItem variant="destructive">

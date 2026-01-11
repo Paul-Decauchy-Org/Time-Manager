@@ -1,5 +1,6 @@
 query GetUser($id: ID!){
    getUser(id: $id){
+       id
        firstName
        lastName
        teams{
@@ -12,6 +13,7 @@ query GetUser($id: ID!){
        }
        email
        password
+       phone
        role
        teams{
             name

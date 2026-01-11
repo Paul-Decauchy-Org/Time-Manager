@@ -60,7 +60,7 @@ CREATE INDEX IF NOT EXISTS idx_time_table_entries_user_id ON time_table_entries(
 CREATE TABLE IF NOT EXISTS time_tables (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   start timestamp NOT NULL,
-  ends timestamp NOT NULL
+  ends timestamp NOT NULL,
   effective_from timestamptz NOT NULL,
   effective_to timestamptz,
   is_active boolean NOT NULL
