@@ -4,7 +4,7 @@ import { useFragment, useQuery, useSuspenseQuery } from "@apollo/client/react";
 import { MeDocument, Role, SignedUser, User } from "@/generated/graphql";
 
 interface AuthContextType {
-  user: SignedUser | undefined;
+  user: User | undefined;
   hasRole: (roles: Role | Role[]) => boolean;
   loading: boolean;
   isAdmin: boolean;
