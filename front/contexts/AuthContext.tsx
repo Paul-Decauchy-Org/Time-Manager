@@ -20,7 +20,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     errorPolicy: "ignore",
   });
 
-  const user = data?.me;
+  const user = data?.me as SignedUser | undefined;
 
   const hasRole = (roles: Role | Role[]): boolean => {
     if (!user) return false;
@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAdmin: user?.role === Role.Admin,
     isManager: user?.role === Role.Manager || user?.role === Role.Admin,
   };
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={ value }> { children } </AuthContext.Provider>;
 }
 
 export function useAuth() {
