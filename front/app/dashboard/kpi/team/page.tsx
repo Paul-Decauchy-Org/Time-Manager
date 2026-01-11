@@ -31,6 +31,7 @@ import {
   TeamsDocument,
 } from "@/generated/graphql";
 import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
+import KPICSV from "@/components/kpiCSV";
 
 function getEntriesForTeam(
   users: any[],
@@ -165,6 +166,7 @@ const PRESET_LABELS: Record<Preset, string> = {
 };
 
 export default function TeamKpiPage() {
+  const csv = KPICSV()
   const { user, isManager } = useAuth();
   const clientRef = useRef<any>(null);
   if (!clientRef.current) {
@@ -288,6 +290,7 @@ export default function TeamKpiPage() {
         { className: "text-2xl font-semibold" },
         "KPIs Equipe",
       ),
+      csv,
       React.createElement(
         "div",
         { className: "text-muted-foreground text-sm" },

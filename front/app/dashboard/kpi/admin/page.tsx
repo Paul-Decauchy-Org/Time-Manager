@@ -22,6 +22,7 @@ import {
   CalendarRange,
   LineChart,
 } from "lucide-react";
+import KPICSV from "@/components/kpiCSV";
 
 function rangeFromPreset(preset: string): { from: string; to: string } {
   const toDate = new Date();
@@ -139,7 +140,9 @@ function StatCard(
 }
 
 export default function AdminKpiPage() {
+  const csv = KPICSV()
   const { user, isManager } = useAuth();
+
   const [preset, setPreset] = useState<string>("30d");
   const { from, to } = rangeFromPreset(preset);
 
@@ -347,6 +350,7 @@ export default function AdminKpiPage() {
         StatCard(UserCog, "Managers", managersCount, "emerald"),
         StatCard(Shield, "Admins", adminsCount, "rose"),
         StatCard(Users, "Users", basicUsersCount, "blue"),
+        FullDiv({ children: csv })
       ),
       React.createElement(
         "div",
@@ -434,4 +438,17 @@ export default function AdminKpiPage() {
         : null,
     ),
   );
+}
+
+type FullDivProps = React.PropsWithChildren<{}>
+
+export function FullDiv({ children }: FullDivProps) {
+  return (
+    <div className="flex justify-center text-center items-center rounded-xl border shadow-sm bg-muted">
+      <div className="h-1/2 w-2/3">
+        {children}
+      </div>
+
+    </div>
+  )
 }
