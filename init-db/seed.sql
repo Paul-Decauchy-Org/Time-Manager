@@ -6,7 +6,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 -- =======================
 INSERT INTO users (id, first_name, last_name, email, phone, password, role)
 VALUES
-(gen_random_uuid(), 'Alice', 'Dupont', 'alice.dupont@example.fr', '0700000001', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'ADMIN'),
+(gen_random_uuid(), 'Alice', 'Dupont', 'alice.dupont@example.fr', '0700000001', crypt('password123', gen_salt('bf')), 'ADMIN'),
 (gen_random_uuid(), 'Bob', 'Sall', 'bob.sall@example.fr', '0700000002', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
 (gen_random_uuid(), 'Carla', 'Diop', 'carla.diop@example.fr', '0700000003', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),
 (gen_random_uuid(), 'David', 'Fall', 'david.fall@example.fr', '0700000004', '2501b937-782b-4a65-8ad8-0ee55cbdb3a6', 'USER'),

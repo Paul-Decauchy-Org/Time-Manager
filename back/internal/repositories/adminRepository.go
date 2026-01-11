@@ -104,7 +104,6 @@ func (r *Repository) GetUser(id string) (*model.UserWithAllData, error) {
 		return nil, idParsingError
 	}
 	if err := r.DB.Preload("TimeTableEntries").
-		Preload("TeamUsers.Team").
 		Where(whereID, uID).
 		First(&existingUser).Error; err != nil {
 		return nil, userNotFoundError
