@@ -9,6 +9,7 @@ import (
 	dbmodels "github.com/epitech/timemanager/internal/models"
 	"github.com/google/uuid"
 	"github.com/spf13/viper"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -106,13 +107,17 @@ func SeedDB() error {
 		return errors.New("database connection not initialized")
 	}
 
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("adminpass"), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
 	// Exemple: créer un utilisateur admin par défaut
 	admin := dbmodels.User{
 		ID:        uuid.New(),
 		FirstName: "Admin",
 		LastName:  "System",
 		Email:     "admin@example.com",
-		Password:  "admin", // Dans un cas réel, utiliser un mot de passe hashé
+		Password:  string(hashedPassword),
 		Role:      dbmodels.RoleAdmin,
 	}
 

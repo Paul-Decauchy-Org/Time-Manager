@@ -16,9 +16,9 @@ func main() {
 		migrateDB bool
 	)
 
-	flag.BoolVar(&resetDB, "reset", false, "Reset database by dropping all tables before migration")
-	flag.BoolVar(&seedDB, "seed", false, "Seed database with default data")
-	flag.BoolVar(&testData, "test-data", false, "Seed database with test data (5 users, 1 team, time entries, etc)")
+	flag.BoolVar(&resetDB, "reset", true, "Reset database by dropping all tables before migration")
+	flag.BoolVar(&seedDB, "seed", true, "Seed database with default data")
+	flag.BoolVar(&testData, "test-data", true, "Seed database with test data (5 users, 1 team, time entries, etc)")
 	flag.BoolVar(&migrateDB, "migrate", true, "Migrate database schema")
 	flag.Parse()
 
