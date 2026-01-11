@@ -367,70 +367,70 @@ export default function AdminKpiPage() {
           },
           coverage.length === 0
             ? React.createElement(
-                "div",
-                {
-                  className:
-                    "flex h-full items-center justify-center text-sm text-muted-foreground",
-                },
-                "Aucune donnée sur la période sélectionnée",
-              )
+              "div",
+              {
+                className:
+                  "flex h-full items-center justify-center text-sm text-muted-foreground",
+              },
+              "Aucune donnée sur la période sélectionnée",
+            )
             : React.createElement(
-                AreaChart as any,
-                { data: coverage },
+              AreaChart as any,
+              { data: coverage },
+              React.createElement(
+                "defs",
+                null,
                 React.createElement(
-                  "defs",
-                  null,
-                  React.createElement(
-                    "linearGradient",
-                    {
-                      id: "fillAdminCount",
-                      x1: "0",
-                      y1: "0",
-                      x2: "0",
-                      y2: "1",
-                    },
-                    React.createElement("stop", {
-                      offset: "5%",
-                      stopColor: "var(--color-count)",
-                      stopOpacity: 0.8,
-                    }),
-                    React.createElement("stop", {
-                      offset: "95%",
-                      stopColor: "var(--color-count)",
-                      stopOpacity: 0.1,
-                    }),
-                  ),
-                ),
-                React.createElement(CartesianGrid as any, { vertical: false }),
-                React.createElement(XAxis as any, {
-                  dataKey: "time",
-                  tickLine: false,
-                  axisLine: false,
-                  tickMargin: 8,
-                  minTickGap: 16,
-                  tickFormatter: fmtTick,
-                }),
-                React.createElement(ChartTooltip as any, {
-                  cursor: false,
-                  content: React.createElement(ChartTooltipContent as any, {
-                    indicator: "dot",
+                  "linearGradient",
+                  {
+                    id: "fillAdminCount",
+                    x1: "0",
+                    y1: "0",
+                    x2: "0",
+                    y2: "1",
+                  },
+                  React.createElement("stop", {
+                    offset: "5%",
+                    stopColor: "var(--color-count)",
+                    stopOpacity: 0.8,
                   }),
-                }),
-                React.createElement(Area as any, {
-                  dataKey: "count",
-                  type: "natural",
-                  fill: "url(#fillAdminCount)",
-                  stroke: "var(--color-count)",
-                }),
+                  React.createElement("stop", {
+                    offset: "95%",
+                    stopColor: "var(--color-count)",
+                    stopOpacity: 0.1,
+                  }),
+                ),
               ),
+              React.createElement(CartesianGrid as any, { vertical: false }),
+              React.createElement(XAxis as any, {
+                dataKey: "time",
+                tickLine: false,
+                axisLine: false,
+                tickMargin: 8,
+                minTickGap: 16,
+                tickFormatter: fmtTick,
+              }),
+              React.createElement(ChartTooltip as any, {
+                cursor: false,
+                content: React.createElement(ChartTooltipContent as any, {
+                  indicator: "dot",
+                }),
+              }),
+              React.createElement(Area as any, {
+                dataKey: "count",
+                type: "natural",
+                fill: "url(#fillAdminCount)",
+                stroke: "var(--color-count)",
+              }),
+            ),
         ),
       ),
       status
         ? React.createElement(
-            "div",
-            { className: "pt-3 text-destructive" },
-            status,
-          )
+          "div",
+          { className: "pt-3 text-destructive" },
+          status,
+        )
         : null,
     ),
   );
