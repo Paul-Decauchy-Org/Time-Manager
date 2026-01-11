@@ -30,3 +30,7 @@ query KpiTeamSummary($teamID: ID!, $from: Date, $to: Date) {
     }
   }
 }
+
+query ExportUserKpiCSV($userID: ID, $from: Date, $to: Date) {
+  exportUserKpiCSV(userID: $userID, from: $from, to: $to)
+}
