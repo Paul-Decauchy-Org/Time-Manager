@@ -20,7 +20,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     errorPolicy: "ignore",
   });
 
-  const user = data?.me;
+  const user = data?.me as User;
 
   const hasRole = (roles: Role | Role[]): boolean => {
     if (!user) return false;
