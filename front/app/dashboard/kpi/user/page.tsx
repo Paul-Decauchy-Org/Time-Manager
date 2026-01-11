@@ -9,6 +9,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import KPICSV from "@/components/kpiCSV";
 
 type Preset = "7d" | "30d" | "90d";
 const PRESETS: Preset[] = ["7d", "30d", "90d"];
@@ -25,6 +26,7 @@ function formatMinutes(mins: number) {
 }
 
 export default function UserKpiPage() {
+  const csv = KPICSV()
   const { user } = useAuth();
   const [preset, setPreset] = useState<Preset>("30d");
   const { summary, loading, error, from, to } = useUserKpi({
@@ -36,7 +38,6 @@ export default function UserKpiPage() {
     date: String(p.date),
     minutes: Number(p.minutes),
   }));
-
   const header = React.createElement(
     "div",
     { className: "flex items-center justify-between gap-3 p-6" },
@@ -54,6 +55,7 @@ export default function UserKpiPage() {
         `Periode: ${from} - ${to}`,
       ),
     ),
+    csv,
     React.createElement(
       "div",
       { className: "flex items-center gap-2" },
