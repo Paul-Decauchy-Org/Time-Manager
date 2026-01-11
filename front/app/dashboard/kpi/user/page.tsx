@@ -190,10 +190,10 @@ export default function UserKpiPage() {
     chart,
     status
       ? React.createElement(
-          "div",
-          { className: "px-6 py-3 text-destructive" },
-          status,
-        )
+        "div",
+        { className: "px-6 py-3 text-destructive" },
+        status,
+      )
       : null,
   );
 }

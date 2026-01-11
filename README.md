@@ -64,8 +64,14 @@ Time-Manager/
 ├── front/                # Frontend Next.js
 │   ├── app/              # Pages et routes Next.js
 │   ├── components/       # Composants React
+│   │   ├── ui/           # Composants UI Shadcn
+│   │   ├── teams/        # Composants gestion équipes
+│   │   └── kpi/          # Composants KPI/analytics
+│   ├── contexts/         # React Context (Auth, etc.)
+│   ├── hooks/            # Custom React hooks
 │   ├── apollo/           # Configuration Apollo Client
-│   └── generated/        # Types GraphQL générés
+│   ├── generated/        # Types GraphQL générés
+│   └── __tests__/        # Tests Jest unitaires
 ├── init-db/              # Scripts SQL d'initialisation
 ├── docker-compose.yml    # Configuration Docker Compose
 ├── nginx/                # Configuration serveur web
@@ -81,10 +87,13 @@ Time-Manager/
 - **testify** - Framework de test
 
 #### Frontend
-- **Next.js** - Framework React
+- **Next.js** (v15.5.4) - Framework React avec Turbopack
 - **Apollo Client** - Client GraphQL
 - **TypeScript** - Typage statique
 - **Tailwind CSS** - Styling
+- **Shadcn/ui** - Composants UI
+- **Jest** - Framework de test
+- **React Testing Library** - Tests des composants
 
 ## 🚀 Quickstart
 
@@ -173,6 +182,13 @@ go test ./... -coverprofile=coverage.out -covermode=atomic
 go tool cover -html=coverage.out
 ```
 
+**Services testés:**
+- AdminService (gestion utilisateurs, rôles)
+- AuthService (authentification, signup/login)
+- TeamService (équipes, membres)
+- TimeTableService (clock-in/out, horaires)
+- KPIService (statistiques et KPIs)
+
 ### Tests Frontend (Next.js)
 
 ```powershell
@@ -184,12 +200,24 @@ npm ci
 # Générer les types GraphQL
 npm run codegen
 
+# Exécuter les tests unitaires
+npm test
+
+# Exécuter les tests avec couverture
+npm run test:coverage
+
 # Vérifier le linting et formatage
 npm run lint
 
 # Build complet (inclut vérifications de types)
 npm run build
 ```
+
+**Tests disponibles:**
+- Tests des composants UI (Login, Signup, TeamCard, Modal, etc.)
+- Tests des pages (Dashboard, KPI, Admin)
+- Tests des composants métier (Clock-in/out, DataTable, Heatmap, etc.)
+- Tests avec mocks Apollo Client pour GraphQL
 
 ### SonarCloud / SonarQube (analyse statique)
 
@@ -211,19 +239,24 @@ npm run sonar
 ## ✨ Fonctionnalités principales
 
 ### Gestion du temps
-- **Clock-in / Clock-out** - Enregistrement des heures de travail
-- **Visualisation** - Graphiques et rapports de temps
-- **Historique** - Consultation des entrées précédentes
+- **Clock-in / Clock-out** - Enregistrement des heures de travail en temps réel
+- **Visualisation** - Graphiques interactifs et tableaux de bord
+- **Heatmap** - Visualisation de l'activité par jour/heure
+- **Historique** - Consultation et modification des entrées précédentes
+- **Export CSV** - Export des données pour analyse externe
 
 ### Gestion d'équipes
-- **Création d'équipes** - Organisation des utilisateurs
-- **Assignation de managers** - Hiérarchie et responsabilités
-- **Statistiques d'équipe** - Vue consolidée par équipe
+- **Création d'équipes** - Organisation des utilisateurs en équipes
+- **Assignation de managers** - Hiérarchie et délégation de responsabilités
+- **Gestion des membres** - Ajout/retrait de membres, suivi de présence
+- **Statistiques d'équipe** - KPIs et analytics par équipe
+- **Indicateurs de présence** - Statut en temps réel (présent/absent/en travail)
 
 ### Administration
-- **Gestion des utilisateurs** - Création, modification, suppression
-- **Gestion des rôles** - Attribution de permissions
-- **Configuration système** - Paramètres globaux
+- **Gestion des utilisateurs** - CRUD complet des utilisateurs
+- **Gestion des rôles** - Attribution de permissions (Admin, Manager, Employee)
+- **Dashboard admin** - Vue d'ensemble et KPIs globaux
+- **Profils utilisateurs** - Informations détaillées avec historique
 
 ## 🔄 CI/CD avec GitHub Actions
 
@@ -238,7 +271,8 @@ Notre pipeline CI/CD est défini dans `.github/workflows/main.yml` et exécute l
 - Setup Node.js 20
 - Installation des dépendances
 - Génération des types GraphQL avec codegen
-- Build Next.js
+- Exécution des tests Jest
+- Build Next.js avec vérification des types TypeScript
 
 ### Qualité & Analyse
 - Quality Check: `go vet`, format Go, installation deps front (Biome prêt mais optionnel)
@@ -324,10 +358,11 @@ func TestAdminService_CreateUser(t *testing.T) {
 ```
 
 ### Notes Backend/GraphQL
-- Les mutations d'authentification exposent `signUp(input: SignUpInput!): User!`.
-- L’input `SignUpInput` ne contient pas de `role`. Le formulaire d’inscription front envoie 
-  `firstName, lastName, email, phone, password` (sans role).
-  En cas d’erreur "Unknown field 'role'", mettre à jour le front pour retirer ce champ des variables/mutations.
+- Les mutations d'authentification exposent `signUp(input: SignUpInput!): UserLogged!` et `login(email: String!, password: String!): UserLogged!`
+- L'input `SignUpInput` contient: `firstName, lastName, email, phone, password` (pas de role)
+- La query `me` retourne un type `SignedUser` (utilisé dans AuthContext)
+- En cas d'erreur "Unknown field 'role'" dans signup, vérifier que le front n'envoie pas ce champ dans les variables de mutation
+- Le type `User` vs `SignedUser`: utiliser `SignedUser` pour l'authentification, `User` pour les opérations CRUD
 
 ### GraphQL Codegen
 

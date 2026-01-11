@@ -4,7 +4,7 @@ import { useFragment, useQuery, useSuspenseQuery } from "@apollo/client/react";
 import { MeDocument, Role, SignedUser, User } from "@/generated/graphql";
 
 interface AuthContextType {
-  user: User | undefined;
+  user: SignedUser | undefined;
   hasRole: (roles: Role | Role[]) => boolean;
   loading: boolean;
   isAdmin: boolean;
@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAdmin: user?.role === Role.Admin,
     isManager: user?.role === Role.Manager || user?.role === Role.Admin,
   };
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={ value }> { children } </AuthContext.Provider>;
 }
 
 export function useAuth() {
