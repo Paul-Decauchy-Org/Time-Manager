@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useContext, ReactNode } from "react";
 import { useFragment, useQuery, useSuspenseQuery } from "@apollo/client/react";
-import { MeDocument, Role, User } from "@/generated/graphql";
+import { MeDocument, Role, SignedUser, User } from "@/generated/graphql";
 
 interface AuthContextType {
   user: User | undefined;
@@ -20,7 +20,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     errorPolicy: "ignore",
   });
 
-  const user = data?.me as User;
+  const user = data?.me as User | undefined;
 
   const hasRole = (roles: Role | Role[]): boolean => {
     if (!user) return false;
