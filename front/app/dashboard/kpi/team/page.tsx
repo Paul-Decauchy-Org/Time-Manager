@@ -129,12 +129,12 @@ function computeTeamDerived(entries: any[]) {
   const dailyArr = buildDailyArray(dailyTotals);
   const topLateName = Object.keys(lateByUser).length
     ? (() => {
-        const topId = Object.entries(lateByUser).sort(
-          (a, b) => b[1] - a[1],
-        )[0][0];
-        const sample = entries.find((x: any) => x.user?.id === topId)?.user;
-        return sample ? `${sample.firstName} ${sample.lastName}` : "-";
-      })()
+      const topId = Object.entries(lateByUser).sort(
+        (a, b) => b[1] - a[1],
+      )[0][0];
+      const sample = entries.find((x: any) => x.user?.id === topId)?.user;
+      return sample ? `${sample.firstName} ${sample.lastName}` : "-";
+    })()
     : "-";
   return { latenessRate, topLateName, dailyArr, heatCells };
 }
@@ -330,19 +330,19 @@ export default function TeamKpiPage() {
           null,
           ...(teamsToShow.length === 0
             ? [
-                React.createElement(
-                  SelectItem as any,
-                  { key: "none", value: "no-teams", disabled: true },
-                  "Aucune équipe",
-                ),
-              ]
+              React.createElement(
+                SelectItem as any,
+                { key: "none", value: "no-teams", disabled: true },
+                "Aucune équipe",
+              ),
+            ]
             : teamsToShow.map((t) =>
-                React.createElement(
-                  SelectItem as any,
-                  { key: t.id, value: t.id },
-                  t.name,
-                ),
-              )),
+              React.createElement(
+                SelectItem as any,
+                { key: t.id, value: t.id },
+                t.name,
+              ),
+            )),
         ),
       ),
       ...PRESETS.map((p) =>
@@ -379,8 +379,8 @@ export default function TeamKpiPage() {
       label: "Moyenne / user",
       value: summary
         ? formatMinutes(
-            Math.round(Number(summary.avgWorkedMinutesPerUser || 0)),
-          )
+          Math.round(Number(summary.avgWorkedMinutesPerUser || 0)),
+        )
         : "-",
     },
     {
@@ -581,10 +581,10 @@ export default function TeamKpiPage() {
     heatmap,
     status
       ? React.createElement(
-          "div",
-          { className: "px-6 py-3 text-destructive" },
-          status,
-        )
+        "div",
+        { className: "px-6 py-3 text-destructive" },
+        status,
+      )
       : null,
   );
 }
