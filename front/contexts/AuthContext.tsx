@@ -1,10 +1,10 @@
 "use client";
 import { createContext, useContext, ReactNode } from "react";
 import { useFragment, useQuery, useSuspenseQuery } from "@apollo/client/react";
-import { MeDocument, Role, User } from "@/generated/graphql";
+import { MeDocument, Role, SignedUser } from "@/generated/graphql";
 
 interface AuthContextType {
-  user: User | undefined;
+  user: SignedUser | undefined;
   hasRole: (roles: Role | Role[]) => boolean;
   loading: boolean;
   isAdmin: boolean;
