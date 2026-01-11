@@ -50,47 +50,33 @@ export function ClockOut({
     return () => globalThis.removeEventListener("keydown", onKey);
   }, [disabled, loading]);
 
-  return (
-    <div className={cn("@container/card", className)} {...props}>
-      <Card className="relative overflow-hidden">
-        <CardHeader className="pb-0">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <SquarePower className="size-5 text-rose-500" />
-            Finir ma journée
-          </CardTitle>
-          <CardDescription>
-            {" "}
-            Enregistrez votre départ en un clic.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-4">
-          <Field>
-            {(() => {
-              let label = "Finir ma journée (ALT+O)";
-              if (loading) label = "Pointage en cours…";
-              else if (disabled) label = "Déjà clôturé aujourd'hui";
-              return (
-                <Button
-                  onClick={handleClockOut}
-                  disabled={disabled || loading}
-                  className="w-full bg-gradient-to-r from-red-500 to-pink-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
-                >
-                  {label}
-                </Button>
-              );
-            })()}
-            {error && (
-              <FieldError className="mt-2">
-                {" "}
-                Impossible de clôturer.Réessayez.
-              </FieldError>
-            )}
-            <FieldDescription className="mt-1">
-              {" "}
-              Raccourci: Alt + O{" "}
-            </FieldDescription>
-          </Field>
-          <div className="pointer-events-none absolute inset-0 -z-10 opacity-50 [background:radial-gradient(500px_200px_at_bottom_right,theme(colors.rose/20),transparent_60%)]" />
+    return (
+        <div className= { cn("@container/card", className) } {...props }>
+            <Card className="relative overflow-hidden" >
+                <CardHeader className="pb-0" >
+                    <CardTitle className="flex items-center gap-2 text-base" >
+                        <SquarePower className="size-5 text-rose-500" />
+                            Finir ma journée
+                                </CardTitle>
+                                < CardDescription > Enregistrez votre départ et terminez votre session.</CardDescription>
+                                    </CardHeader>
+                                    < CardContent className = "pt-4" >
+                                        <Field role="field">
+                                        {(() => {
+                                            let label = "Finir ma journée (ALT+O)"
+                                            if (loading) label = "Pointage en cours…"
+                                            else if (disabled) label = "Déjà clôturé aujourd'hui"
+                                            return (
+                                                <Button onClick= { handleClockOut } role = 'clockout' disabled = { disabled || loading
+                                        } className = "w-full bg-gradient-to-r from-red-500 to-pink-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300" >
+                                        { label }
+                                        </Button>
+                                        )
+}) ()}
+{ error && <FieldError className="mt-2" > Impossible de clôturer.Réessayez.</FieldError> }
+<FieldDescription className="mt-1" > Raccourci: Alt + O </FieldDescription>
+    </Field>
+    < div className = "pointer-events-none absolute inset-0 -z-10 opacity-50 [background:radial-gradient(500px_200px_at_bottom_right,theme(colors.rose/20),transparent_60%)]" />
         </CardContent>
       </Card>
     </div>

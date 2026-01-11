@@ -2,11 +2,13 @@
  * @jest-environment jsdom
  */
 
-import "@testing-library/jest-dom";
-import { ClockIn } from "@/components/clock-in";
-import { gql } from "@apollo/client";
-import { MockedProvider } from "@apollo/client/testing/react";
-import { render } from "@testing-library/react";
+import '@testing-library/jest-dom' 
+import { ClockIn } from '@/components/clock-in';
+import { gql } from '@apollo/client';
+import { MockedProvider } from '@apollo/client/testing/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { access } from 'fs';
+import { act } from 'react';
 
 jest.mock("next/navigation", () => ({
   useRouter() {
@@ -17,17 +19,15 @@ jest.mock("next/navigation", () => ({
   },
 }));
 
-describe("clockin", () => {
-  const clockIn = {
-    id: "1",
-    arrival: "10:10",
-    departure: "12:00",
-    status: "unfinished",
-  };
-  const mocks = [
-    {
-      request: {
-        query: gql`mutation clockIn {
+describe('clockin', ()=> {
+    beforeEach(() => {
+    jest.resetAllMocks()
+   })
+    const clockIn = { id : '1', arrival : '10:10', departure :'12:00', status : 'unfinished' }
+    const mocks = [
+        {
+            request :{
+                query:gql`mutation clockIn {
   clockIn {
     id
     arrival
@@ -35,18 +35,30 @@ describe("clockin", () => {
     status
   }
 }`,
-        results: {
-          data: clockIn,
-        },
-      },
-    },
-  ];
-  it("should render clockin", () => {
-    const container = render(
-      <MockedProvider mocks={mocks}>
-        <ClockIn />
-      </MockedProvider>,
-    );
-    expect(container).toBeDefined();
-  });
-});
+    results: {
+        data: clockIn
+    }
+
+            }
+        }
+    ]
+    it('should render clockin', () => {
+        const container = render(
+            <MockedProvider mocks={mocks}>
+                <ClockIn/>
+            </MockedProvider>
+        )
+        expect(container).toBeDefined()
+    })
+    it('should be able to clock', () => {
+        render(
+            <MockedProvider mocks={mocks}>
+                <ClockIn/>
+            </MockedProvider>
+        )
+        act(() => {
+        fireEvent.click(screen.getByRole('clockin'))
+        })
+        expect(screen.getByRole('field')).toHaveTextContent('Pointage en cours…Raccourci: Alt + I')
+    })
+})

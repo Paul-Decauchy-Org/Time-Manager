@@ -18,19 +18,15 @@ jest.mock("next/navigation", () => ({
     };
   },
 }));
-describe("LoginForm", () => {
-  const UserLogged = {
-    firstName: "user",
-    lastName: "test",
-    email: "user@test.fr",
-    phone: "111",
-    role: "t",
-    token: "jijon",
-  };
-  const mocks = [
-    {
-      request: {
-        query: gql`
+describe('LoginForm', () =>{
+  beforeEach(() => {
+    jest.resetAllMocks()
+   })
+    const UserLogged = { firstName: 'user', lastName: 'test', email : 'user@test.fr', phone: '111',role: 't', token:'jijon' }
+    const mocks = [ 
+        {
+    request: {
+      query: gql`
       mutation login($email: String!,$password: String!) {
         login(email: $email, password: $password) {
     token

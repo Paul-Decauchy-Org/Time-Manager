@@ -271,32 +271,32 @@ export function SignupForm({
                 </Field>
               </div>
 
-              {passwordError ? (
-                <FieldDescription className="text-destructive text-xs flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {passwordError}
-                </FieldDescription>
-              ) : (
-                <FieldDescription className="text-xs text-muted-foreground">
-                  Le mot de passe doit contenir au moins 8 caractères
-                </FieldDescription>
-              )}
-              <Button
-                role="submit"
-                type="submit"
-                disabled={!isFormValid || loading}
-                className="w-full h-11 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
-              >
-                {loading ? (
-                  <>
-                    <Sparkles className="mr-2 h-4 w-4 animate-spin" />
-                    Creating account...
-                  </>
-                ) : (
-                  "Create Account"
-                )}
-              </Button>
-            </FieldGroup>
+{
+    passwordError ? (
+        <FieldDescription role="alert" className= "text-destructive text-xs flex items-center gap-1" >
+        <AlertCircle className="h-3 w-3" />
+            { passwordError }
+            </FieldDescription>
+                            ) : (
+        <FieldDescription className= "text-xs text-muted-foreground"  >
+        Le mot de passe doit contenir au moins 8 caractères
+            </FieldDescription>
+                            )
+}
+<Button role="submit" type="submit" disabled = { !isFormValid || loading } className = "w-full h-11 text-base font-semibold shadow-lg hover:shadow-xl transition-all" >
+{
+    loading?(
+                                    <>
+    <Sparkles className="mr-2 h-4 w-4 animate-spin" />
+        Creating account...
+</>
+                                ) : (
+    "Create Account"
+)
+}
+</Button>
+    </FieldGroup>
+
 
             <div className="mt-4 text-center">
               <p className="text-sm text-muted-foreground">
