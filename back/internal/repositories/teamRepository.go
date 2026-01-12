@@ -125,6 +125,14 @@ func (r *Repository) GetTeams() ([]*model.Team, error) {
 	return teamMapper.DBTeamsToGraph(teams), nil
 }
 
+func (r *Repository) GetTeamByUUID(teamID uuid.UUID) (*model.Team, error) {
+	var existingTeam *dbmodels.Team
+	if err := r.DB.Preload("Manager").Where(whereIDs, teamID).First(&existingTeam).Error; err != nil {
+		return nil, teamNotFoundErrors
+	}
+	return teamMapper.DBTeamToGraph(existingTeam), nil
+}
+
 func (r *Repository) AddUserToTeam(id string, teamID string) (*model.TeamUser, error) {
 	userID, ok := uuid.Parse(id)
 	if ok != nil {

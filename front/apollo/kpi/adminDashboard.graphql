@@ -1,0 +1,107 @@
+query AdminKpiDashboard($from: Date, $to: Date) {
+  adminKpiDashboard(from: $from, to: $to) {
+    period {
+      from
+      to
+    }
+    summary {
+      totalUsers
+      activeUsers
+      totalTeams
+      totalWorkedHours
+      avgHoursPerUser
+      complianceRate
+    }
+    workload {
+      avgDailyMinutes
+      avgWeeklyMinutes
+      peakDayMinutes
+      peakDay
+      distributionByDay {
+        day
+        avgMinutes
+        totalMinutes
+      }
+      totalOvertime
+      usersWithOvertime
+    }
+    punctuality {
+      onTimeRate
+      lateRate
+      avgLateMinutes
+      totalLateIncidents
+      punctualUsers
+      lateUsers
+      trendByWeek {
+        weekStart
+        onTimeRate
+        avgLateMinutes
+      }
+    }
+    overtime {
+      totalOvertimeMinutes
+      avgOvertimePerUser
+      usersWithOvertime
+      topOvertimeUsers {
+        userID
+        userName
+        overtimeMinutes
+        daysWorked
+      }
+      overtimeByWeek {
+        periodStart
+        totalMinutes
+        usersCount
+      }
+    }
+    compliance {
+      missingEntriesCount
+      incompleteEntriesCount
+      anomaliesCount
+      complianceRate
+      usersWithIssues
+      anomalies {
+        type
+        count
+        severity
+        affectedUsers
+      }
+    }
+    productivity {
+      avgEfficiencyRate
+      totalProductiveHours
+      avgHoursPerUser
+      topPerformers {
+        userID
+        userName
+        efficiencyRate
+        totalHours
+      }
+      productivityTrend {
+        date
+        avgEfficiency
+        totalHours
+      }
+    }
+    teams {
+      teamID
+      teamName
+      memberCount
+      totalWorkedMinutes
+      avgMinutesPerMember
+      activeNow
+      topContributors {
+        userID
+        userName
+        workedMinutes
+        daysPresent
+        overtimeMinutes
+      }
+      workloadDistribution {
+        range
+        userCount
+        percentage
+      }
+    }
+  }
+}

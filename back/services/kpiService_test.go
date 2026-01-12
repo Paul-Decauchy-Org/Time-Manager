@@ -16,6 +16,16 @@ type mockKpiRepo struct {
 	err     error
 }
 
+// GetTeamByUUID implements KpiRepository.
+func (m *mockKpiRepo) GetTeamByUUID(teamID uuid.UUID) (*model.Team, error) {
+	panic("unimplemented")
+}
+
+// GetTeams implements KpiRepository.
+func (m *mockKpiRepo) GetTeams() ([]*model.Team, error) {
+	panic("unimplemented")
+}
+
 var layoutISOs = "2024-01-10"
 var dater = "2024-01-01"
 

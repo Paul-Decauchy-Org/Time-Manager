@@ -2,27 +2,17 @@
 
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { AreaChart, Area, XAxis, CartesianGrid } from "recharts";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import {
-  KpiTeamSummaryDocument,
-  TeamsDocument,
-  AllUsersDocument,
-} from "@/generated/graphql";
+import { AdminKpiDashboardDocument } from "@/generated/graphql";
 import { print } from "graphql";
-import {
-  Users,
-  UsersRound,
-  UserCog,
-  Shield,
-  CalendarRange,
-  LineChart,
-} from "lucide-react";
-import KPICSV from "@/components/kpiCSV";
+import { Download, Users, UsersRound, Clock, CheckCircle } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { StatCard } from "@/components/dashboard/StatCard";
+import { OverviewTab } from "@/components/dashboard/admin/OverviewTab";
+import { WorkloadTab } from "@/components/dashboard/admin/WorkloadTab";
+import { PunctualityTab } from "@/components/dashboard/admin/PunctualityTab";
+import { OvertimeTab } from "@/components/dashboard/admin/OvertimeTab";
+import { TeamsTab } from "@/components/dashboard/admin/TeamsTab";
+import { generateCSVReport, downloadCSV } from "@/lib/csv-export";
 
 function rangeFromPreset(preset: string): { from: string; to: string } {
   const toDate = new Date();
@@ -43,412 +33,205 @@ const PRESET_LABELS: Record<Preset, string> = {
   "90d": "90 jours",
 };
 
-function mergeCoverage(arrays: Array<Array<{ time: string; count: number }>>) {
-  const map = new Map<string, number>();
-  for (const a of arrays) {
-    for (const { time, count } of a) {
-      map.set(time, (map.get(time) || 0) + Number(count));
-    }
-  }
-  return Array.from(map.entries())
-    .map(([time, count]) => ({ time, count }))
-    .sort((x, y) => x.time.localeCompare(y.time));
-}
-
-const COLORS: Record<
-  string,
-  { bg: string; iconBg: string; icon: string; value: string }
-> = {
-  violet: {
-    bg: "bg-violet-50",
-    iconBg: "bg-violet-100",
-    icon: "text-violet-600",
-    value: "text-violet-700",
-  },
-  blue: {
-    bg: "bg-blue-50",
-    iconBg: "bg-blue-100",
-    icon: "text-blue-600",
-    value: "text-blue-700",
-  },
-  emerald: {
-    bg: "bg-emerald-50",
-    iconBg: "bg-emerald-100",
-    icon: "text-emerald-600",
-    value: "text-emerald-700",
-  },
-  rose: {
-    bg: "bg-rose-50",
-    iconBg: "bg-rose-100",
-    icon: "text-rose-600",
-    value: "text-rose-700",
-  },
-  slate: {
-    bg: "bg-slate-50",
-    iconBg: "bg-slate-100",
-    icon: "text-slate-600",
-    value: "text-slate-700",
-  },
-  amber: {
-    bg: "bg-amber-50",
-    iconBg: "bg-amber-100",
-    icon: "text-amber-600",
-    value: "text-amber-700",
-  },
-};
-
-function StatCard(
-  IconComp: any,
-  label: string,
-  value: string | number,
-  colorKey: keyof typeof COLORS,
-) {
-  const c = COLORS[colorKey];
-  return React.createElement(
-    "div",
-    { className: `rounded-xl border p-4 shadow-sm bg-muted` },
-    React.createElement(
-      "div",
-      { className: "flex items-center justify-between" },
-      React.createElement(
-        "div",
-        { className: "flex items-center gap-3" },
-        React.createElement(
-          "div",
-          {
-            className: `h-9 w-9 rounded-full flex items-center justify-center ${c.iconBg}`,
-          },
-          React.createElement(IconComp, { className: `h-5 w-5 ${c.icon}` }),
-        ),
-        React.createElement(
-          "div",
-          null,
-          React.createElement(
-            "div",
-            { className: "text-sm text-muted-foreground" },
-            label,
-          ),
-          React.createElement(
-            "div",
-            { className: `text-2xl font-semibold leading-tight ${c.value}` },
-            String(value),
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
 export default function AdminKpiPage() {
-  const csv = KPICSV()
-  const { user, isManager } = useAuth();
-
-  const [preset, setPreset] = useState<string>("30d");
+  const { user } = useAuth();
+  const [preset, setPreset] = useState<Preset>("30d");
   const { from, to } = rangeFromPreset(preset);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [usersCount, setUsersCount] = useState<number>(0);
-  const [teamsCount, setTeamsCount] = useState<number>(0);
-  const [managersCount, setManagersCount] = useState<number>(0);
-  const [adminsCount, setAdminsCount] = useState<number>(0);
-  const [basicUsersCount, setBasicUsersCount] = useState<number>(0);
-  const [coverage, setCoverage] = useState<
-    Array<{ time: string; count: number }>
-  >([]);
-  const [teams, setTeams] = useState<any[]>([]);
+  const [data, setData] = useState<any>(null);
 
-  // Load base counts and teams
   useEffect(() => {
     let cancelled = false;
-    async function run() {
+
+    async function fetchData() {
       setLoading(true);
       setError(null);
+
       try {
         const endpoint = process.env.NEXT_PUBLIC_SCHEMA_URL as string;
-        const qUsers = print(AllUsersDocument as any);
-        const qTeams = print(TeamsDocument as any);
-        const [ru, rt] = await Promise.all([
-          fetch(endpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ query: qUsers }),
+        const query = print(AdminKpiDashboardDocument as any);
+
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            query,
+            variables: { from, to },
           }),
-          fetch(endpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ query: qTeams }),
-          }),
-        ]);
-        const ju = await ru.json();
-        const jt = await rt.json();
-        const allUsers: any[] = ju?.data?.UsersWithAllData ?? [];
-        const allTeams: any[] = jt?.data?.teams ?? [];
-        const filtered = allTeams.filter(
-          (t) => !isManager || t.managerID?.id === user?.id,
-        );
+        });
+
+        const result = await response.json();
+
         if (!cancelled) {
-          setUsersCount(allUsers.length);
-          setTeamsCount(filtered.length);
-          setTeams(filtered);
-          const mgr = allUsers.filter((u) => u.role === "MANAGER").length;
-          const adm = allUsers.filter((u) => u.role === "ADMIN").length;
-          const basic = allUsers.filter((u) => u.role === "USER").length;
-          setManagersCount(mgr);
-          setAdminsCount(adm);
-          setBasicUsersCount(basic);
+          if (result.errors) {
+            setError(result.errors[0]?.message || "Erreur GraphQL");
+          } else {
+            setData(result.data?.adminKpiDashboard);
+          }
         }
       } catch (e: any) {
-        if (!cancelled) setError(String(e.message ?? e));
+        if (!cancelled) {
+          setError(e.message || "Erreur de chargement");
+        }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
-    run();
+
+    fetchData();
+
     return () => {
       cancelled = true;
     };
-  }, [user?.id, isManager]);
+  }, [from, to]);
 
-  // Load merged coverage for selected period
-  useEffect(() => {
-    let cancelled = false;
-    async function teamCoverage(
-      endpoint: string,
-      kpiQuery: string,
-      teamID: string,
-      from: string,
-      to: string,
-    ) {
-      const r = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          query: kpiQuery,
-          variables: { teamID, from, to },
-        }),
-      });
-      const j = await r.json();
-      const arr = j?.data?.kpiTeamSummary?.coverage ?? [];
-      return arr.map((c: any) => ({
-        time: String(c.time),
-        count: Number(c.count),
-      }));
-    }
-    async function run() {
-      if (!teams.length) {
-        setCoverage([]);
-        return;
-      }
-      try {
-        const endpoint = process.env.NEXT_PUBLIC_SCHEMA_URL as string;
-        const kpiQuery = print(KpiTeamSummaryDocument as any);
-        const results = await Promise.all(
-          teams.map((t) => teamCoverage(endpoint, kpiQuery, t.id, from, to)),
-        );
-        if (!cancelled) setCoverage(mergeCoverage(results));
-      } catch (e: any) {
-        if (!cancelled) setError(String(e.message ?? e));
-      }
-    }
-    run();
-    return () => {
-      cancelled = true;
-    };
-  }, [teams, from, to]);
+  if (loading) {
+    return (
+      <div className= "flex items-center justify-center min-h-screen" >
+      <div className="text-lg" > Chargement des KPIs...</div>
+        </div>
+    );
+  }
 
-  const fmtTick = (t: string) => {
-    // t is ISO; show compact local date
-    try {
-      const d = new Date(t);
-      return `${d.getDate().toString().padStart(2, "0")}/${(d.getMonth() + 1).toString().padStart(2, "0")}`;
-    } catch {
-      return t;
-    }
+  if (error) {
+    return (
+      <div className= "flex items-center justify-center min-h-screen" >
+      <div className="text-destructive" > Erreur: { error } </div>
+        </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className= "flex items-center justify-center min-h-screen" >
+      <div className="text-muted-foreground" > Aucune donnée disponible </div>
+        </div>
+    );
+  }
+
+  const summary = data.summary || {};
+  const workload = data.workload || {};
+  const punctuality = data.punctuality || {};
+  const overtime = data.overtime || {};
+  const compliance = data.compliance || {};
+  const productivity = data.productivity || {};
+  const teams = data.teams || [];
+
+  const handleExportCSV = () => {
+    if (!data) return;
+    const csvContent = generateCSVReport(data, from, to);
+    const filename = `kpi-admin-${from}-${to}.csv`;
+    downloadCSV(csvContent, filename);
   };
 
-  let status: string | null = null;
-  if (loading) status = "Chargement...";
-  else if (error) status = `Erreur: ${error}`;
-
-  return React.createElement(
-    "div",
-    null,
-    React.createElement(
-      "div",
-      { className: "p-6" },
-      React.createElement(
-        "div",
-        { className: "flex items-center justify-between mb-4" },
-        React.createElement(
-          "div",
-          { className: "text-2xl font-semibold" },
-          "KPIs Admin",
-        ),
-        React.createElement(
-          "div",
-          { className: "hidden md:flex items-center gap-2" },
-          ...PRESETS.map((p) =>
-            React.createElement(
-              "button",
-              {
-                key: p,
-                className: `h-8 rounded-md border px-3 text-sm ${preset === p ? "bg-accent" : "hover:bg-accent/60"}`,
-                onClick: () => setPreset(p),
-              },
-              PRESET_LABELS[p],
-            ),
-          ),
-        ),
-      ),
-      React.createElement(
-        "div",
-        { className: "grid gap-4 grid-cols-1 md:grid-cols-3 mb-6" },
-        StatCard(Users, "Utilisateurs", usersCount, "violet"),
-        StatCard(UsersRound, "Equipes (portée)", teamsCount, "blue"),
-        (function () {
-          const PeriodIcon = CalendarRange;
-          return React.createElement(
-            "div",
-            { className: `rounded-xl border p-4 shadow-sm bg-muted` },
-            React.createElement(
-              "div",
-              { className: "flex items-center gap-3" },
-              React.createElement(
-                "div",
-                {
-                  className: `h-9 w-9 rounded-full flex items-center justify-center ${COLORS.slate.iconBg}`,
-                },
-                React.createElement(PeriodIcon, {
-                  className: `h-5 w-5 ${COLORS.slate.icon}`,
-                }),
-              ),
-              React.createElement(
-                "div",
-                null,
-                React.createElement(
-                  "div",
-                  { className: "text-sm text-muted-foreground" },
-                  "Periode",
-                ),
-                React.createElement(
-                  "div",
-                  { className: `text-base font-medium ${COLORS.slate.value}` },
-                  `${from} - ${to}`,
-                ),
-              ),
-            ),
-          );
-        })(),
-      ),
-      React.createElement(
-        "div",
-        { className: "grid gap-4 grid-cols-1 md:grid-cols-4 mb-6" },
-        StatCard(UserCog, "Managers", managersCount, "emerald"),
-        StatCard(Shield, "Admins", adminsCount, "rose"),
-        StatCard(Users, "Users", basicUsersCount, "blue"),
-        FullDiv({ children: csv })
-      ),
-      React.createElement(
-        "div",
-        { className: "rounded-xl border p-4 shadow-sm mb-6 bg-muted" },
-        React.createElement(
-          "div",
-          { className: "flex items-center gap-2 text-lg font-semibold mb-2" },
-          React.createElement(LineChart, {
-            className: "h-5 w-5 text-muted-foreground",
-          }),
-          "Couverture globale (somme des equipes)",
-        ),
-        React.createElement(
-          ChartContainer as any,
-          {
-            config: { count: { label: "Presence", color: "var(--primary)" } },
-            className: "aspect-auto h-[260px] w-full",
-          },
-          coverage.length === 0
-            ? React.createElement(
-              "div",
-              {
-                className:
-                  "flex h-full items-center justify-center text-sm text-muted-foreground",
-              },
-              "Aucune donnée sur la période sélectionnée",
-            )
-            : React.createElement(
-              AreaChart as any,
-              { data: coverage },
-              React.createElement(
-                "defs",
-                null,
-                React.createElement(
-                  "linearGradient",
-                  {
-                    id: "fillAdminCount",
-                    x1: "0",
-                    y1: "0",
-                    x2: "0",
-                    y2: "1",
-                  },
-                  React.createElement("stop", {
-                    offset: "5%",
-                    stopColor: "var(--color-count)",
-                    stopOpacity: 0.8,
-                  }),
-                  React.createElement("stop", {
-                    offset: "95%",
-                    stopColor: "var(--color-count)",
-                    stopOpacity: 0.1,
-                  }),
-                ),
-              ),
-              React.createElement(CartesianGrid as any, { vertical: false }),
-              React.createElement(XAxis as any, {
-                dataKey: "time",
-                tickLine: false,
-                axisLine: false,
-                tickMargin: 8,
-                minTickGap: 16,
-                tickFormatter: fmtTick,
-              }),
-              React.createElement(ChartTooltip as any, {
-                cursor: false,
-                content: React.createElement(ChartTooltipContent as any, {
-                  indicator: "dot",
-                }),
-              }),
-              React.createElement(Area as any, {
-                dataKey: "count",
-                type: "natural",
-                fill: "url(#fillAdminCount)",
-                stroke: "var(--color-count)",
-              }),
-            ),
-        ),
-      ),
-      status
-        ? React.createElement(
-          "div",
-          { className: "pt-3 text-destructive" },
-          status,
-        )
-        : null,
-    ),
-  );
-}
-
-type FullDivProps = React.PropsWithChildren<{}>
-
-export function FullDiv({ children }: FullDivProps) {
   return (
-    <div className="flex justify-center text-center items-center rounded-xl border shadow-sm bg-muted">
-      <div className="h-1/2 w-2/3">
-        {children}
-      </div>
+    <div className= "p-6 space-y-6" >
+    {/* Header */ }
+    < div className = "flex items-center justify-between" >
+      <div>
+      <h1 className="text-3xl font-bold" > Tableau de Bord Administrateur </h1>
+        < p className = "text-muted-foreground" >
+          Vue d'ensemble des KPIs du {from} au {to}
+            </p>
+            </div>
+            < div className = "flex items-center gap-2" >
+              <button
+            onClick={ handleExportCSV }
+  className = "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors"
+    >
+    <Download className="h-4 w-4" />
+      Télécharger KPI
+        </button>
+  {
+    PRESETS.map((p) => (
+      <button
+              key= { p }
+              onClick = {() => setPreset(p)}
+  className = {`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${preset === p
+      ? "bg-primary text-primary-foreground"
+      : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+    }`
+}
+            >
+  { PRESET_LABELS[p]}
+  </button>
+          ))}
+</div>
+  </div>
 
+{/* Summary Cards */ }
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" >
+  <StatCard
+          icon={ Users }
+label = "Utilisateurs Totaux"
+value = { summary.totalUsers || 0 }
+subtitle = {`${summary.activeUsers || 0} actifs maintenant`}
+        />
+  < StatCard
+icon = { UsersRound }
+label = "Équipes"
+value = { summary.totalTeams || 0 }
+  />
+  <StatCard
+          icon={ Clock }
+label = "Heures Travaillées"
+value = {`${summary.totalWorkedHours || 0}h`}
+subtitle = {`${(summary.avgHoursPerUser || 0).toFixed(1)}h/utilisateur`}
+        />
+  < StatCard
+icon = { CheckCircle }
+label = "Taux de Conformité"
+value = {`${((summary.complianceRate || 0) * 100).toFixed(1)}%`}
+color = "success"
+  />
+  </div>
+
+{/* Tabs for different sections */ }
+<Tabs defaultValue="overview" className = "space-y-4" >
+  <TabsList className="grid w-full grid-cols-5" >
+    <TabsTrigger value="overview" > Vue d'ensemble</TabsTrigger>
+      < TabsTrigger value = "workload" > Charge de Travail </TabsTrigger>
+        < TabsTrigger value = "punctuality" > Ponctualité </TabsTrigger>
+          < TabsTrigger value = "overtime" > Heures Sup </TabsTrigger>
+            < TabsTrigger value = "teams" > Équipes </TabsTrigger>
+              </TabsList>
+
+{/* Overview Tab */ }
+<TabsContent value="overview" className = "space-y-4" >
+  <OverviewTab
+            summary={ summary }
+workload = { workload }
+punctuality = { punctuality }
+overtime = { overtime }
+compliance = { compliance }
+productivity = { productivity }
+  />
+  </TabsContent>
+
+{/* Workload Tab */ }
+<TabsContent value="workload" className = "space-y-4" >
+  <WorkloadTab workload={ workload } />
+    </TabsContent>
+
+{/* Punctuality Tab */ }
+<TabsContent value="punctuality" className = "space-y-4" >
+  <PunctualityTab punctuality={ punctuality } />
+    </TabsContent>
+
+{/* Overtime Tab */ }
+<TabsContent value="overtime" className = "space-y-4" >
+  <OvertimeTab overtime={ overtime } />
+    </TabsContent>
+
+{/* Teams Tab */ }
+<TabsContent value="teams" className = "space-y-4" >
+  <TeamsTab teams={ teams } />
+    </TabsContent>
+    </Tabs>
     </div>
-  )
+  );
 }

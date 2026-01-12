@@ -1,24 +1,38 @@
 package timeTableEntriesMapper
 
 import (
+	"log"
+	"time"
+
 	"github.com/epitech/timemanager/internal/graph/model"
 	gmodel "github.com/epitech/timemanager/internal/models"
 	"github.com/google/uuid"
-	"log"
-	"time"
 )
 
 func DBTimeTableEntryToGraph(e *gmodel.TimeTableEntry) *model.TimeTableEntry {
 	if e == nil {
 		return nil
 	}
+
+	// Build User object with loaded data if available
+	user := &model.User{
+		ID: e.UserID.String(),
+	}
+
+	// If User relation was preloaded, include the names
+	if e.User != nil {
+		user.FirstName = e.User.FirstName
+		user.LastName = e.User.LastName
+		user.Email = e.User.Email
+	}
+
 	return &model.TimeTableEntry{
 		ID:        e.ID.String(),
 		Day:       e.Day,
 		Arrival:   e.Arrival,
 		Departure: &e.Departure,
 		Status:    e.Status,
-		UserID:    &model.User{ID: e.UserID.String()},
+		UserID:    user,
 	}
 }
 

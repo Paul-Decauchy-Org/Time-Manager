@@ -15,6 +15,42 @@ type AddUsersToTeamInput struct {
 	TeamID  string   `json:"teamID"`
 }
 
+type AdminKpiDashboard struct {
+	Period       *DateRange            `json:"period"`
+	Summary      *AdminKpiSummary      `json:"summary"`
+	Workload     *WorkloadAnalysis     `json:"workload"`
+	Punctuality  *PunctualityMetrics   `json:"punctuality"`
+	Overtime     *OvertimeReport       `json:"overtime"`
+	Compliance   *ComplianceMetrics    `json:"compliance"`
+	Productivity *ProductivityMetrics  `json:"productivity"`
+	Teams        []*TeamDetailedReport `json:"teams"`
+}
+
+type AdminKpiSummary struct {
+	TotalUsers       int32   `json:"totalUsers"`
+	ActiveUsers      int32   `json:"activeUsers"`
+	TotalTeams       int32   `json:"totalTeams"`
+	TotalWorkedHours int32   `json:"totalWorkedHours"`
+	AvgHoursPerUser  float64 `json:"avgHoursPerUser"`
+	ComplianceRate   float64 `json:"complianceRate"`
+}
+
+type ComplianceAnomaly struct {
+	Type          string `json:"type"`
+	Count         int32  `json:"count"`
+	Severity      string `json:"severity"`
+	AffectedUsers int32  `json:"affectedUsers"`
+}
+
+type ComplianceMetrics struct {
+	MissingEntriesCount    int32                `json:"missingEntriesCount"`
+	IncompleteEntriesCount int32                `json:"incompleteEntriesCount"`
+	AnomaliesCount         int32                `json:"anomaliesCount"`
+	ComplianceRate         float64              `json:"complianceRate"`
+	UsersWithIssues        int32                `json:"usersWithIssues"`
+	Anomalies              []*ComplianceAnomaly `json:"anomalies"`
+}
+
 type CoveragePoint struct {
 	Time  time.Time `json:"time"`
 	Count int32     `json:"count"`
@@ -47,12 +83,67 @@ type CreateUserInput struct {
 	Role      Role   `json:"role"`
 }
 
+type DateRange struct {
+	From string `json:"from"`
+	To   string `json:"to"`
+}
+
+type DayDistribution struct {
+	Day          string  `json:"day"`
+	AvgMinutes   float64 `json:"avgMinutes"`
+	TotalMinutes int32   `json:"totalMinutes"`
+}
+
 type KpiPoint struct {
 	Date    string `json:"date"`
 	Minutes int32  `json:"minutes"`
 }
 
 type Mutation struct {
+}
+
+type OvertimeByPeriod struct {
+	PeriodStart  string `json:"periodStart"`
+	TotalMinutes int32  `json:"totalMinutes"`
+	UsersCount   int32  `json:"usersCount"`
+}
+
+type OvertimeReport struct {
+	TotalOvertimeMinutes int32                 `json:"totalOvertimeMinutes"`
+	AvgOvertimePerUser   float64               `json:"avgOvertimePerUser"`
+	UsersWithOvertime    int32                 `json:"usersWithOvertime"`
+	TopOvertimeUsers     []*UserOvertimeDetail `json:"topOvertimeUsers"`
+	OvertimeByWeek       []*OvertimeByPeriod   `json:"overtimeByWeek"`
+}
+
+type ProductivityMetrics struct {
+	AvgEfficiencyRate    float64                   `json:"avgEfficiencyRate"`
+	TotalProductiveHours int32                     `json:"totalProductiveHours"`
+	AvgHoursPerUser      float64                   `json:"avgHoursPerUser"`
+	TopPerformers        []*UserProductivityDetail `json:"topPerformers"`
+	ProductivityTrend    []*ProductivityTrend      `json:"productivityTrend"`
+}
+
+type ProductivityTrend struct {
+	Date          string  `json:"date"`
+	AvgEfficiency float64 `json:"avgEfficiency"`
+	TotalHours    int32   `json:"totalHours"`
+}
+
+type PunctualityMetrics struct {
+	OnTimeRate         float64             `json:"onTimeRate"`
+	LateRate           float64             `json:"lateRate"`
+	AvgLateMinutes     float64             `json:"avgLateMinutes"`
+	TotalLateIncidents int32               `json:"totalLateIncidents"`
+	PunctualUsers      int32               `json:"punctualUsers"`
+	LateUsers          int32               `json:"lateUsers"`
+	TrendByWeek        []*PunctualityTrend `json:"trendByWeek"`
+}
+
+type PunctualityTrend struct {
+	WeekStart      string  `json:"weekStart"`
+	OnTimeRate     float64 `json:"onTimeRate"`
+	AvgLateMinutes float64 `json:"avgLateMinutes"`
 }
 
 type Query struct {
@@ -86,6 +177,17 @@ type Team struct {
 	Users       []*UserWithAllData `json:"users"`
 }
 
+type TeamDetailedReport struct {
+	TeamID               string                    `json:"teamID"`
+	TeamName             string                    `json:"teamName"`
+	MemberCount          int32                     `json:"memberCount"`
+	TotalWorkedMinutes   int32                     `json:"totalWorkedMinutes"`
+	AvgMinutesPerMember  float64                   `json:"avgMinutesPerMember"`
+	ActiveNow            int32                     `json:"activeNow"`
+	TopContributors      []*TeamMemberContribution `json:"topContributors"`
+	WorkloadDistribution []*WorkloadDistribution   `json:"workloadDistribution"`
+}
+
 type TeamKpiSummary struct {
 	From                    string           `json:"from"`
 	To                      string           `json:"to"`
@@ -94,6 +196,14 @@ type TeamKpiSummary struct {
 	AvgWorkedMinutesPerUser float64          `json:"avgWorkedMinutesPerUser"`
 	ActiveUsers             int32            `json:"activeUsers"`
 	Coverage                []*CoveragePoint `json:"coverage"`
+}
+
+type TeamMemberContribution struct {
+	UserID          string `json:"userID"`
+	UserName        string `json:"userName"`
+	WorkedMinutes   int32  `json:"workedMinutes"`
+	DaysPresent     int32  `json:"daysPresent"`
+	OvertimeMinutes int32  `json:"overtimeMinutes"`
 }
 
 type TeamUser struct {
@@ -182,6 +292,20 @@ type UserLogged struct {
 	Token     string `json:"token"`
 }
 
+type UserOvertimeDetail struct {
+	UserID          string `json:"userID"`
+	UserName        string `json:"userName"`
+	OvertimeMinutes int32  `json:"overtimeMinutes"`
+	DaysWorked      int32  `json:"daysWorked"`
+}
+
+type UserProductivityDetail struct {
+	UserID         string  `json:"userID"`
+	UserName       string  `json:"userName"`
+	EfficiencyRate float64 `json:"efficiencyRate"`
+	TotalHours     int32   `json:"totalHours"`
+}
+
 type UserWithAllData struct {
 	ID               string            `json:"id"`
 	FirstName        string            `json:"firstName"`
@@ -192,6 +316,22 @@ type UserWithAllData struct {
 	Role             Role              `json:"role"`
 	Teams            []*Team           `json:"teams"`
 	TimeTableEntries []*TimeTableEntry `json:"timeTableEntries"`
+}
+
+type WorkloadAnalysis struct {
+	AvgDailyMinutes   float64            `json:"avgDailyMinutes"`
+	AvgWeeklyMinutes  float64            `json:"avgWeeklyMinutes"`
+	PeakDayMinutes    int32              `json:"peakDayMinutes"`
+	PeakDay           string             `json:"peakDay"`
+	DistributionByDay []*DayDistribution `json:"distributionByDay"`
+	TotalOvertime     int32              `json:"totalOvertime"`
+	UsersWithOvertime int32              `json:"usersWithOvertime"`
+}
+
+type WorkloadDistribution struct {
+	Range      string  `json:"range"`
+	UserCount  int32   `json:"userCount"`
+	Percentage float64 `json:"percentage"`
 }
 
 type Role string

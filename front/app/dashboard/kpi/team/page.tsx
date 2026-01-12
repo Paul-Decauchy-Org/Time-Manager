@@ -279,315 +279,266 @@ export default function TeamKpiPage() {
     return t?.name || "";
   }, [teams, selectedTeamId]);
 
-  const header = React.createElement(
-    "div",
-    { className: "flex items-center justify-between gap-3 p-6" },
-    React.createElement(
-      "div",
-      null,
-      React.createElement(
-        "div",
-        { className: "text-2xl font-semibold" },
-        "KPIs Equipe",
-      ),
-      csv,
-      React.createElement(
-        "div",
-        { className: "text-muted-foreground text-sm" },
-        `Equipe: ${teamName || "-"}`,
-      ),
-      React.createElement(
-        "div",
-        { className: "text-muted-foreground text-sm" },
-        `Periode: ${from} - ${to}`,
-      ),
-    ),
-    React.createElement(
-      "div",
-      { className: "flex items-center gap-2" },
-      React.createElement(
-        Select as any,
-        {
-          value: selectedTeamId,
-          onValueChange: (id: string) => {
-            if (id === "no-teams") return;
-            setTeamID(id);
-          },
-        },
-        React.createElement(
-          SelectTrigger as any,
-          {
-            size: "sm",
-            className: "w-[280px]",
-            disabled: teamsToShow.length === 0,
-          },
-          React.createElement(SelectValue as any, {
-            placeholder:
-              teamsToShow.length === 0
-                ? "Aucune équipe"
-                : "Sélectionner une équipe",
-          }),
-        ),
-        React.createElement(
-          SelectContent as any,
-          null,
-          ...(teamsToShow.length === 0
-            ? [
-              React.createElement(
-                SelectItem as any,
-                { key: "none", value: "no-teams", disabled: true },
-                "Aucune équipe",
-              ),
-            ]
-            : teamsToShow.map((t) =>
-              React.createElement(
-                SelectItem as any,
-                { key: t.id, value: t.id },
-                t.name,
-              ),
-            )),
-        ),
-      ),
-      ...PRESETS.map((p) =>
-        React.createElement(
-          "button",
-          {
-            key: p,
-            className: `h-8 rounded-md border px-3 text-sm ${preset === p ? "bg-accent" : ""}`,
-            onClick: () => setPreset(p),
-          },
-          PRESET_LABELS[p],
-        ),
-      ),
-    ),
+  if (loading) {
+    return (
+      <div className= "flex items-center justify-center min-h-screen" >
+      <div className="text-lg" > Chargement des KPIs de l'équipe...</div>
+        </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className= "flex items-center justify-center min-h-screen" >
+      <div className="text-destructive" > Erreur: { error } </div>
+        </div>
+    );
+  }
+
+  return (
+    <div className= "p-6 space-y-6" >
+    {/* Header */ }
+    < div className = "flex items-center justify-between" >
+      <div>
+      <h1 className="text-3xl font-bold" > KPIs Équipe - Manager </h1>
+        < p className = "text-muted-foreground" > Équipe: { teamName || "-" } </p>
+          < p className = "text-muted-foreground text-sm" >
+            Période: { from } au { to }
+  </p>
+    </div>
+    < div className = "flex items-center gap-2" >
+      { csv }
+      < Select
+  value = { selectedTeamId }
+  onValueChange = {(id: string) => {
+    if (id === "no-teams") return;
+    setTeamID(id);
+  }
+}
+          >
+  <SelectTrigger
+              className="w-[280px]"
+disabled = { teamsToShow.length === 0 }
+  >
+  <SelectValue
+                placeholder={
+  teamsToShow.length === 0
+    ? "Aucune équipe"
+    : "Sélectionner une équipe"
+}
+              />
+  </SelectTrigger>
+  <SelectContent>
+{
+  teamsToShow.length === 0 ? (
+    <SelectItem value= "no-teams" disabled >
+      Aucune équipe
+        </SelectItem>
+              ) : (
+    teamsToShow.map((t) => (
+      <SelectItem key= { t.id } value = { t.id } >
+      { t.name }
+      </SelectItem>
+    ))
+              )
+}
+</SelectContent>
+  </Select>
+{
+  PRESETS.map((p) => (
+    <button
+              key= { p }
+              onClick = {() => setPreset(p)}
+className = {`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${preset === p
+    ? "bg-primary text-primary-foreground"
+    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+  }`}
+            >
+  { PRESET_LABELS[p]}
+  </button>
+          ))}
+</div>
+  </div>
+
+{/* Summary Cards */ }
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" >
+  <div className="rounded-xl border p-4 shadow-sm bg-card" >
+    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1" >
+      <Clock className="h-4 w-4" />
+        Total Heures Travaillées
+          </div>
+          < div className = "text-2xl font-bold" >
+            { summary? formatMinutes(Number(summary.totalWorkedMinutes)) : "-"}
+</div>
+  < p className = "text-xs text-muted-foreground mt-1" >
+    Toutes les heures badgées de l'équipe
+      </p>
+      </div>
+
+      < div className = "rounded-xl border p-4 shadow-sm bg-card" >
+        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1" >
+          <TrendingUp className="h-4 w-4" />
+            Moyenne par Utilisateur
+              </div>
+              < div className = "text-2xl font-bold" >
+              {
+                summary
+                ? formatMinutes(
+                  Math.round(Number(summary.avgWorkedMinutesPerUser || 0))
+                )
+              : "-"}
+                </div>
+                < p className = "text-xs text-muted-foreground mt-1" >
+                  Charge de travail moyenne par membre
+                    </p>
+                    </div>
+
+                    < div className = "rounded-xl border p-4 shadow-sm bg-card" >
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1" >
+                        <Users className="h-4 w-4" />
+                          Utilisateurs Actifs
+                            </div>
+                            < div className = "text-2xl font-bold" >
+                              { summary? String(Number(summary.activeUsers)) : "-"}
+</div>
+  < p className = "text-xs text-muted-foreground mt-1" >
+    Membres ayant badgé sur la période
+      </p>
+      </div>
+
+      < div className = "rounded-xl border p-4 shadow-sm bg-card" >
+        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1" >
+          <AlertTriangle className="h-4 w-4" />
+            Taux de Retard
+              </div>
+              < div className = "text-2xl font-bold" >
+                { Math.round(latenessRate * 100) } %
+                </div>
+                < p className = "text-xs text-muted-foreground mt-1" >
+                  Arrivées après 10h00(seuil de ponctualité)
+                    </p>
+                    </div>
+                    </div>
+
+{/* Top Late User */ }
+<div className="rounded-xl border p-4 shadow-sm bg-card" >
+  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1" >
+    <AlertTriangle className="h-4 w-4 text-rose-500" />
+      Membre avec le Plus de Retards
+        </div>
+        < div className = "text-xl font-semibold" > { topLateName } </div>
+          < p className = "text-xs text-muted-foreground mt-1" >
+            Personne ayant badgé en retard(après 10h) le plus souvent
+              </p>
+              </div>
+
+{/* Coverage Chart */ }
+<div className="rounded-xl border p-4 shadow-sm bg-card" >
+  <div className="mb-4" >
+    <h3 className="text-lg font-semibold" > Couverture Horaire de l'Équipe</h3>
+      < p className = "text-sm text-muted-foreground" >
+        Nombre de membres présents par tranche horaire(moyenné sur la période)
+          </p>
+          </div>
+          < ChartContainer
+config = {{ count: { label: "Présence", color: "var(--primary)" } }}
+className = "aspect-auto h-[300px] w-full"
+  >
+  <AreaChart data={ cov }>
+    <defs>
+    <linearGradient id="fillCount" x1 = "0" y1 = "0" x2 = "0" y2 = "1" >
+      <stop
+                  offset="5%"
+stopColor = "var(--color-count)"
+stopOpacity = { 0.8}
+  />
+  <stop
+                  offset="95%"
+stopColor = "var(--color-count)"
+stopOpacity = { 0.1}
+  />
+  </linearGradient>
+  </defs>
+  < CartesianGrid vertical = { false} />
+    <XAxis
+              dataKey="time"
+tickLine = { false}
+axisLine = { false}
+tickMargin = { 8}
+minTickGap = { 16}
+  />
+  <ChartTooltip
+              cursor={ false }
+content = {< ChartTooltipContent indicator = "dot" />}
+            />
+  < Area
+dataKey = "count"
+type = "natural"
+fill = "url(#fillCount)"
+stroke = "var(--color-count)"
+  />
+  </AreaChart>
+  </ChartContainer>
+  </div>
+
+{/* Daily Minutes Chart */ }
+<div className="rounded-xl border p-4 shadow-sm bg-card" >
+  <div className="mb-4" >
+    <h3 className="text-lg font-semibold" > Charge de Travail Quotidienne </h3>
+      < p className = "text-sm text-muted-foreground" >
+        Total des heures travaillées par jour(tous les membres cumulés)
+          </p>
+          </div>
+          < ChartContainer
+config = {{
+  minutes: {
+    label: "Minutes",
+      color: "hsl(var(--chart-2))",
+            },
+}}
+className = "aspect-auto h-[300px] w-full"
+  >
+  <BarChart data={ dailyArr }>
+    <CartesianGrid vertical={ false } />
+      < XAxis
+dataKey = "date"
+tickLine = { true}
+axisLine = { true}
+tickMargin = { 8}
+minTickGap = { 8}
+  />
+  <YAxis />
+  < ChartTooltip
+cursor = {{ fill: "hsl(var(--muted))" }}
+content = {< ChartTooltipContent indicator = "dot" />}
+            />
+  < Bar
+dataKey = "minutes"
+fill = "var(--color-minutes)"
+radius = { [6, 6, 0, 0]}
+  />
+  </BarChart>
+  </ChartContainer>
+  </div>
+
+{/* Heatmap */ }
+<div className="rounded-xl border p-4 shadow-sm bg-card" >
+  <div className="mb-4" >
+    <h3 className="text-lg font-semibold" > Analyse des Retards </h3>
+      < p className = "text-sm text-muted-foreground" >
+        Visualisation des retards par jour de la semaine et heure d'arrivée
+          </p>
+          </div>
+          < Heatmap
+rows = { 7}
+cols = { 24}
+data = { heatCells }
+max = { Math.max(1, Math.max(...heatCells.map((c) => c.v))) }
+rowLabels = { ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"]}
+title = ""
+  />
+  </div>
+  </div>
   );
 
-  const statCards = [
-    {
-      key: "total",
-      container:
-        "rounded-xl border p-4 shadow-sm bg-emerald-50/50 dark:bg-emerald-950/20",
-      iconRow:
-        "flex items-center gap-2 text-sm text-emerald-700 dark:text-emerald-300",
-      icon: Clock,
-      label: "Total minutes",
-      value: summary ? formatMinutes(Number(summary.totalWorkedMinutes)) : "-",
-    },
-    {
-      key: "avg",
-      container:
-        "rounded-xl border p-4 shadow-sm bg-sky-50/50 dark:bg-sky-950/20",
-      iconRow: "flex items-center gap-2 text-sm text-sky-700 dark:text-sky-300",
-      icon: TrendingUp,
-      label: "Moyenne / user",
-      value: summary
-        ? formatMinutes(
-          Math.round(Number(summary.avgWorkedMinutesPerUser || 0)),
-        )
-        : "-",
-    },
-    {
-      key: "active",
-      container:
-        "rounded-xl border p-4 shadow-sm bg-amber-50/50 dark:bg-amber-950/20",
-      iconRow:
-        "flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300",
-      icon: Users,
-      label: "Utilisateurs actifs",
-      value: summary ? String(Number(summary.activeUsers)) : "-",
-    },
-    {
-      key: "late",
-      container:
-        "rounded-xl border p-4 shadow-sm bg-rose-50/50 dark:bg-rose-950/20",
-      iconRow:
-        "flex items-center gap-2 text-sm text-rose-700 dark:text-rose-300",
-      icon: AlertTriangle,
-      label: "Taux de retard",
-      value: `${Math.round(latenessRate * 100)}%`,
-    },
-  ] as const;
-
-  const cards = React.createElement(
-    "div",
-    { className: "grid gap-4 grid-cols-1 md:grid-cols-3 px-6 mb-6" },
-    ...statCards.map((c) =>
-      React.createElement(
-        "div",
-        { key: c.key, className: c.container },
-        React.createElement(
-          "div",
-          { className: c.iconRow },
-          React.createElement(c.icon as any, { className: "size-4" }),
-          c.label,
-        ),
-        React.createElement(
-          "div",
-          { className: "text-xl font-semibold" },
-          c.value,
-        ),
-      ),
-    ),
-    React.createElement(
-      "div",
-      {
-        className:
-          "rounded-xl border p-4 shadow-sm bg-purple-50/50 dark:bg-purple-950/20 md:col-span-2",
-      },
-      React.createElement(
-        "div",
-        { className: "text-sm text-muted-foreground" },
-        "Plus en retard",
-      ),
-      React.createElement(
-        "div",
-        { className: "text-xl font-semibold" },
-        topLateName,
-      ),
-    ),
-  );
-
-  const chart = React.createElement(
-    "div",
-    { className: "px-6 mb-6" },
-    React.createElement(
-      "div",
-      { className: "rounded-xl border p-4 shadow-sm" },
-      React.createElement(
-        "div",
-        { className: "text-lg font-semibold mb-2" },
-        "Couverture horaire",
-      ),
-      React.createElement(
-        ChartContainer as any,
-        {
-          config: { count: { label: "Presence", color: "var(--primary)" } },
-          className: "aspect-auto h-[260px] w-full",
-        },
-        React.createElement(
-          AreaChart as any,
-          { data: cov },
-          React.createElement(
-            "defs",
-            null,
-            React.createElement(
-              "linearGradient",
-              { id: "fillCount", x1: "0", y1: "0", x2: "0", y2: "1" },
-              React.createElement("stop", {
-                offset: "5%",
-                stopColor: "var(--color-count)",
-                stopOpacity: 0.8,
-              }),
-              React.createElement("stop", {
-                offset: "95%",
-                stopColor: "var(--color-count)",
-                stopOpacity: 0.1,
-              }),
-            ),
-          ),
-          React.createElement(CartesianGrid as any, { vertical: false }),
-          React.createElement(XAxis as any, {
-            dataKey: "time",
-            tickLine: false,
-            axisLine: false,
-            tickMargin: 8,
-            minTickGap: 16,
-          }),
-          React.createElement(ChartTooltip as any, {
-            cursor: false,
-            content: React.createElement(ChartTooltipContent as any, {
-              indicator: "dot",
-            }),
-          }),
-          React.createElement(Area as any, {
-            dataKey: "count",
-            type: "natural",
-            fill: "url(#fillCount)",
-            stroke: "var(--color-count)",
-          }),
-        ),
-      ),
-    ),
-  );
-
-  const chart2 = React.createElement(
-    "div",
-    { className: "px-6 mb-6" },
-    React.createElement(
-      "div",
-      { className: "rounded-xl border p-4 shadow-sm" },
-      React.createElement(
-        "div",
-        { className: "text-lg font-semibold mb-2" },
-        "Minutes par jour",
-      ),
-      React.createElement(
-        ChartContainer as any,
-        {
-          config: {
-            minutes: { label: "Minutes", color: "hsla(180, 90%, 45%, 0.45)" },
-          },
-          className: "aspect-auto h-[260px] w-full",
-        },
-        React.createElement(
-          BarChart as any,
-          { data: dailyArr },
-          React.createElement(CartesianGrid as any, { vertical: false }),
-          React.createElement(XAxis as any, {
-            dataKey: "date",
-            tickLine: true,
-            axisLine: true,
-            tickMargin: 8,
-            minTickGap: 8,
-          }),
-          React.createElement(YAxis as any, { hide: false }),
-          React.createElement(ChartTooltip as any, {
-            cursor: { fill: "hsl(210 90% 45% / .05)" },
-            content: React.createElement(ChartTooltipContent as any, {
-              indicator: "dot",
-            }),
-          }),
-          React.createElement(Bar as any, {
-            dataKey: "minutes",
-            fill: "var(--color-minutes)",
-            radius: [6, 6, 0, 0],
-          }),
-        ),
-      ),
-    ),
-  );
-
-  const heatmap = React.createElement(
-    "div",
-    { className: "px-6 mb-6" },
-    React.createElement(Heatmap as any, {
-      rows: 7,
-      cols: 31,
-      data: heatCells,
-      max: Math.max(1, Math.max(...heatCells.map((c) => c.v))),
-      rowLabels: ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"],
-      title: "Retards par jour (heatmap)",
-    }),
-  );
-
-  let status: string | null = null;
-  if (loading) status = "Chargement...";
-  else if (error) status = `Erreur: ${error}`;
-
-  return React.createElement(
-    "div",
-    null,
-    header,
-    cards,
-    chart,
-    chart2,
-    heatmap,
-    status
-      ? React.createElement(
-        "div",
-        { className: "px-6 py-3 text-destructive" },
-        status,
-      )
-      : null,
-  );
 }

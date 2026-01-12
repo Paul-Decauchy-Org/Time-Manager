@@ -48,9 +48,56 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	AdminKpiDashboard struct {
+		Compliance   func(childComplexity int) int
+		Overtime     func(childComplexity int) int
+		Period       func(childComplexity int) int
+		Productivity func(childComplexity int) int
+		Punctuality  func(childComplexity int) int
+		Summary      func(childComplexity int) int
+		Teams        func(childComplexity int) int
+		Workload     func(childComplexity int) int
+	}
+
+	AdminKpiSummary struct {
+		ActiveUsers      func(childComplexity int) int
+		AvgHoursPerUser  func(childComplexity int) int
+		ComplianceRate   func(childComplexity int) int
+		TotalTeams       func(childComplexity int) int
+		TotalUsers       func(childComplexity int) int
+		TotalWorkedHours func(childComplexity int) int
+	}
+
+	ComplianceAnomaly struct {
+		AffectedUsers func(childComplexity int) int
+		Count         func(childComplexity int) int
+		Severity      func(childComplexity int) int
+		Type          func(childComplexity int) int
+	}
+
+	ComplianceMetrics struct {
+		Anomalies              func(childComplexity int) int
+		AnomaliesCount         func(childComplexity int) int
+		ComplianceRate         func(childComplexity int) int
+		IncompleteEntriesCount func(childComplexity int) int
+		MissingEntriesCount    func(childComplexity int) int
+		UsersWithIssues        func(childComplexity int) int
+	}
+
 	CoveragePoint struct {
 		Count func(childComplexity int) int
 		Time  func(childComplexity int) int
+	}
+
+	DateRange struct {
+		From func(childComplexity int) int
+		To   func(childComplexity int) int
+	}
+
+	DayDistribution struct {
+		AvgMinutes   func(childComplexity int) int
+		Day          func(childComplexity int) int
+		TotalMinutes func(childComplexity int) int
 	}
 
 	KpiPoint struct {
@@ -84,24 +131,75 @@ type ComplexityRoot struct {
 		UpdateUser         func(childComplexity int, id string, input model.UpdateUserInput) int
 	}
 
+	OvertimeByPeriod struct {
+		PeriodStart  func(childComplexity int) int
+		TotalMinutes func(childComplexity int) int
+		UsersCount   func(childComplexity int) int
+	}
+
+	OvertimeReport struct {
+		AvgOvertimePerUser   func(childComplexity int) int
+		OvertimeByWeek       func(childComplexity int) int
+		TopOvertimeUsers     func(childComplexity int) int
+		TotalOvertimeMinutes func(childComplexity int) int
+		UsersWithOvertime    func(childComplexity int) int
+	}
+
+	ProductivityMetrics struct {
+		AvgEfficiencyRate    func(childComplexity int) int
+		AvgHoursPerUser      func(childComplexity int) int
+		ProductivityTrend    func(childComplexity int) int
+		TopPerformers        func(childComplexity int) int
+		TotalProductiveHours func(childComplexity int) int
+	}
+
+	ProductivityTrend struct {
+		AvgEfficiency func(childComplexity int) int
+		Date          func(childComplexity int) int
+		TotalHours    func(childComplexity int) int
+	}
+
+	PunctualityMetrics struct {
+		AvgLateMinutes     func(childComplexity int) int
+		LateRate           func(childComplexity int) int
+		LateUsers          func(childComplexity int) int
+		OnTimeRate         func(childComplexity int) int
+		PunctualUsers      func(childComplexity int) int
+		TotalLateIncidents func(childComplexity int) int
+		TrendByWeek        func(childComplexity int) int
+	}
+
+	PunctualityTrend struct {
+		AvgLateMinutes func(childComplexity int) int
+		OnTimeRate     func(childComplexity int) int
+		WeekStart      func(childComplexity int) int
+	}
+
 	Query struct {
-		ExportUserKpiCSV func(childComplexity int, userID *string, from *string, to *string) int
-		GetUser          func(childComplexity int, id string) int
-		KpiTeamSummary   func(childComplexity int, teamID string, from *string, to *string) int
-		KpiUserSummary   func(childComplexity int, userID *string, from *string, to *string) int
-		Me               func(childComplexity int) int
-		Roles            func(childComplexity int) int
-		Team             func(childComplexity int, id string) int
-		TeamUsers        func(childComplexity int) int
-		Teams            func(childComplexity int) int
-		TimeTableEntries func(childComplexity int, userID *string, teamID *string, from *string, to *string) int
-		TimeTables       func(childComplexity int) int
-		UserByEmail      func(childComplexity int, email string) int
-		UserWithAllData  func(childComplexity int, id string) int
-		Users            func(childComplexity int) int
-		UsersByGroup     func(childComplexity int, inGroup bool) int
-		UsersByTeam      func(childComplexity int, teamID string) int
-		UsersWithAllData func(childComplexity int) int
+		AdminKpiDashboard   func(childComplexity int, from *string, to *string) int
+		ComplianceMetrics   func(childComplexity int, teamID *string, from *string, to *string) int
+		ExportUserKpiCSV    func(childComplexity int, userID *string, from *string, to *string) int
+		GetUser             func(childComplexity int, id string) int
+		KpiTeamSummary      func(childComplexity int, teamID string, from *string, to *string) int
+		KpiUserSummary      func(childComplexity int, userID *string, from *string, to *string) int
+		Me                  func(childComplexity int) int
+		OvertimeReport      func(childComplexity int, teamID *string, from *string, to *string) int
+		ProductivityMetrics func(childComplexity int, teamID *string, from *string, to *string) int
+		PunctualityMetrics  func(childComplexity int, teamID *string, from *string, to *string) int
+		Roles               func(childComplexity int) int
+		Team                func(childComplexity int, id string) int
+		TeamDetailedReports func(childComplexity int, from *string, to *string) int
+		TeamUsers           func(childComplexity int) int
+		Teams               func(childComplexity int) int
+		TimeTableEntries    func(childComplexity int, userID *string, teamID *string, from *string, to *string) int
+		TimeTables          func(childComplexity int) int
+		UserByEmail         func(childComplexity int, email string) int
+		UserWithAllData     func(childComplexity int, id string) int
+		Users               func(childComplexity int) int
+		UsersByGroup        func(childComplexity int, inGroup bool) int
+		UsersByTeam         func(childComplexity int, teamID string) int
+		UsersWithAllData    func(childComplexity int) int
+		WorkloadAnalysis    func(childComplexity int, teamID *string, from *string, to *string) int
 	}
 
 	SignedUser struct {
@@ -124,6 +222,17 @@ type ComplexityRoot struct {
 		Users       func(childComplexity int) int
 	}
 
+	TeamDetailedReport struct {
+		ActiveNow            func(childComplexity int) int
+		AvgMinutesPerMember  func(childComplexity int) int
+		MemberCount          func(childComplexity int) int
+		TeamID               func(childComplexity int) int
+		TeamName             func(childComplexity int) int
+		TopContributors      func(childComplexity int) int
+		TotalWorkedMinutes   func(childComplexity int) int
+		WorkloadDistribution func(childComplexity int) int
+	}
+
 	TeamKpiSummary struct {
 		ActiveUsers             func(childComplexity int) int
 		AvgWorkedMinutesPerUser func(childComplexity int) int
@@ -132,6 +241,14 @@ type ComplexityRoot struct {
 		TeamID                  func(childComplexity int) int
 		To                      func(childComplexity int) int
 		TotalWorkedMinutes      func(childComplexity int) int
+	}
+
+	TeamMemberContribution struct {
+		DaysPresent     func(childComplexity int) int
+		OvertimeMinutes func(childComplexity int) int
+		UserID          func(childComplexity int) int
+		UserName        func(childComplexity int) int
+		WorkedMinutes   func(childComplexity int) int
 	}
 
 	TeamUser struct {
@@ -189,6 +306,20 @@ type ComplexityRoot struct {
 		Token     func(childComplexity int) int
 	}
 
+	UserOvertimeDetail struct {
+		DaysWorked      func(childComplexity int) int
+		OvertimeMinutes func(childComplexity int) int
+		UserID          func(childComplexity int) int
+		UserName        func(childComplexity int) int
+	}
+
+	UserProductivityDetail struct {
+		EfficiencyRate func(childComplexity int) int
+		TotalHours     func(childComplexity int) int
+		UserID         func(childComplexity int) int
+		UserName       func(childComplexity int) int
+	}
+
 	UserWithAllData struct {
 		Email            func(childComplexity int) int
 		FirstName        func(childComplexity int) int
@@ -199,6 +330,22 @@ type ComplexityRoot struct {
 		Role             func(childComplexity int) int
 		Teams            func(childComplexity int) int
 		TimeTableEntries func(childComplexity int) int
+	}
+
+	WorkloadAnalysis struct {
+		AvgDailyMinutes   func(childComplexity int) int
+		AvgWeeklyMinutes  func(childComplexity int) int
+		DistributionByDay func(childComplexity int) int
+		PeakDay           func(childComplexity int) int
+		PeakDayMinutes    func(childComplexity int) int
+		TotalOvertime     func(childComplexity int) int
+		UsersWithOvertime func(childComplexity int) int
+	}
+
+	WorkloadDistribution struct {
+		Percentage func(childComplexity int) int
+		Range      func(childComplexity int) int
+		UserCount  func(childComplexity int) int
 	}
 }
 
@@ -245,6 +392,13 @@ type QueryResolver interface {
 	KpiUserSummary(ctx context.Context, userID *string, from *string, to *string) (*model.UserKpiSummary, error)
 	KpiTeamSummary(ctx context.Context, teamID string, from *string, to *string) (*model.TeamKpiSummary, error)
 	ExportUserKpiCSV(ctx context.Context, userID *string, from *string, to *string) (string, error)
+	AdminKpiDashboard(ctx context.Context, from *string, to *string) (*model.AdminKpiDashboard, error)
+	WorkloadAnalysis(ctx context.Context, teamID *string, from *string, to *string) (*model.WorkloadAnalysis, error)
+	PunctualityMetrics(ctx context.Context, teamID *string, from *string, to *string) (*model.PunctualityMetrics, error)
+	OvertimeReport(ctx context.Context, teamID *string, from *string, to *string) (*model.OvertimeReport, error)
+	ComplianceMetrics(ctx context.Context, teamID *string, from *string, to *string) (*model.ComplianceMetrics, error)
+	ProductivityMetrics(ctx context.Context, teamID *string, from *string, to *string) (*model.ProductivityMetrics, error)
+	TeamDetailedReports(ctx context.Context, from *string, to *string) ([]*model.TeamDetailedReport, error)
 }
 
 type executableSchema struct {
@@ -266,6 +420,154 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	_ = ec
 	switch typeName + "." + field {
 
+	case "AdminKpiDashboard.compliance":
+		if e.complexity.AdminKpiDashboard.Compliance == nil {
+			break
+		}
+
+		return e.complexity.AdminKpiDashboard.Compliance(childComplexity), true
+	case "AdminKpiDashboard.overtime":
+		if e.complexity.AdminKpiDashboard.Overtime == nil {
+			break
+		}
+
+		return e.complexity.AdminKpiDashboard.Overtime(childComplexity), true
+	case "AdminKpiDashboard.period":
+		if e.complexity.AdminKpiDashboard.Period == nil {
+			break
+		}
+
+		return e.complexity.AdminKpiDashboard.Period(childComplexity), true
+	case "AdminKpiDashboard.productivity":
+		if e.complexity.AdminKpiDashboard.Productivity == nil {
+			break
+		}
+
+		return e.complexity.AdminKpiDashboard.Productivity(childComplexity), true
+	case "AdminKpiDashboard.punctuality":
+		if e.complexity.AdminKpiDashboard.Punctuality == nil {
+			break
+		}
+
+		return e.complexity.AdminKpiDashboard.Punctuality(childComplexity), true
+	case "AdminKpiDashboard.summary":
+		if e.complexity.AdminKpiDashboard.Summary == nil {
+			break
+		}
+
+		return e.complexity.AdminKpiDashboard.Summary(childComplexity), true
+	case "AdminKpiDashboard.teams":
+		if e.complexity.AdminKpiDashboard.Teams == nil {
+			break
+		}
+
+		return e.complexity.AdminKpiDashboard.Teams(childComplexity), true
+	case "AdminKpiDashboard.workload":
+		if e.complexity.AdminKpiDashboard.Workload == nil {
+			break
+		}
+
+		return e.complexity.AdminKpiDashboard.Workload(childComplexity), true
+
+	case "AdminKpiSummary.activeUsers":
+		if e.complexity.AdminKpiSummary.ActiveUsers == nil {
+			break
+		}
+
+		return e.complexity.AdminKpiSummary.ActiveUsers(childComplexity), true
+	case "AdminKpiSummary.avgHoursPerUser":
+		if e.complexity.AdminKpiSummary.AvgHoursPerUser == nil {
+			break
+		}
+
+		return e.complexity.AdminKpiSummary.AvgHoursPerUser(childComplexity), true
+	case "AdminKpiSummary.complianceRate":
+		if e.complexity.AdminKpiSummary.ComplianceRate == nil {
+			break
+		}
+
+		return e.complexity.AdminKpiSummary.ComplianceRate(childComplexity), true
+	case "AdminKpiSummary.totalTeams":
+		if e.complexity.AdminKpiSummary.TotalTeams == nil {
+			break
+		}
+
+		return e.complexity.AdminKpiSummary.TotalTeams(childComplexity), true
+	case "AdminKpiSummary.totalUsers":
+		if e.complexity.AdminKpiSummary.TotalUsers == nil {
+			break
+		}
+
+		return e.complexity.AdminKpiSummary.TotalUsers(childComplexity), true
+	case "AdminKpiSummary.totalWorkedHours":
+		if e.complexity.AdminKpiSummary.TotalWorkedHours == nil {
+			break
+		}
+
+		return e.complexity.AdminKpiSummary.TotalWorkedHours(childComplexity), true
+
+	case "ComplianceAnomaly.affectedUsers":
+		if e.complexity.ComplianceAnomaly.AffectedUsers == nil {
+			break
+		}
+
+		return e.complexity.ComplianceAnomaly.AffectedUsers(childComplexity), true
+	case "ComplianceAnomaly.count":
+		if e.complexity.ComplianceAnomaly.Count == nil {
+			break
+		}
+
+		return e.complexity.ComplianceAnomaly.Count(childComplexity), true
+	case "ComplianceAnomaly.severity":
+		if e.complexity.ComplianceAnomaly.Severity == nil {
+			break
+		}
+
+		return e.complexity.ComplianceAnomaly.Severity(childComplexity), true
+	case "ComplianceAnomaly.type":
+		if e.complexity.ComplianceAnomaly.Type == nil {
+			break
+		}
+
+		return e.complexity.ComplianceAnomaly.Type(childComplexity), true
+
+	case "ComplianceMetrics.anomalies":
+		if e.complexity.ComplianceMetrics.Anomalies == nil {
+			break
+		}
+
+		return e.complexity.ComplianceMetrics.Anomalies(childComplexity), true
+	case "ComplianceMetrics.anomaliesCount":
+		if e.complexity.ComplianceMetrics.AnomaliesCount == nil {
+			break
+		}
+
+		return e.complexity.ComplianceMetrics.AnomaliesCount(childComplexity), true
+	case "ComplianceMetrics.complianceRate":
+		if e.complexity.ComplianceMetrics.ComplianceRate == nil {
+			break
+		}
+
+		return e.complexity.ComplianceMetrics.ComplianceRate(childComplexity), true
+	case "ComplianceMetrics.incompleteEntriesCount":
+		if e.complexity.ComplianceMetrics.IncompleteEntriesCount == nil {
+			break
+		}
+
+		return e.complexity.ComplianceMetrics.IncompleteEntriesCount(childComplexity), true
+	case "ComplianceMetrics.missingEntriesCount":
+		if e.complexity.ComplianceMetrics.MissingEntriesCount == nil {
+			break
+		}
+
+		return e.complexity.ComplianceMetrics.MissingEntriesCount(childComplexity), true
+	case "ComplianceMetrics.usersWithIssues":
+		if e.complexity.ComplianceMetrics.UsersWithIssues == nil {
+			break
+		}
+
+		return e.complexity.ComplianceMetrics.UsersWithIssues(childComplexity), true
+
 	case "CoveragePoint.count":
 		if e.complexity.CoveragePoint.Count == nil {
 			break
@@ -278,6 +580,38 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.CoveragePoint.Time(childComplexity), true
+
+	case "DateRange.from":
+		if e.complexity.DateRange.From == nil {
+			break
+		}
+
+		return e.complexity.DateRange.From(childComplexity), true
+	case "DateRange.to":
+		if e.complexity.DateRange.To == nil {
+			break
+		}
+
+		return e.complexity.DateRange.To(childComplexity), true
+
+	case "DayDistribution.avgMinutes":
+		if e.complexity.DayDistribution.AvgMinutes == nil {
+			break
+		}
+
+		return e.complexity.DayDistribution.AvgMinutes(childComplexity), true
+	case "DayDistribution.day":
+		if e.complexity.DayDistribution.Day == nil {
+			break
+		}
+
+		return e.complexity.DayDistribution.Day(childComplexity), true
+	case "DayDistribution.totalMinutes":
+		if e.complexity.DayDistribution.TotalMinutes == nil {
+			break
+		}
+
+		return e.complexity.DayDistribution.TotalMinutes(childComplexity), true
 
 	case "KpiPoint.date":
 		if e.complexity.KpiPoint.Date == nil {
@@ -521,6 +855,190 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["id"].(string), args["input"].(model.UpdateUserInput)), true
 
+	case "OvertimeByPeriod.periodStart":
+		if e.complexity.OvertimeByPeriod.PeriodStart == nil {
+			break
+		}
+
+		return e.complexity.OvertimeByPeriod.PeriodStart(childComplexity), true
+	case "OvertimeByPeriod.totalMinutes":
+		if e.complexity.OvertimeByPeriod.TotalMinutes == nil {
+			break
+		}
+
+		return e.complexity.OvertimeByPeriod.TotalMinutes(childComplexity), true
+	case "OvertimeByPeriod.usersCount":
+		if e.complexity.OvertimeByPeriod.UsersCount == nil {
+			break
+		}
+
+		return e.complexity.OvertimeByPeriod.UsersCount(childComplexity), true
+
+	case "OvertimeReport.avgOvertimePerUser":
+		if e.complexity.OvertimeReport.AvgOvertimePerUser == nil {
+			break
+		}
+
+		return e.complexity.OvertimeReport.AvgOvertimePerUser(childComplexity), true
+	case "OvertimeReport.overtimeByWeek":
+		if e.complexity.OvertimeReport.OvertimeByWeek == nil {
+			break
+		}
+
+		return e.complexity.OvertimeReport.OvertimeByWeek(childComplexity), true
+	case "OvertimeReport.topOvertimeUsers":
+		if e.complexity.OvertimeReport.TopOvertimeUsers == nil {
+			break
+		}
+
+		return e.complexity.OvertimeReport.TopOvertimeUsers(childComplexity), true
+	case "OvertimeReport.totalOvertimeMinutes":
+		if e.complexity.OvertimeReport.TotalOvertimeMinutes == nil {
+			break
+		}
+
+		return e.complexity.OvertimeReport.TotalOvertimeMinutes(childComplexity), true
+	case "OvertimeReport.usersWithOvertime":
+		if e.complexity.OvertimeReport.UsersWithOvertime == nil {
+			break
+		}
+
+		return e.complexity.OvertimeReport.UsersWithOvertime(childComplexity), true
+
+	case "ProductivityMetrics.avgEfficiencyRate":
+		if e.complexity.ProductivityMetrics.AvgEfficiencyRate == nil {
+			break
+		}
+
+		return e.complexity.ProductivityMetrics.AvgEfficiencyRate(childComplexity), true
+	case "ProductivityMetrics.avgHoursPerUser":
+		if e.complexity.ProductivityMetrics.AvgHoursPerUser == nil {
+			break
+		}
+
+		return e.complexity.ProductivityMetrics.AvgHoursPerUser(childComplexity), true
+	case "ProductivityMetrics.productivityTrend":
+		if e.complexity.ProductivityMetrics.ProductivityTrend == nil {
+			break
+		}
+
+		return e.complexity.ProductivityMetrics.ProductivityTrend(childComplexity), true
+	case "ProductivityMetrics.topPerformers":
+		if e.complexity.ProductivityMetrics.TopPerformers == nil {
+			break
+		}
+
+		return e.complexity.ProductivityMetrics.TopPerformers(childComplexity), true
+	case "ProductivityMetrics.totalProductiveHours":
+		if e.complexity.ProductivityMetrics.TotalProductiveHours == nil {
+			break
+		}
+
+		return e.complexity.ProductivityMetrics.TotalProductiveHours(childComplexity), true
+
+	case "ProductivityTrend.avgEfficiency":
+		if e.complexity.ProductivityTrend.AvgEfficiency == nil {
+			break
+		}
+
+		return e.complexity.ProductivityTrend.AvgEfficiency(childComplexity), true
+	case "ProductivityTrend.date":
+		if e.complexity.ProductivityTrend.Date == nil {
+			break
+		}
+
+		return e.complexity.ProductivityTrend.Date(childComplexity), true
+	case "ProductivityTrend.totalHours":
+		if e.complexity.ProductivityTrend.TotalHours == nil {
+			break
+		}
+
+		return e.complexity.ProductivityTrend.TotalHours(childComplexity), true
+
+	case "PunctualityMetrics.avgLateMinutes":
+		if e.complexity.PunctualityMetrics.AvgLateMinutes == nil {
+			break
+		}
+
+		return e.complexity.PunctualityMetrics.AvgLateMinutes(childComplexity), true
+	case "PunctualityMetrics.lateRate":
+		if e.complexity.PunctualityMetrics.LateRate == nil {
+			break
+		}
+
+		return e.complexity.PunctualityMetrics.LateRate(childComplexity), true
+	case "PunctualityMetrics.lateUsers":
+		if e.complexity.PunctualityMetrics.LateUsers == nil {
+			break
+		}
+
+		return e.complexity.PunctualityMetrics.LateUsers(childComplexity), true
+	case "PunctualityMetrics.onTimeRate":
+		if e.complexity.PunctualityMetrics.OnTimeRate == nil {
+			break
+		}
+
+		return e.complexity.PunctualityMetrics.OnTimeRate(childComplexity), true
+	case "PunctualityMetrics.punctualUsers":
+		if e.complexity.PunctualityMetrics.PunctualUsers == nil {
+			break
+		}
+
+		return e.complexity.PunctualityMetrics.PunctualUsers(childComplexity), true
+	case "PunctualityMetrics.totalLateIncidents":
+		if e.complexity.PunctualityMetrics.TotalLateIncidents == nil {
+			break
+		}
+
+		return e.complexity.PunctualityMetrics.TotalLateIncidents(childComplexity), true
+	case "PunctualityMetrics.trendByWeek":
+		if e.complexity.PunctualityMetrics.TrendByWeek == nil {
+			break
+		}
+
+		return e.complexity.PunctualityMetrics.TrendByWeek(childComplexity), true
+
+	case "PunctualityTrend.avgLateMinutes":
+		if e.complexity.PunctualityTrend.AvgLateMinutes == nil {
+			break
+		}
+
+		return e.complexity.PunctualityTrend.AvgLateMinutes(childComplexity), true
+	case "PunctualityTrend.onTimeRate":
+		if e.complexity.PunctualityTrend.OnTimeRate == nil {
+			break
+		}
+
+		return e.complexity.PunctualityTrend.OnTimeRate(childComplexity), true
+	case "PunctualityTrend.weekStart":
+		if e.complexity.PunctualityTrend.WeekStart == nil {
+			break
+		}
+
+		return e.complexity.PunctualityTrend.WeekStart(childComplexity), true
+
+	case "Query.adminKpiDashboard":
+		if e.complexity.Query.AdminKpiDashboard == nil {
+			break
+		}
+
+		args, err := ec.field_Query_adminKpiDashboard_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AdminKpiDashboard(childComplexity, args["from"].(*string), args["to"].(*string)), true
+	case "Query.complianceMetrics":
+		if e.complexity.Query.ComplianceMetrics == nil {
+			break
+		}
+
+		args, err := ec.field_Query_complianceMetrics_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ComplianceMetrics(childComplexity, args["teamID"].(*string), args["from"].(*string), args["to"].(*string)), true
 	case "Query.exportUserKpiCSV":
 		if e.complexity.Query.ExportUserKpiCSV == nil {
 			break
@@ -571,6 +1089,39 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.Me(childComplexity), true
+	case "Query.overtimeReport":
+		if e.complexity.Query.OvertimeReport == nil {
+			break
+		}
+
+		args, err := ec.field_Query_overtimeReport_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.OvertimeReport(childComplexity, args["teamID"].(*string), args["from"].(*string), args["to"].(*string)), true
+	case "Query.productivityMetrics":
+		if e.complexity.Query.ProductivityMetrics == nil {
+			break
+		}
+
+		args, err := ec.field_Query_productivityMetrics_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ProductivityMetrics(childComplexity, args["teamID"].(*string), args["from"].(*string), args["to"].(*string)), true
+	case "Query.punctualityMetrics":
+		if e.complexity.Query.PunctualityMetrics == nil {
+			break
+		}
+
+		args, err := ec.field_Query_punctualityMetrics_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PunctualityMetrics(childComplexity, args["teamID"].(*string), args["from"].(*string), args["to"].(*string)), true
 	case "Query.roles":
 		if e.complexity.Query.Roles == nil {
 			break
@@ -588,6 +1139,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.Team(childComplexity, args["id"].(string)), true
+	case "Query.teamDetailedReports":
+		if e.complexity.Query.TeamDetailedReports == nil {
+			break
+		}
+
+		args, err := ec.field_Query_teamDetailedReports_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.TeamDetailedReports(childComplexity, args["from"].(*string), args["to"].(*string)), true
 	case "Query.teamUsers":
 		if e.complexity.Query.TeamUsers == nil {
 			break
@@ -673,6 +1235,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.UsersWithAllData(childComplexity), true
+	case "Query.workloadAnalysis":
+		if e.complexity.Query.WorkloadAnalysis == nil {
+			break
+		}
+
+		args, err := ec.field_Query_workloadAnalysis_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.WorkloadAnalysis(childComplexity, args["teamID"].(*string), args["from"].(*string), args["to"].(*string)), true
 
 	case "SignedUser.email":
 		if e.complexity.SignedUser.Email == nil {
@@ -760,6 +1333,55 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Team.Users(childComplexity), true
 
+	case "TeamDetailedReport.activeNow":
+		if e.complexity.TeamDetailedReport.ActiveNow == nil {
+			break
+		}
+
+		return e.complexity.TeamDetailedReport.ActiveNow(childComplexity), true
+	case "TeamDetailedReport.avgMinutesPerMember":
+		if e.complexity.TeamDetailedReport.AvgMinutesPerMember == nil {
+			break
+		}
+
+		return e.complexity.TeamDetailedReport.AvgMinutesPerMember(childComplexity), true
+	case "TeamDetailedReport.memberCount":
+		if e.complexity.TeamDetailedReport.MemberCount == nil {
+			break
+		}
+
+		return e.complexity.TeamDetailedReport.MemberCount(childComplexity), true
+	case "TeamDetailedReport.teamID":
+		if e.complexity.TeamDetailedReport.TeamID == nil {
+			break
+		}
+
+		return e.complexity.TeamDetailedReport.TeamID(childComplexity), true
+	case "TeamDetailedReport.teamName":
+		if e.complexity.TeamDetailedReport.TeamName == nil {
+			break
+		}
+
+		return e.complexity.TeamDetailedReport.TeamName(childComplexity), true
+	case "TeamDetailedReport.topContributors":
+		if e.complexity.TeamDetailedReport.TopContributors == nil {
+			break
+		}
+
+		return e.complexity.TeamDetailedReport.TopContributors(childComplexity), true
+	case "TeamDetailedReport.totalWorkedMinutes":
+		if e.complexity.TeamDetailedReport.TotalWorkedMinutes == nil {
+			break
+		}
+
+		return e.complexity.TeamDetailedReport.TotalWorkedMinutes(childComplexity), true
+	case "TeamDetailedReport.workloadDistribution":
+		if e.complexity.TeamDetailedReport.WorkloadDistribution == nil {
+			break
+		}
+
+		return e.complexity.TeamDetailedReport.WorkloadDistribution(childComplexity), true
+
 	case "TeamKpiSummary.activeUsers":
 		if e.complexity.TeamKpiSummary.ActiveUsers == nil {
 			break
@@ -802,6 +1424,37 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.TeamKpiSummary.TotalWorkedMinutes(childComplexity), true
+
+	case "TeamMemberContribution.daysPresent":
+		if e.complexity.TeamMemberContribution.DaysPresent == nil {
+			break
+		}
+
+		return e.complexity.TeamMemberContribution.DaysPresent(childComplexity), true
+	case "TeamMemberContribution.overtimeMinutes":
+		if e.complexity.TeamMemberContribution.OvertimeMinutes == nil {
+			break
+		}
+
+		return e.complexity.TeamMemberContribution.OvertimeMinutes(childComplexity), true
+	case "TeamMemberContribution.userID":
+		if e.complexity.TeamMemberContribution.UserID == nil {
+			break
+		}
+
+		return e.complexity.TeamMemberContribution.UserID(childComplexity), true
+	case "TeamMemberContribution.userName":
+		if e.complexity.TeamMemberContribution.UserName == nil {
+			break
+		}
+
+		return e.complexity.TeamMemberContribution.UserName(childComplexity), true
+	case "TeamMemberContribution.workedMinutes":
+		if e.complexity.TeamMemberContribution.WorkedMinutes == nil {
+			break
+		}
+
+		return e.complexity.TeamMemberContribution.WorkedMinutes(childComplexity), true
 
 	case "TeamUser.teamID":
 		if e.complexity.TeamUser.TeamID == nil {
@@ -1031,6 +1684,56 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.UserLogged.Token(childComplexity), true
 
+	case "UserOvertimeDetail.daysWorked":
+		if e.complexity.UserOvertimeDetail.DaysWorked == nil {
+			break
+		}
+
+		return e.complexity.UserOvertimeDetail.DaysWorked(childComplexity), true
+	case "UserOvertimeDetail.overtimeMinutes":
+		if e.complexity.UserOvertimeDetail.OvertimeMinutes == nil {
+			break
+		}
+
+		return e.complexity.UserOvertimeDetail.OvertimeMinutes(childComplexity), true
+	case "UserOvertimeDetail.userID":
+		if e.complexity.UserOvertimeDetail.UserID == nil {
+			break
+		}
+
+		return e.complexity.UserOvertimeDetail.UserID(childComplexity), true
+	case "UserOvertimeDetail.userName":
+		if e.complexity.UserOvertimeDetail.UserName == nil {
+			break
+		}
+
+		return e.complexity.UserOvertimeDetail.UserName(childComplexity), true
+
+	case "UserProductivityDetail.efficiencyRate":
+		if e.complexity.UserProductivityDetail.EfficiencyRate == nil {
+			break
+		}
+
+		return e.complexity.UserProductivityDetail.EfficiencyRate(childComplexity), true
+	case "UserProductivityDetail.totalHours":
+		if e.complexity.UserProductivityDetail.TotalHours == nil {
+			break
+		}
+
+		return e.complexity.UserProductivityDetail.TotalHours(childComplexity), true
+	case "UserProductivityDetail.userID":
+		if e.complexity.UserProductivityDetail.UserID == nil {
+			break
+		}
+
+		return e.complexity.UserProductivityDetail.UserID(childComplexity), true
+	case "UserProductivityDetail.userName":
+		if e.complexity.UserProductivityDetail.UserName == nil {
+			break
+		}
+
+		return e.complexity.UserProductivityDetail.UserName(childComplexity), true
+
 	case "UserWithAllData.email":
 		if e.complexity.UserWithAllData.Email == nil {
 			break
@@ -1085,6 +1788,68 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.UserWithAllData.TimeTableEntries(childComplexity), true
+
+	case "WorkloadAnalysis.avgDailyMinutes":
+		if e.complexity.WorkloadAnalysis.AvgDailyMinutes == nil {
+			break
+		}
+
+		return e.complexity.WorkloadAnalysis.AvgDailyMinutes(childComplexity), true
+	case "WorkloadAnalysis.avgWeeklyMinutes":
+		if e.complexity.WorkloadAnalysis.AvgWeeklyMinutes == nil {
+			break
+		}
+
+		return e.complexity.WorkloadAnalysis.AvgWeeklyMinutes(childComplexity), true
+	case "WorkloadAnalysis.distributionByDay":
+		if e.complexity.WorkloadAnalysis.DistributionByDay == nil {
+			break
+		}
+
+		return e.complexity.WorkloadAnalysis.DistributionByDay(childComplexity), true
+	case "WorkloadAnalysis.peakDay":
+		if e.complexity.WorkloadAnalysis.PeakDay == nil {
+			break
+		}
+
+		return e.complexity.WorkloadAnalysis.PeakDay(childComplexity), true
+	case "WorkloadAnalysis.peakDayMinutes":
+		if e.complexity.WorkloadAnalysis.PeakDayMinutes == nil {
+			break
+		}
+
+		return e.complexity.WorkloadAnalysis.PeakDayMinutes(childComplexity), true
+	case "WorkloadAnalysis.totalOvertime":
+		if e.complexity.WorkloadAnalysis.TotalOvertime == nil {
+			break
+		}
+
+		return e.complexity.WorkloadAnalysis.TotalOvertime(childComplexity), true
+	case "WorkloadAnalysis.usersWithOvertime":
+		if e.complexity.WorkloadAnalysis.UsersWithOvertime == nil {
+			break
+		}
+
+		return e.complexity.WorkloadAnalysis.UsersWithOvertime(childComplexity), true
+
+	case "WorkloadDistribution.percentage":
+		if e.complexity.WorkloadDistribution.Percentage == nil {
+			break
+		}
+
+		return e.complexity.WorkloadDistribution.Percentage(childComplexity), true
+	case "WorkloadDistribution.range":
+		if e.complexity.WorkloadDistribution.Range == nil {
+			break
+		}
+
+		return e.complexity.WorkloadDistribution.Range(childComplexity), true
+	case "WorkloadDistribution.userCount":
+		if e.complexity.WorkloadDistribution.UserCount == nil {
+			break
+		}
+
+		return e.complexity.WorkloadDistribution.UserCount(childComplexity), true
 
 	}
 	return 0, false
@@ -1474,6 +2239,43 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_adminKpiDashboard_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "from", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["from"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "to", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["to"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_complianceMetrics_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "teamID", ec.unmarshalOID2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["teamID"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "from", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["from"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "to", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["to"] = arg2
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_exportUserKpiCSV_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1545,6 +2347,85 @@ func (ec *executionContext) field_Query_kpiUserSummary_args(ctx context.Context,
 		return nil, err
 	}
 	args["to"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_overtimeReport_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "teamID", ec.unmarshalOID2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["teamID"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "from", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["from"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "to", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["to"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_productivityMetrics_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "teamID", ec.unmarshalOID2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["teamID"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "from", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["from"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "to", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["to"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_punctualityMetrics_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "teamID", ec.unmarshalOID2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["teamID"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "from", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["from"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "to", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["to"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_teamDetailedReports_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "from", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["from"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "to", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["to"] = arg1
 	return args, nil
 }
 
@@ -1629,6 +2510,27 @@ func (ec *executionContext) field_Query_usersByTeam_args(ctx context.Context, ra
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_workloadAnalysis_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "teamID", ec.unmarshalOID2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["teamID"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "from", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["from"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "to", ec.unmarshalODate2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["to"] = arg2
+	return args, nil
+}
+
 func (ec *executionContext) field___Directive_args_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1681,6 +2583,820 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _AdminKpiDashboard_period(ctx context.Context, field graphql.CollectedField, obj *model.AdminKpiDashboard) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AdminKpiDashboard_period,
+		func(ctx context.Context) (any, error) {
+			return obj.Period, nil
+		},
+		nil,
+		ec.marshalNDateRange2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐDateRange,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AdminKpiDashboard_period(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminKpiDashboard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "from":
+				return ec.fieldContext_DateRange_from(ctx, field)
+			case "to":
+				return ec.fieldContext_DateRange_to(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DateRange", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminKpiDashboard_summary(ctx context.Context, field graphql.CollectedField, obj *model.AdminKpiDashboard) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AdminKpiDashboard_summary,
+		func(ctx context.Context) (any, error) {
+			return obj.Summary, nil
+		},
+		nil,
+		ec.marshalNAdminKpiSummary2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐAdminKpiSummary,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AdminKpiDashboard_summary(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminKpiDashboard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalUsers":
+				return ec.fieldContext_AdminKpiSummary_totalUsers(ctx, field)
+			case "activeUsers":
+				return ec.fieldContext_AdminKpiSummary_activeUsers(ctx, field)
+			case "totalTeams":
+				return ec.fieldContext_AdminKpiSummary_totalTeams(ctx, field)
+			case "totalWorkedHours":
+				return ec.fieldContext_AdminKpiSummary_totalWorkedHours(ctx, field)
+			case "avgHoursPerUser":
+				return ec.fieldContext_AdminKpiSummary_avgHoursPerUser(ctx, field)
+			case "complianceRate":
+				return ec.fieldContext_AdminKpiSummary_complianceRate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AdminKpiSummary", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminKpiDashboard_workload(ctx context.Context, field graphql.CollectedField, obj *model.AdminKpiDashboard) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AdminKpiDashboard_workload,
+		func(ctx context.Context) (any, error) {
+			return obj.Workload, nil
+		},
+		nil,
+		ec.marshalNWorkloadAnalysis2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐWorkloadAnalysis,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AdminKpiDashboard_workload(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminKpiDashboard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "avgDailyMinutes":
+				return ec.fieldContext_WorkloadAnalysis_avgDailyMinutes(ctx, field)
+			case "avgWeeklyMinutes":
+				return ec.fieldContext_WorkloadAnalysis_avgWeeklyMinutes(ctx, field)
+			case "peakDayMinutes":
+				return ec.fieldContext_WorkloadAnalysis_peakDayMinutes(ctx, field)
+			case "peakDay":
+				return ec.fieldContext_WorkloadAnalysis_peakDay(ctx, field)
+			case "distributionByDay":
+				return ec.fieldContext_WorkloadAnalysis_distributionByDay(ctx, field)
+			case "totalOvertime":
+				return ec.fieldContext_WorkloadAnalysis_totalOvertime(ctx, field)
+			case "usersWithOvertime":
+				return ec.fieldContext_WorkloadAnalysis_usersWithOvertime(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type WorkloadAnalysis", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminKpiDashboard_punctuality(ctx context.Context, field graphql.CollectedField, obj *model.AdminKpiDashboard) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AdminKpiDashboard_punctuality,
+		func(ctx context.Context) (any, error) {
+			return obj.Punctuality, nil
+		},
+		nil,
+		ec.marshalNPunctualityMetrics2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐPunctualityMetrics,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AdminKpiDashboard_punctuality(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminKpiDashboard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "onTimeRate":
+				return ec.fieldContext_PunctualityMetrics_onTimeRate(ctx, field)
+			case "lateRate":
+				return ec.fieldContext_PunctualityMetrics_lateRate(ctx, field)
+			case "avgLateMinutes":
+				return ec.fieldContext_PunctualityMetrics_avgLateMinutes(ctx, field)
+			case "totalLateIncidents":
+				return ec.fieldContext_PunctualityMetrics_totalLateIncidents(ctx, field)
+			case "punctualUsers":
+				return ec.fieldContext_PunctualityMetrics_punctualUsers(ctx, field)
+			case "lateUsers":
+				return ec.fieldContext_PunctualityMetrics_lateUsers(ctx, field)
+			case "trendByWeek":
+				return ec.fieldContext_PunctualityMetrics_trendByWeek(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PunctualityMetrics", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminKpiDashboard_overtime(ctx context.Context, field graphql.CollectedField, obj *model.AdminKpiDashboard) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AdminKpiDashboard_overtime,
+		func(ctx context.Context) (any, error) {
+			return obj.Overtime, nil
+		},
+		nil,
+		ec.marshalNOvertimeReport2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐOvertimeReport,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AdminKpiDashboard_overtime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminKpiDashboard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalOvertimeMinutes":
+				return ec.fieldContext_OvertimeReport_totalOvertimeMinutes(ctx, field)
+			case "avgOvertimePerUser":
+				return ec.fieldContext_OvertimeReport_avgOvertimePerUser(ctx, field)
+			case "usersWithOvertime":
+				return ec.fieldContext_OvertimeReport_usersWithOvertime(ctx, field)
+			case "topOvertimeUsers":
+				return ec.fieldContext_OvertimeReport_topOvertimeUsers(ctx, field)
+			case "overtimeByWeek":
+				return ec.fieldContext_OvertimeReport_overtimeByWeek(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type OvertimeReport", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminKpiDashboard_compliance(ctx context.Context, field graphql.CollectedField, obj *model.AdminKpiDashboard) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AdminKpiDashboard_compliance,
+		func(ctx context.Context) (any, error) {
+			return obj.Compliance, nil
+		},
+		nil,
+		ec.marshalNComplianceMetrics2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐComplianceMetrics,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AdminKpiDashboard_compliance(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminKpiDashboard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "missingEntriesCount":
+				return ec.fieldContext_ComplianceMetrics_missingEntriesCount(ctx, field)
+			case "incompleteEntriesCount":
+				return ec.fieldContext_ComplianceMetrics_incompleteEntriesCount(ctx, field)
+			case "anomaliesCount":
+				return ec.fieldContext_ComplianceMetrics_anomaliesCount(ctx, field)
+			case "complianceRate":
+				return ec.fieldContext_ComplianceMetrics_complianceRate(ctx, field)
+			case "usersWithIssues":
+				return ec.fieldContext_ComplianceMetrics_usersWithIssues(ctx, field)
+			case "anomalies":
+				return ec.fieldContext_ComplianceMetrics_anomalies(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ComplianceMetrics", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminKpiDashboard_productivity(ctx context.Context, field graphql.CollectedField, obj *model.AdminKpiDashboard) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AdminKpiDashboard_productivity,
+		func(ctx context.Context) (any, error) {
+			return obj.Productivity, nil
+		},
+		nil,
+		ec.marshalNProductivityMetrics2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐProductivityMetrics,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AdminKpiDashboard_productivity(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminKpiDashboard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "avgEfficiencyRate":
+				return ec.fieldContext_ProductivityMetrics_avgEfficiencyRate(ctx, field)
+			case "totalProductiveHours":
+				return ec.fieldContext_ProductivityMetrics_totalProductiveHours(ctx, field)
+			case "avgHoursPerUser":
+				return ec.fieldContext_ProductivityMetrics_avgHoursPerUser(ctx, field)
+			case "topPerformers":
+				return ec.fieldContext_ProductivityMetrics_topPerformers(ctx, field)
+			case "productivityTrend":
+				return ec.fieldContext_ProductivityMetrics_productivityTrend(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProductivityMetrics", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminKpiDashboard_teams(ctx context.Context, field graphql.CollectedField, obj *model.AdminKpiDashboard) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AdminKpiDashboard_teams,
+		func(ctx context.Context) (any, error) {
+			return obj.Teams, nil
+		},
+		nil,
+		ec.marshalNTeamDetailedReport2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamDetailedReportᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AdminKpiDashboard_teams(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminKpiDashboard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "teamID":
+				return ec.fieldContext_TeamDetailedReport_teamID(ctx, field)
+			case "teamName":
+				return ec.fieldContext_TeamDetailedReport_teamName(ctx, field)
+			case "memberCount":
+				return ec.fieldContext_TeamDetailedReport_memberCount(ctx, field)
+			case "totalWorkedMinutes":
+				return ec.fieldContext_TeamDetailedReport_totalWorkedMinutes(ctx, field)
+			case "avgMinutesPerMember":
+				return ec.fieldContext_TeamDetailedReport_avgMinutesPerMember(ctx, field)
+			case "activeNow":
+				return ec.fieldContext_TeamDetailedReport_activeNow(ctx, field)
+			case "topContributors":
+				return ec.fieldContext_TeamDetailedReport_topContributors(ctx, field)
+			case "workloadDistribution":
+				return ec.fieldContext_TeamDetailedReport_workloadDistribution(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TeamDetailedReport", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminKpiSummary_totalUsers(ctx context.Context, field graphql.CollectedField, obj *model.AdminKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AdminKpiSummary_totalUsers,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalUsers, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AdminKpiSummary_totalUsers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminKpiSummary_activeUsers(ctx context.Context, field graphql.CollectedField, obj *model.AdminKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AdminKpiSummary_activeUsers,
+		func(ctx context.Context) (any, error) {
+			return obj.ActiveUsers, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AdminKpiSummary_activeUsers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminKpiSummary_totalTeams(ctx context.Context, field graphql.CollectedField, obj *model.AdminKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AdminKpiSummary_totalTeams,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalTeams, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AdminKpiSummary_totalTeams(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminKpiSummary_totalWorkedHours(ctx context.Context, field graphql.CollectedField, obj *model.AdminKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AdminKpiSummary_totalWorkedHours,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalWorkedHours, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AdminKpiSummary_totalWorkedHours(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminKpiSummary_avgHoursPerUser(ctx context.Context, field graphql.CollectedField, obj *model.AdminKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AdminKpiSummary_avgHoursPerUser,
+		func(ctx context.Context) (any, error) {
+			return obj.AvgHoursPerUser, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AdminKpiSummary_avgHoursPerUser(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminKpiSummary_complianceRate(ctx context.Context, field graphql.CollectedField, obj *model.AdminKpiSummary) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AdminKpiSummary_complianceRate,
+		func(ctx context.Context) (any, error) {
+			return obj.ComplianceRate, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AdminKpiSummary_complianceRate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminKpiSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ComplianceAnomaly_type(ctx context.Context, field graphql.CollectedField, obj *model.ComplianceAnomaly) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ComplianceAnomaly_type,
+		func(ctx context.Context) (any, error) {
+			return obj.Type, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ComplianceAnomaly_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ComplianceAnomaly",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ComplianceAnomaly_count(ctx context.Context, field graphql.CollectedField, obj *model.ComplianceAnomaly) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ComplianceAnomaly_count,
+		func(ctx context.Context) (any, error) {
+			return obj.Count, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ComplianceAnomaly_count(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ComplianceAnomaly",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ComplianceAnomaly_severity(ctx context.Context, field graphql.CollectedField, obj *model.ComplianceAnomaly) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ComplianceAnomaly_severity,
+		func(ctx context.Context) (any, error) {
+			return obj.Severity, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ComplianceAnomaly_severity(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ComplianceAnomaly",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ComplianceAnomaly_affectedUsers(ctx context.Context, field graphql.CollectedField, obj *model.ComplianceAnomaly) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ComplianceAnomaly_affectedUsers,
+		func(ctx context.Context) (any, error) {
+			return obj.AffectedUsers, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ComplianceAnomaly_affectedUsers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ComplianceAnomaly",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ComplianceMetrics_missingEntriesCount(ctx context.Context, field graphql.CollectedField, obj *model.ComplianceMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ComplianceMetrics_missingEntriesCount,
+		func(ctx context.Context) (any, error) {
+			return obj.MissingEntriesCount, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ComplianceMetrics_missingEntriesCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ComplianceMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ComplianceMetrics_incompleteEntriesCount(ctx context.Context, field graphql.CollectedField, obj *model.ComplianceMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ComplianceMetrics_incompleteEntriesCount,
+		func(ctx context.Context) (any, error) {
+			return obj.IncompleteEntriesCount, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ComplianceMetrics_incompleteEntriesCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ComplianceMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ComplianceMetrics_anomaliesCount(ctx context.Context, field graphql.CollectedField, obj *model.ComplianceMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ComplianceMetrics_anomaliesCount,
+		func(ctx context.Context) (any, error) {
+			return obj.AnomaliesCount, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ComplianceMetrics_anomaliesCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ComplianceMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ComplianceMetrics_complianceRate(ctx context.Context, field graphql.CollectedField, obj *model.ComplianceMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ComplianceMetrics_complianceRate,
+		func(ctx context.Context) (any, error) {
+			return obj.ComplianceRate, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ComplianceMetrics_complianceRate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ComplianceMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ComplianceMetrics_usersWithIssues(ctx context.Context, field graphql.CollectedField, obj *model.ComplianceMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ComplianceMetrics_usersWithIssues,
+		func(ctx context.Context) (any, error) {
+			return obj.UsersWithIssues, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ComplianceMetrics_usersWithIssues(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ComplianceMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ComplianceMetrics_anomalies(ctx context.Context, field graphql.CollectedField, obj *model.ComplianceMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ComplianceMetrics_anomalies,
+		func(ctx context.Context) (any, error) {
+			return obj.Anomalies, nil
+		},
+		nil,
+		ec.marshalNComplianceAnomaly2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐComplianceAnomalyᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ComplianceMetrics_anomalies(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ComplianceMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "type":
+				return ec.fieldContext_ComplianceAnomaly_type(ctx, field)
+			case "count":
+				return ec.fieldContext_ComplianceAnomaly_count(ctx, field)
+			case "severity":
+				return ec.fieldContext_ComplianceAnomaly_severity(ctx, field)
+			case "affectedUsers":
+				return ec.fieldContext_ComplianceAnomaly_affectedUsers(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ComplianceAnomaly", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CoveragePoint_time(ctx context.Context, field graphql.CollectedField, obj *model.CoveragePoint) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -1729,6 +3445,151 @@ func (ec *executionContext) _CoveragePoint_count(ctx context.Context, field grap
 func (ec *executionContext) fieldContext_CoveragePoint_count(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "CoveragePoint",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DateRange_from(ctx context.Context, field graphql.CollectedField, obj *model.DateRange) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DateRange_from,
+		func(ctx context.Context) (any, error) {
+			return obj.From, nil
+		},
+		nil,
+		ec.marshalNDate2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DateRange_from(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DateRange",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DateRange_to(ctx context.Context, field graphql.CollectedField, obj *model.DateRange) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DateRange_to,
+		func(ctx context.Context) (any, error) {
+			return obj.To, nil
+		},
+		nil,
+		ec.marshalNDate2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DateRange_to(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DateRange",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DayDistribution_day(ctx context.Context, field graphql.CollectedField, obj *model.DayDistribution) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DayDistribution_day,
+		func(ctx context.Context) (any, error) {
+			return obj.Day, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DayDistribution_day(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DayDistribution",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DayDistribution_avgMinutes(ctx context.Context, field graphql.CollectedField, obj *model.DayDistribution) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DayDistribution_avgMinutes,
+		func(ctx context.Context) (any, error) {
+			return obj.AvgMinutes, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DayDistribution_avgMinutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DayDistribution",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DayDistribution_totalMinutes(ctx context.Context, field graphql.CollectedField, obj *model.DayDistribution) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DayDistribution_totalMinutes,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalMinutes, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DayDistribution_totalMinutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DayDistribution",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2924,6 +4785,804 @@ func (ec *executionContext) fieldContext_Mutation_clockOut(_ context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _OvertimeByPeriod_periodStart(ctx context.Context, field graphql.CollectedField, obj *model.OvertimeByPeriod) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_OvertimeByPeriod_periodStart,
+		func(ctx context.Context) (any, error) {
+			return obj.PeriodStart, nil
+		},
+		nil,
+		ec.marshalNDate2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_OvertimeByPeriod_periodStart(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OvertimeByPeriod",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OvertimeByPeriod_totalMinutes(ctx context.Context, field graphql.CollectedField, obj *model.OvertimeByPeriod) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_OvertimeByPeriod_totalMinutes,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalMinutes, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_OvertimeByPeriod_totalMinutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OvertimeByPeriod",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OvertimeByPeriod_usersCount(ctx context.Context, field graphql.CollectedField, obj *model.OvertimeByPeriod) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_OvertimeByPeriod_usersCount,
+		func(ctx context.Context) (any, error) {
+			return obj.UsersCount, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_OvertimeByPeriod_usersCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OvertimeByPeriod",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OvertimeReport_totalOvertimeMinutes(ctx context.Context, field graphql.CollectedField, obj *model.OvertimeReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_OvertimeReport_totalOvertimeMinutes,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalOvertimeMinutes, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_OvertimeReport_totalOvertimeMinutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OvertimeReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OvertimeReport_avgOvertimePerUser(ctx context.Context, field graphql.CollectedField, obj *model.OvertimeReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_OvertimeReport_avgOvertimePerUser,
+		func(ctx context.Context) (any, error) {
+			return obj.AvgOvertimePerUser, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_OvertimeReport_avgOvertimePerUser(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OvertimeReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OvertimeReport_usersWithOvertime(ctx context.Context, field graphql.CollectedField, obj *model.OvertimeReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_OvertimeReport_usersWithOvertime,
+		func(ctx context.Context) (any, error) {
+			return obj.UsersWithOvertime, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_OvertimeReport_usersWithOvertime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OvertimeReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OvertimeReport_topOvertimeUsers(ctx context.Context, field graphql.CollectedField, obj *model.OvertimeReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_OvertimeReport_topOvertimeUsers,
+		func(ctx context.Context) (any, error) {
+			return obj.TopOvertimeUsers, nil
+		},
+		nil,
+		ec.marshalNUserOvertimeDetail2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserOvertimeDetailᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_OvertimeReport_topOvertimeUsers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OvertimeReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "userID":
+				return ec.fieldContext_UserOvertimeDetail_userID(ctx, field)
+			case "userName":
+				return ec.fieldContext_UserOvertimeDetail_userName(ctx, field)
+			case "overtimeMinutes":
+				return ec.fieldContext_UserOvertimeDetail_overtimeMinutes(ctx, field)
+			case "daysWorked":
+				return ec.fieldContext_UserOvertimeDetail_daysWorked(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserOvertimeDetail", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OvertimeReport_overtimeByWeek(ctx context.Context, field graphql.CollectedField, obj *model.OvertimeReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_OvertimeReport_overtimeByWeek,
+		func(ctx context.Context) (any, error) {
+			return obj.OvertimeByWeek, nil
+		},
+		nil,
+		ec.marshalNOvertimeByPeriod2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐOvertimeByPeriodᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_OvertimeReport_overtimeByWeek(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OvertimeReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "periodStart":
+				return ec.fieldContext_OvertimeByPeriod_periodStart(ctx, field)
+			case "totalMinutes":
+				return ec.fieldContext_OvertimeByPeriod_totalMinutes(ctx, field)
+			case "usersCount":
+				return ec.fieldContext_OvertimeByPeriod_usersCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type OvertimeByPeriod", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductivityMetrics_avgEfficiencyRate(ctx context.Context, field graphql.CollectedField, obj *model.ProductivityMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductivityMetrics_avgEfficiencyRate,
+		func(ctx context.Context) (any, error) {
+			return obj.AvgEfficiencyRate, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductivityMetrics_avgEfficiencyRate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductivityMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductivityMetrics_totalProductiveHours(ctx context.Context, field graphql.CollectedField, obj *model.ProductivityMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductivityMetrics_totalProductiveHours,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalProductiveHours, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductivityMetrics_totalProductiveHours(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductivityMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductivityMetrics_avgHoursPerUser(ctx context.Context, field graphql.CollectedField, obj *model.ProductivityMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductivityMetrics_avgHoursPerUser,
+		func(ctx context.Context) (any, error) {
+			return obj.AvgHoursPerUser, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductivityMetrics_avgHoursPerUser(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductivityMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductivityMetrics_topPerformers(ctx context.Context, field graphql.CollectedField, obj *model.ProductivityMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductivityMetrics_topPerformers,
+		func(ctx context.Context) (any, error) {
+			return obj.TopPerformers, nil
+		},
+		nil,
+		ec.marshalNUserProductivityDetail2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserProductivityDetailᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductivityMetrics_topPerformers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductivityMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "userID":
+				return ec.fieldContext_UserProductivityDetail_userID(ctx, field)
+			case "userName":
+				return ec.fieldContext_UserProductivityDetail_userName(ctx, field)
+			case "efficiencyRate":
+				return ec.fieldContext_UserProductivityDetail_efficiencyRate(ctx, field)
+			case "totalHours":
+				return ec.fieldContext_UserProductivityDetail_totalHours(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserProductivityDetail", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductivityMetrics_productivityTrend(ctx context.Context, field graphql.CollectedField, obj *model.ProductivityMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductivityMetrics_productivityTrend,
+		func(ctx context.Context) (any, error) {
+			return obj.ProductivityTrend, nil
+		},
+		nil,
+		ec.marshalNProductivityTrend2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐProductivityTrendᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductivityMetrics_productivityTrend(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductivityMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "date":
+				return ec.fieldContext_ProductivityTrend_date(ctx, field)
+			case "avgEfficiency":
+				return ec.fieldContext_ProductivityTrend_avgEfficiency(ctx, field)
+			case "totalHours":
+				return ec.fieldContext_ProductivityTrend_totalHours(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProductivityTrend", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductivityTrend_date(ctx context.Context, field graphql.CollectedField, obj *model.ProductivityTrend) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductivityTrend_date,
+		func(ctx context.Context) (any, error) {
+			return obj.Date, nil
+		},
+		nil,
+		ec.marshalNDate2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductivityTrend_date(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductivityTrend",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductivityTrend_avgEfficiency(ctx context.Context, field graphql.CollectedField, obj *model.ProductivityTrend) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductivityTrend_avgEfficiency,
+		func(ctx context.Context) (any, error) {
+			return obj.AvgEfficiency, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductivityTrend_avgEfficiency(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductivityTrend",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductivityTrend_totalHours(ctx context.Context, field graphql.CollectedField, obj *model.ProductivityTrend) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductivityTrend_totalHours,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalHours, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductivityTrend_totalHours(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductivityTrend",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PunctualityMetrics_onTimeRate(ctx context.Context, field graphql.CollectedField, obj *model.PunctualityMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_PunctualityMetrics_onTimeRate,
+		func(ctx context.Context) (any, error) {
+			return obj.OnTimeRate, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_PunctualityMetrics_onTimeRate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PunctualityMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PunctualityMetrics_lateRate(ctx context.Context, field graphql.CollectedField, obj *model.PunctualityMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_PunctualityMetrics_lateRate,
+		func(ctx context.Context) (any, error) {
+			return obj.LateRate, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_PunctualityMetrics_lateRate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PunctualityMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PunctualityMetrics_avgLateMinutes(ctx context.Context, field graphql.CollectedField, obj *model.PunctualityMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_PunctualityMetrics_avgLateMinutes,
+		func(ctx context.Context) (any, error) {
+			return obj.AvgLateMinutes, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_PunctualityMetrics_avgLateMinutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PunctualityMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PunctualityMetrics_totalLateIncidents(ctx context.Context, field graphql.CollectedField, obj *model.PunctualityMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_PunctualityMetrics_totalLateIncidents,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalLateIncidents, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_PunctualityMetrics_totalLateIncidents(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PunctualityMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PunctualityMetrics_punctualUsers(ctx context.Context, field graphql.CollectedField, obj *model.PunctualityMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_PunctualityMetrics_punctualUsers,
+		func(ctx context.Context) (any, error) {
+			return obj.PunctualUsers, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_PunctualityMetrics_punctualUsers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PunctualityMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PunctualityMetrics_lateUsers(ctx context.Context, field graphql.CollectedField, obj *model.PunctualityMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_PunctualityMetrics_lateUsers,
+		func(ctx context.Context) (any, error) {
+			return obj.LateUsers, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_PunctualityMetrics_lateUsers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PunctualityMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PunctualityMetrics_trendByWeek(ctx context.Context, field graphql.CollectedField, obj *model.PunctualityMetrics) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_PunctualityMetrics_trendByWeek,
+		func(ctx context.Context) (any, error) {
+			return obj.TrendByWeek, nil
+		},
+		nil,
+		ec.marshalNPunctualityTrend2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐPunctualityTrendᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_PunctualityMetrics_trendByWeek(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PunctualityMetrics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "weekStart":
+				return ec.fieldContext_PunctualityTrend_weekStart(ctx, field)
+			case "onTimeRate":
+				return ec.fieldContext_PunctualityTrend_onTimeRate(ctx, field)
+			case "avgLateMinutes":
+				return ec.fieldContext_PunctualityTrend_avgLateMinutes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PunctualityTrend", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PunctualityTrend_weekStart(ctx context.Context, field graphql.CollectedField, obj *model.PunctualityTrend) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_PunctualityTrend_weekStart,
+		func(ctx context.Context) (any, error) {
+			return obj.WeekStart, nil
+		},
+		nil,
+		ec.marshalNDate2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_PunctualityTrend_weekStart(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PunctualityTrend",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PunctualityTrend_onTimeRate(ctx context.Context, field graphql.CollectedField, obj *model.PunctualityTrend) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_PunctualityTrend_onTimeRate,
+		func(ctx context.Context) (any, error) {
+			return obj.OnTimeRate, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_PunctualityTrend_onTimeRate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PunctualityTrend",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PunctualityTrend_avgLateMinutes(ctx context.Context, field graphql.CollectedField, obj *model.PunctualityTrend) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_PunctualityTrend_avgLateMinutes,
+		func(ctx context.Context) (any, error) {
+			return obj.AvgLateMinutes, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_PunctualityTrend_avgLateMinutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PunctualityTrend",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_teamUsers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -3781,6 +6440,399 @@ func (ec *executionContext) fieldContext_Query_exportUserKpiCSV(ctx context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_adminKpiDashboard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_adminKpiDashboard,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().AdminKpiDashboard(ctx, fc.Args["from"].(*string), fc.Args["to"].(*string))
+		},
+		nil,
+		ec.marshalNAdminKpiDashboard2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐAdminKpiDashboard,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_adminKpiDashboard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "period":
+				return ec.fieldContext_AdminKpiDashboard_period(ctx, field)
+			case "summary":
+				return ec.fieldContext_AdminKpiDashboard_summary(ctx, field)
+			case "workload":
+				return ec.fieldContext_AdminKpiDashboard_workload(ctx, field)
+			case "punctuality":
+				return ec.fieldContext_AdminKpiDashboard_punctuality(ctx, field)
+			case "overtime":
+				return ec.fieldContext_AdminKpiDashboard_overtime(ctx, field)
+			case "compliance":
+				return ec.fieldContext_AdminKpiDashboard_compliance(ctx, field)
+			case "productivity":
+				return ec.fieldContext_AdminKpiDashboard_productivity(ctx, field)
+			case "teams":
+				return ec.fieldContext_AdminKpiDashboard_teams(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AdminKpiDashboard", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_adminKpiDashboard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_workloadAnalysis(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_workloadAnalysis,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().WorkloadAnalysis(ctx, fc.Args["teamID"].(*string), fc.Args["from"].(*string), fc.Args["to"].(*string))
+		},
+		nil,
+		ec.marshalNWorkloadAnalysis2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐWorkloadAnalysis,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_workloadAnalysis(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "avgDailyMinutes":
+				return ec.fieldContext_WorkloadAnalysis_avgDailyMinutes(ctx, field)
+			case "avgWeeklyMinutes":
+				return ec.fieldContext_WorkloadAnalysis_avgWeeklyMinutes(ctx, field)
+			case "peakDayMinutes":
+				return ec.fieldContext_WorkloadAnalysis_peakDayMinutes(ctx, field)
+			case "peakDay":
+				return ec.fieldContext_WorkloadAnalysis_peakDay(ctx, field)
+			case "distributionByDay":
+				return ec.fieldContext_WorkloadAnalysis_distributionByDay(ctx, field)
+			case "totalOvertime":
+				return ec.fieldContext_WorkloadAnalysis_totalOvertime(ctx, field)
+			case "usersWithOvertime":
+				return ec.fieldContext_WorkloadAnalysis_usersWithOvertime(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type WorkloadAnalysis", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_workloadAnalysis_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_punctualityMetrics(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_punctualityMetrics,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().PunctualityMetrics(ctx, fc.Args["teamID"].(*string), fc.Args["from"].(*string), fc.Args["to"].(*string))
+		},
+		nil,
+		ec.marshalNPunctualityMetrics2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐPunctualityMetrics,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_punctualityMetrics(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "onTimeRate":
+				return ec.fieldContext_PunctualityMetrics_onTimeRate(ctx, field)
+			case "lateRate":
+				return ec.fieldContext_PunctualityMetrics_lateRate(ctx, field)
+			case "avgLateMinutes":
+				return ec.fieldContext_PunctualityMetrics_avgLateMinutes(ctx, field)
+			case "totalLateIncidents":
+				return ec.fieldContext_PunctualityMetrics_totalLateIncidents(ctx, field)
+			case "punctualUsers":
+				return ec.fieldContext_PunctualityMetrics_punctualUsers(ctx, field)
+			case "lateUsers":
+				return ec.fieldContext_PunctualityMetrics_lateUsers(ctx, field)
+			case "trendByWeek":
+				return ec.fieldContext_PunctualityMetrics_trendByWeek(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PunctualityMetrics", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_punctualityMetrics_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_overtimeReport(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_overtimeReport,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().OvertimeReport(ctx, fc.Args["teamID"].(*string), fc.Args["from"].(*string), fc.Args["to"].(*string))
+		},
+		nil,
+		ec.marshalNOvertimeReport2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐOvertimeReport,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_overtimeReport(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalOvertimeMinutes":
+				return ec.fieldContext_OvertimeReport_totalOvertimeMinutes(ctx, field)
+			case "avgOvertimePerUser":
+				return ec.fieldContext_OvertimeReport_avgOvertimePerUser(ctx, field)
+			case "usersWithOvertime":
+				return ec.fieldContext_OvertimeReport_usersWithOvertime(ctx, field)
+			case "topOvertimeUsers":
+				return ec.fieldContext_OvertimeReport_topOvertimeUsers(ctx, field)
+			case "overtimeByWeek":
+				return ec.fieldContext_OvertimeReport_overtimeByWeek(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type OvertimeReport", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_overtimeReport_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_complianceMetrics(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_complianceMetrics,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().ComplianceMetrics(ctx, fc.Args["teamID"].(*string), fc.Args["from"].(*string), fc.Args["to"].(*string))
+		},
+		nil,
+		ec.marshalNComplianceMetrics2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐComplianceMetrics,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_complianceMetrics(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "missingEntriesCount":
+				return ec.fieldContext_ComplianceMetrics_missingEntriesCount(ctx, field)
+			case "incompleteEntriesCount":
+				return ec.fieldContext_ComplianceMetrics_incompleteEntriesCount(ctx, field)
+			case "anomaliesCount":
+				return ec.fieldContext_ComplianceMetrics_anomaliesCount(ctx, field)
+			case "complianceRate":
+				return ec.fieldContext_ComplianceMetrics_complianceRate(ctx, field)
+			case "usersWithIssues":
+				return ec.fieldContext_ComplianceMetrics_usersWithIssues(ctx, field)
+			case "anomalies":
+				return ec.fieldContext_ComplianceMetrics_anomalies(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ComplianceMetrics", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_complianceMetrics_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_productivityMetrics(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_productivityMetrics,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().ProductivityMetrics(ctx, fc.Args["teamID"].(*string), fc.Args["from"].(*string), fc.Args["to"].(*string))
+		},
+		nil,
+		ec.marshalNProductivityMetrics2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐProductivityMetrics,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_productivityMetrics(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "avgEfficiencyRate":
+				return ec.fieldContext_ProductivityMetrics_avgEfficiencyRate(ctx, field)
+			case "totalProductiveHours":
+				return ec.fieldContext_ProductivityMetrics_totalProductiveHours(ctx, field)
+			case "avgHoursPerUser":
+				return ec.fieldContext_ProductivityMetrics_avgHoursPerUser(ctx, field)
+			case "topPerformers":
+				return ec.fieldContext_ProductivityMetrics_topPerformers(ctx, field)
+			case "productivityTrend":
+				return ec.fieldContext_ProductivityMetrics_productivityTrend(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProductivityMetrics", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_productivityMetrics_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_teamDetailedReports(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_teamDetailedReports,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().TeamDetailedReports(ctx, fc.Args["from"].(*string), fc.Args["to"].(*string))
+		},
+		nil,
+		ec.marshalNTeamDetailedReport2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamDetailedReportᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_teamDetailedReports(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "teamID":
+				return ec.fieldContext_TeamDetailedReport_teamID(ctx, field)
+			case "teamName":
+				return ec.fieldContext_TeamDetailedReport_teamName(ctx, field)
+			case "memberCount":
+				return ec.fieldContext_TeamDetailedReport_memberCount(ctx, field)
+			case "totalWorkedMinutes":
+				return ec.fieldContext_TeamDetailedReport_totalWorkedMinutes(ctx, field)
+			case "avgMinutesPerMember":
+				return ec.fieldContext_TeamDetailedReport_avgMinutesPerMember(ctx, field)
+			case "activeNow":
+				return ec.fieldContext_TeamDetailedReport_activeNow(ctx, field)
+			case "topContributors":
+				return ec.fieldContext_TeamDetailedReport_topContributors(ctx, field)
+			case "workloadDistribution":
+				return ec.fieldContext_TeamDetailedReport_workloadDistribution(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TeamDetailedReport", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_teamDetailedReports_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -4331,6 +7383,258 @@ func (ec *executionContext) fieldContext_Team_users(_ context.Context, field gra
 	return fc, nil
 }
 
+func (ec *executionContext) _TeamDetailedReport_teamID(ctx context.Context, field graphql.CollectedField, obj *model.TeamDetailedReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamDetailedReport_teamID,
+		func(ctx context.Context) (any, error) {
+			return obj.TeamID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamDetailedReport_teamID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamDetailedReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamDetailedReport_teamName(ctx context.Context, field graphql.CollectedField, obj *model.TeamDetailedReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamDetailedReport_teamName,
+		func(ctx context.Context) (any, error) {
+			return obj.TeamName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamDetailedReport_teamName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamDetailedReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamDetailedReport_memberCount(ctx context.Context, field graphql.CollectedField, obj *model.TeamDetailedReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamDetailedReport_memberCount,
+		func(ctx context.Context) (any, error) {
+			return obj.MemberCount, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamDetailedReport_memberCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamDetailedReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamDetailedReport_totalWorkedMinutes(ctx context.Context, field graphql.CollectedField, obj *model.TeamDetailedReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamDetailedReport_totalWorkedMinutes,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalWorkedMinutes, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamDetailedReport_totalWorkedMinutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamDetailedReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamDetailedReport_avgMinutesPerMember(ctx context.Context, field graphql.CollectedField, obj *model.TeamDetailedReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamDetailedReport_avgMinutesPerMember,
+		func(ctx context.Context) (any, error) {
+			return obj.AvgMinutesPerMember, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamDetailedReport_avgMinutesPerMember(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamDetailedReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamDetailedReport_activeNow(ctx context.Context, field graphql.CollectedField, obj *model.TeamDetailedReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamDetailedReport_activeNow,
+		func(ctx context.Context) (any, error) {
+			return obj.ActiveNow, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamDetailedReport_activeNow(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamDetailedReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamDetailedReport_topContributors(ctx context.Context, field graphql.CollectedField, obj *model.TeamDetailedReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamDetailedReport_topContributors,
+		func(ctx context.Context) (any, error) {
+			return obj.TopContributors, nil
+		},
+		nil,
+		ec.marshalNTeamMemberContribution2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamMemberContributionᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamDetailedReport_topContributors(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamDetailedReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "userID":
+				return ec.fieldContext_TeamMemberContribution_userID(ctx, field)
+			case "userName":
+				return ec.fieldContext_TeamMemberContribution_userName(ctx, field)
+			case "workedMinutes":
+				return ec.fieldContext_TeamMemberContribution_workedMinutes(ctx, field)
+			case "daysPresent":
+				return ec.fieldContext_TeamMemberContribution_daysPresent(ctx, field)
+			case "overtimeMinutes":
+				return ec.fieldContext_TeamMemberContribution_overtimeMinutes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TeamMemberContribution", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamDetailedReport_workloadDistribution(ctx context.Context, field graphql.CollectedField, obj *model.TeamDetailedReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamDetailedReport_workloadDistribution,
+		func(ctx context.Context) (any, error) {
+			return obj.WorkloadDistribution, nil
+		},
+		nil,
+		ec.marshalNWorkloadDistribution2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐWorkloadDistributionᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamDetailedReport_workloadDistribution(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamDetailedReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "range":
+				return ec.fieldContext_WorkloadDistribution_range(ctx, field)
+			case "userCount":
+				return ec.fieldContext_WorkloadDistribution_userCount(ctx, field)
+			case "percentage":
+				return ec.fieldContext_WorkloadDistribution_percentage(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type WorkloadDistribution", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _TeamKpiSummary_from(ctx context.Context, field graphql.CollectedField, obj *model.TeamKpiSummary) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -4535,6 +7839,151 @@ func (ec *executionContext) fieldContext_TeamKpiSummary_coverage(_ context.Conte
 				return ec.fieldContext_CoveragePoint_count(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CoveragePoint", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamMemberContribution_userID(ctx context.Context, field graphql.CollectedField, obj *model.TeamMemberContribution) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamMemberContribution_userID,
+		func(ctx context.Context) (any, error) {
+			return obj.UserID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamMemberContribution_userID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamMemberContribution",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamMemberContribution_userName(ctx context.Context, field graphql.CollectedField, obj *model.TeamMemberContribution) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamMemberContribution_userName,
+		func(ctx context.Context) (any, error) {
+			return obj.UserName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamMemberContribution_userName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamMemberContribution",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamMemberContribution_workedMinutes(ctx context.Context, field graphql.CollectedField, obj *model.TeamMemberContribution) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamMemberContribution_workedMinutes,
+		func(ctx context.Context) (any, error) {
+			return obj.WorkedMinutes, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamMemberContribution_workedMinutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamMemberContribution",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamMemberContribution_daysPresent(ctx context.Context, field graphql.CollectedField, obj *model.TeamMemberContribution) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamMemberContribution_daysPresent,
+		func(ctx context.Context) (any, error) {
+			return obj.DaysPresent, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamMemberContribution_daysPresent(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamMemberContribution",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TeamMemberContribution_overtimeMinutes(ctx context.Context, field graphql.CollectedField, obj *model.TeamMemberContribution) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TeamMemberContribution_overtimeMinutes,
+		func(ctx context.Context) (any, error) {
+			return obj.OvertimeMinutes, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TeamMemberContribution_overtimeMinutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TeamMemberContribution",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5663,6 +9112,238 @@ func (ec *executionContext) fieldContext_UserLogged_token(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _UserOvertimeDetail_userID(ctx context.Context, field graphql.CollectedField, obj *model.UserOvertimeDetail) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserOvertimeDetail_userID,
+		func(ctx context.Context) (any, error) {
+			return obj.UserID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserOvertimeDetail_userID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserOvertimeDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserOvertimeDetail_userName(ctx context.Context, field graphql.CollectedField, obj *model.UserOvertimeDetail) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserOvertimeDetail_userName,
+		func(ctx context.Context) (any, error) {
+			return obj.UserName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserOvertimeDetail_userName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserOvertimeDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserOvertimeDetail_overtimeMinutes(ctx context.Context, field graphql.CollectedField, obj *model.UserOvertimeDetail) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserOvertimeDetail_overtimeMinutes,
+		func(ctx context.Context) (any, error) {
+			return obj.OvertimeMinutes, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserOvertimeDetail_overtimeMinutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserOvertimeDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserOvertimeDetail_daysWorked(ctx context.Context, field graphql.CollectedField, obj *model.UserOvertimeDetail) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserOvertimeDetail_daysWorked,
+		func(ctx context.Context) (any, error) {
+			return obj.DaysWorked, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserOvertimeDetail_daysWorked(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserOvertimeDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserProductivityDetail_userID(ctx context.Context, field graphql.CollectedField, obj *model.UserProductivityDetail) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserProductivityDetail_userID,
+		func(ctx context.Context) (any, error) {
+			return obj.UserID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserProductivityDetail_userID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserProductivityDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserProductivityDetail_userName(ctx context.Context, field graphql.CollectedField, obj *model.UserProductivityDetail) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserProductivityDetail_userName,
+		func(ctx context.Context) (any, error) {
+			return obj.UserName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserProductivityDetail_userName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserProductivityDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserProductivityDetail_efficiencyRate(ctx context.Context, field graphql.CollectedField, obj *model.UserProductivityDetail) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserProductivityDetail_efficiencyRate,
+		func(ctx context.Context) (any, error) {
+			return obj.EfficiencyRate, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserProductivityDetail_efficiencyRate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserProductivityDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserProductivityDetail_totalHours(ctx context.Context, field graphql.CollectedField, obj *model.UserProductivityDetail) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UserProductivityDetail_totalHours,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalHours, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UserProductivityDetail_totalHours(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserProductivityDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UserWithAllData_id(ctx context.Context, field graphql.CollectedField, obj *model.UserWithAllData) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -5945,6 +9626,304 @@ func (ec *executionContext) fieldContext_UserWithAllData_timeTableEntries(_ cont
 				return ec.fieldContext_TimeTableEntry_status(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TimeTableEntry", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkloadAnalysis_avgDailyMinutes(ctx context.Context, field graphql.CollectedField, obj *model.WorkloadAnalysis) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_WorkloadAnalysis_avgDailyMinutes,
+		func(ctx context.Context) (any, error) {
+			return obj.AvgDailyMinutes, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_WorkloadAnalysis_avgDailyMinutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkloadAnalysis",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkloadAnalysis_avgWeeklyMinutes(ctx context.Context, field graphql.CollectedField, obj *model.WorkloadAnalysis) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_WorkloadAnalysis_avgWeeklyMinutes,
+		func(ctx context.Context) (any, error) {
+			return obj.AvgWeeklyMinutes, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_WorkloadAnalysis_avgWeeklyMinutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkloadAnalysis",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkloadAnalysis_peakDayMinutes(ctx context.Context, field graphql.CollectedField, obj *model.WorkloadAnalysis) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_WorkloadAnalysis_peakDayMinutes,
+		func(ctx context.Context) (any, error) {
+			return obj.PeakDayMinutes, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_WorkloadAnalysis_peakDayMinutes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkloadAnalysis",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkloadAnalysis_peakDay(ctx context.Context, field graphql.CollectedField, obj *model.WorkloadAnalysis) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_WorkloadAnalysis_peakDay,
+		func(ctx context.Context) (any, error) {
+			return obj.PeakDay, nil
+		},
+		nil,
+		ec.marshalNDate2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_WorkloadAnalysis_peakDay(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkloadAnalysis",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkloadAnalysis_distributionByDay(ctx context.Context, field graphql.CollectedField, obj *model.WorkloadAnalysis) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_WorkloadAnalysis_distributionByDay,
+		func(ctx context.Context) (any, error) {
+			return obj.DistributionByDay, nil
+		},
+		nil,
+		ec.marshalNDayDistribution2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐDayDistributionᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_WorkloadAnalysis_distributionByDay(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkloadAnalysis",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "day":
+				return ec.fieldContext_DayDistribution_day(ctx, field)
+			case "avgMinutes":
+				return ec.fieldContext_DayDistribution_avgMinutes(ctx, field)
+			case "totalMinutes":
+				return ec.fieldContext_DayDistribution_totalMinutes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DayDistribution", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkloadAnalysis_totalOvertime(ctx context.Context, field graphql.CollectedField, obj *model.WorkloadAnalysis) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_WorkloadAnalysis_totalOvertime,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalOvertime, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_WorkloadAnalysis_totalOvertime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkloadAnalysis",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkloadAnalysis_usersWithOvertime(ctx context.Context, field graphql.CollectedField, obj *model.WorkloadAnalysis) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_WorkloadAnalysis_usersWithOvertime,
+		func(ctx context.Context) (any, error) {
+			return obj.UsersWithOvertime, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_WorkloadAnalysis_usersWithOvertime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkloadAnalysis",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkloadDistribution_range(ctx context.Context, field graphql.CollectedField, obj *model.WorkloadDistribution) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_WorkloadDistribution_range,
+		func(ctx context.Context) (any, error) {
+			return obj.Range, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_WorkloadDistribution_range(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkloadDistribution",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkloadDistribution_userCount(ctx context.Context, field graphql.CollectedField, obj *model.WorkloadDistribution) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_WorkloadDistribution_userCount,
+		func(ctx context.Context) (any, error) {
+			return obj.UserCount, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_WorkloadDistribution_userCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkloadDistribution",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkloadDistribution_percentage(ctx context.Context, field graphql.CollectedField, obj *model.WorkloadDistribution) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_WorkloadDistribution_percentage,
+		func(ctx context.Context) (any, error) {
+			return obj.Percentage, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_WorkloadDistribution_percentage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkloadDistribution",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -7891,6 +11870,262 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 
 // region    **************************** object.gotpl ****************************
 
+var adminKpiDashboardImplementors = []string{"AdminKpiDashboard"}
+
+func (ec *executionContext) _AdminKpiDashboard(ctx context.Context, sel ast.SelectionSet, obj *model.AdminKpiDashboard) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, adminKpiDashboardImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AdminKpiDashboard")
+		case "period":
+			out.Values[i] = ec._AdminKpiDashboard_period(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "summary":
+			out.Values[i] = ec._AdminKpiDashboard_summary(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "workload":
+			out.Values[i] = ec._AdminKpiDashboard_workload(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "punctuality":
+			out.Values[i] = ec._AdminKpiDashboard_punctuality(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "overtime":
+			out.Values[i] = ec._AdminKpiDashboard_overtime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "compliance":
+			out.Values[i] = ec._AdminKpiDashboard_compliance(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "productivity":
+			out.Values[i] = ec._AdminKpiDashboard_productivity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "teams":
+			out.Values[i] = ec._AdminKpiDashboard_teams(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var adminKpiSummaryImplementors = []string{"AdminKpiSummary"}
+
+func (ec *executionContext) _AdminKpiSummary(ctx context.Context, sel ast.SelectionSet, obj *model.AdminKpiSummary) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, adminKpiSummaryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AdminKpiSummary")
+		case "totalUsers":
+			out.Values[i] = ec._AdminKpiSummary_totalUsers(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "activeUsers":
+			out.Values[i] = ec._AdminKpiSummary_activeUsers(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalTeams":
+			out.Values[i] = ec._AdminKpiSummary_totalTeams(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalWorkedHours":
+			out.Values[i] = ec._AdminKpiSummary_totalWorkedHours(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "avgHoursPerUser":
+			out.Values[i] = ec._AdminKpiSummary_avgHoursPerUser(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "complianceRate":
+			out.Values[i] = ec._AdminKpiSummary_complianceRate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var complianceAnomalyImplementors = []string{"ComplianceAnomaly"}
+
+func (ec *executionContext) _ComplianceAnomaly(ctx context.Context, sel ast.SelectionSet, obj *model.ComplianceAnomaly) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, complianceAnomalyImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ComplianceAnomaly")
+		case "type":
+			out.Values[i] = ec._ComplianceAnomaly_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "count":
+			out.Values[i] = ec._ComplianceAnomaly_count(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "severity":
+			out.Values[i] = ec._ComplianceAnomaly_severity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "affectedUsers":
+			out.Values[i] = ec._ComplianceAnomaly_affectedUsers(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var complianceMetricsImplementors = []string{"ComplianceMetrics"}
+
+func (ec *executionContext) _ComplianceMetrics(ctx context.Context, sel ast.SelectionSet, obj *model.ComplianceMetrics) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, complianceMetricsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ComplianceMetrics")
+		case "missingEntriesCount":
+			out.Values[i] = ec._ComplianceMetrics_missingEntriesCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "incompleteEntriesCount":
+			out.Values[i] = ec._ComplianceMetrics_incompleteEntriesCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "anomaliesCount":
+			out.Values[i] = ec._ComplianceMetrics_anomaliesCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "complianceRate":
+			out.Values[i] = ec._ComplianceMetrics_complianceRate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "usersWithIssues":
+			out.Values[i] = ec._ComplianceMetrics_usersWithIssues(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "anomalies":
+			out.Values[i] = ec._ComplianceMetrics_anomalies(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var coveragePointImplementors = []string{"CoveragePoint"}
 
 func (ec *executionContext) _CoveragePoint(ctx context.Context, sel ast.SelectionSet, obj *model.CoveragePoint) graphql.Marshaler {
@@ -7909,6 +12144,99 @@ func (ec *executionContext) _CoveragePoint(ctx context.Context, sel ast.Selectio
 			}
 		case "count":
 			out.Values[i] = ec._CoveragePoint_count(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var dateRangeImplementors = []string{"DateRange"}
+
+func (ec *executionContext) _DateRange(ctx context.Context, sel ast.SelectionSet, obj *model.DateRange) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, dateRangeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DateRange")
+		case "from":
+			out.Values[i] = ec._DateRange_from(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "to":
+			out.Values[i] = ec._DateRange_to(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var dayDistributionImplementors = []string{"DayDistribution"}
+
+func (ec *executionContext) _DayDistribution(ctx context.Context, sel ast.SelectionSet, obj *model.DayDistribution) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, dayDistributionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DayDistribution")
+		case "day":
+			out.Values[i] = ec._DayDistribution_day(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "avgMinutes":
+			out.Values[i] = ec._DayDistribution_avgMinutes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalMinutes":
+			out.Values[i] = ec._DayDistribution_totalMinutes(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -8156,6 +12484,340 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_clockOut(ctx, field)
 			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var overtimeByPeriodImplementors = []string{"OvertimeByPeriod"}
+
+func (ec *executionContext) _OvertimeByPeriod(ctx context.Context, sel ast.SelectionSet, obj *model.OvertimeByPeriod) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, overtimeByPeriodImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("OvertimeByPeriod")
+		case "periodStart":
+			out.Values[i] = ec._OvertimeByPeriod_periodStart(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalMinutes":
+			out.Values[i] = ec._OvertimeByPeriod_totalMinutes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "usersCount":
+			out.Values[i] = ec._OvertimeByPeriod_usersCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var overtimeReportImplementors = []string{"OvertimeReport"}
+
+func (ec *executionContext) _OvertimeReport(ctx context.Context, sel ast.SelectionSet, obj *model.OvertimeReport) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, overtimeReportImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("OvertimeReport")
+		case "totalOvertimeMinutes":
+			out.Values[i] = ec._OvertimeReport_totalOvertimeMinutes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "avgOvertimePerUser":
+			out.Values[i] = ec._OvertimeReport_avgOvertimePerUser(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "usersWithOvertime":
+			out.Values[i] = ec._OvertimeReport_usersWithOvertime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "topOvertimeUsers":
+			out.Values[i] = ec._OvertimeReport_topOvertimeUsers(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "overtimeByWeek":
+			out.Values[i] = ec._OvertimeReport_overtimeByWeek(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var productivityMetricsImplementors = []string{"ProductivityMetrics"}
+
+func (ec *executionContext) _ProductivityMetrics(ctx context.Context, sel ast.SelectionSet, obj *model.ProductivityMetrics) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, productivityMetricsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProductivityMetrics")
+		case "avgEfficiencyRate":
+			out.Values[i] = ec._ProductivityMetrics_avgEfficiencyRate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalProductiveHours":
+			out.Values[i] = ec._ProductivityMetrics_totalProductiveHours(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "avgHoursPerUser":
+			out.Values[i] = ec._ProductivityMetrics_avgHoursPerUser(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "topPerformers":
+			out.Values[i] = ec._ProductivityMetrics_topPerformers(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "productivityTrend":
+			out.Values[i] = ec._ProductivityMetrics_productivityTrend(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var productivityTrendImplementors = []string{"ProductivityTrend"}
+
+func (ec *executionContext) _ProductivityTrend(ctx context.Context, sel ast.SelectionSet, obj *model.ProductivityTrend) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, productivityTrendImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProductivityTrend")
+		case "date":
+			out.Values[i] = ec._ProductivityTrend_date(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "avgEfficiency":
+			out.Values[i] = ec._ProductivityTrend_avgEfficiency(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalHours":
+			out.Values[i] = ec._ProductivityTrend_totalHours(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var punctualityMetricsImplementors = []string{"PunctualityMetrics"}
+
+func (ec *executionContext) _PunctualityMetrics(ctx context.Context, sel ast.SelectionSet, obj *model.PunctualityMetrics) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, punctualityMetricsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PunctualityMetrics")
+		case "onTimeRate":
+			out.Values[i] = ec._PunctualityMetrics_onTimeRate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "lateRate":
+			out.Values[i] = ec._PunctualityMetrics_lateRate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "avgLateMinutes":
+			out.Values[i] = ec._PunctualityMetrics_avgLateMinutes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalLateIncidents":
+			out.Values[i] = ec._PunctualityMetrics_totalLateIncidents(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "punctualUsers":
+			out.Values[i] = ec._PunctualityMetrics_punctualUsers(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "lateUsers":
+			out.Values[i] = ec._PunctualityMetrics_lateUsers(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "trendByWeek":
+			out.Values[i] = ec._PunctualityMetrics_trendByWeek(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var punctualityTrendImplementors = []string{"PunctualityTrend"}
+
+func (ec *executionContext) _PunctualityTrend(ctx context.Context, sel ast.SelectionSet, obj *model.PunctualityTrend) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, punctualityTrendImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PunctualityTrend")
+		case "weekStart":
+			out.Values[i] = ec._PunctualityTrend_weekStart(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "onTimeRate":
+			out.Values[i] = ec._PunctualityTrend_onTimeRate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "avgLateMinutes":
+			out.Values[i] = ec._PunctualityTrend_avgLateMinutes(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -8566,6 +13228,160 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "adminKpiDashboard":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_adminKpiDashboard(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "workloadAnalysis":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_workloadAnalysis(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "punctualityMetrics":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_punctualityMetrics(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "overtimeReport":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_overtimeReport(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "complianceMetrics":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_complianceMetrics(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "productivityMetrics":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_productivityMetrics(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "teamDetailedReports":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_teamDetailedReports(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -8732,6 +13548,80 @@ func (ec *executionContext) _Team(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
+var teamDetailedReportImplementors = []string{"TeamDetailedReport"}
+
+func (ec *executionContext) _TeamDetailedReport(ctx context.Context, sel ast.SelectionSet, obj *model.TeamDetailedReport) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, teamDetailedReportImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TeamDetailedReport")
+		case "teamID":
+			out.Values[i] = ec._TeamDetailedReport_teamID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "teamName":
+			out.Values[i] = ec._TeamDetailedReport_teamName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "memberCount":
+			out.Values[i] = ec._TeamDetailedReport_memberCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalWorkedMinutes":
+			out.Values[i] = ec._TeamDetailedReport_totalWorkedMinutes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "avgMinutesPerMember":
+			out.Values[i] = ec._TeamDetailedReport_avgMinutesPerMember(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "activeNow":
+			out.Values[i] = ec._TeamDetailedReport_activeNow(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "topContributors":
+			out.Values[i] = ec._TeamDetailedReport_topContributors(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "workloadDistribution":
+			out.Values[i] = ec._TeamDetailedReport_workloadDistribution(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var teamKpiSummaryImplementors = []string{"TeamKpiSummary"}
 
 func (ec *executionContext) _TeamKpiSummary(ctx context.Context, sel ast.SelectionSet, obj *model.TeamKpiSummary) graphql.Marshaler {
@@ -8775,6 +13665,65 @@ func (ec *executionContext) _TeamKpiSummary(ctx context.Context, sel ast.Selecti
 			}
 		case "coverage":
 			out.Values[i] = ec._TeamKpiSummary_coverage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var teamMemberContributionImplementors = []string{"TeamMemberContribution"}
+
+func (ec *executionContext) _TeamMemberContribution(ctx context.Context, sel ast.SelectionSet, obj *model.TeamMemberContribution) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, teamMemberContributionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TeamMemberContribution")
+		case "userID":
+			out.Values[i] = ec._TeamMemberContribution_userID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "userName":
+			out.Values[i] = ec._TeamMemberContribution_userName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "workedMinutes":
+			out.Values[i] = ec._TeamMemberContribution_workedMinutes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "daysPresent":
+			out.Values[i] = ec._TeamMemberContribution_daysPresent(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "overtimeMinutes":
+			out.Values[i] = ec._TeamMemberContribution_overtimeMinutes(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -9184,6 +14133,114 @@ func (ec *executionContext) _UserLogged(ctx context.Context, sel ast.SelectionSe
 	return out
 }
 
+var userOvertimeDetailImplementors = []string{"UserOvertimeDetail"}
+
+func (ec *executionContext) _UserOvertimeDetail(ctx context.Context, sel ast.SelectionSet, obj *model.UserOvertimeDetail) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userOvertimeDetailImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserOvertimeDetail")
+		case "userID":
+			out.Values[i] = ec._UserOvertimeDetail_userID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "userName":
+			out.Values[i] = ec._UserOvertimeDetail_userName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "overtimeMinutes":
+			out.Values[i] = ec._UserOvertimeDetail_overtimeMinutes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "daysWorked":
+			out.Values[i] = ec._UserOvertimeDetail_daysWorked(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var userProductivityDetailImplementors = []string{"UserProductivityDetail"}
+
+func (ec *executionContext) _UserProductivityDetail(ctx context.Context, sel ast.SelectionSet, obj *model.UserProductivityDetail) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userProductivityDetailImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserProductivityDetail")
+		case "userID":
+			out.Values[i] = ec._UserProductivityDetail_userID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "userName":
+			out.Values[i] = ec._UserProductivityDetail_userName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "efficiencyRate":
+			out.Values[i] = ec._UserProductivityDetail_efficiencyRate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalHours":
+			out.Values[i] = ec._UserProductivityDetail_totalHours(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var userWithAllDataImplementors = []string{"UserWithAllData"}
 
 func (ec *executionContext) _UserWithAllData(ctx context.Context, sel ast.SelectionSet, obj *model.UserWithAllData) graphql.Marshaler {
@@ -9237,6 +14294,124 @@ func (ec *executionContext) _UserWithAllData(ctx context.Context, sel ast.Select
 			}
 		case "timeTableEntries":
 			out.Values[i] = ec._UserWithAllData_timeTableEntries(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var workloadAnalysisImplementors = []string{"WorkloadAnalysis"}
+
+func (ec *executionContext) _WorkloadAnalysis(ctx context.Context, sel ast.SelectionSet, obj *model.WorkloadAnalysis) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, workloadAnalysisImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("WorkloadAnalysis")
+		case "avgDailyMinutes":
+			out.Values[i] = ec._WorkloadAnalysis_avgDailyMinutes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "avgWeeklyMinutes":
+			out.Values[i] = ec._WorkloadAnalysis_avgWeeklyMinutes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "peakDayMinutes":
+			out.Values[i] = ec._WorkloadAnalysis_peakDayMinutes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "peakDay":
+			out.Values[i] = ec._WorkloadAnalysis_peakDay(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "distributionByDay":
+			out.Values[i] = ec._WorkloadAnalysis_distributionByDay(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalOvertime":
+			out.Values[i] = ec._WorkloadAnalysis_totalOvertime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "usersWithOvertime":
+			out.Values[i] = ec._WorkloadAnalysis_usersWithOvertime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var workloadDistributionImplementors = []string{"WorkloadDistribution"}
+
+func (ec *executionContext) _WorkloadDistribution(ctx context.Context, sel ast.SelectionSet, obj *model.WorkloadDistribution) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, workloadDistributionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("WorkloadDistribution")
+		case "range":
+			out.Values[i] = ec._WorkloadDistribution_range(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "userCount":
+			out.Values[i] = ec._WorkloadDistribution_userCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "percentage":
+			out.Values[i] = ec._WorkloadDistribution_percentage(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -9603,6 +14778,30 @@ func (ec *executionContext) unmarshalNAddUsersToTeamInput2githubᚗcomᚋepitech
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNAdminKpiDashboard2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐAdminKpiDashboard(ctx context.Context, sel ast.SelectionSet, v model.AdminKpiDashboard) graphql.Marshaler {
+	return ec._AdminKpiDashboard(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAdminKpiDashboard2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐAdminKpiDashboard(ctx context.Context, sel ast.SelectionSet, v *model.AdminKpiDashboard) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AdminKpiDashboard(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNAdminKpiSummary2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐAdminKpiSummary(ctx context.Context, sel ast.SelectionSet, v *model.AdminKpiSummary) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AdminKpiSummary(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -9617,6 +14816,74 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNComplianceAnomaly2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐComplianceAnomalyᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ComplianceAnomaly) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNComplianceAnomaly2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐComplianceAnomaly(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNComplianceAnomaly2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐComplianceAnomaly(ctx context.Context, sel ast.SelectionSet, v *model.ComplianceAnomaly) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ComplianceAnomaly(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNComplianceMetrics2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐComplianceMetrics(ctx context.Context, sel ast.SelectionSet, v model.ComplianceMetrics) graphql.Marshaler {
+	return ec._ComplianceMetrics(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNComplianceMetrics2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐComplianceMetrics(ctx context.Context, sel ast.SelectionSet, v *model.ComplianceMetrics) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ComplianceMetrics(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNCoveragePoint2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐCoveragePointᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.CoveragePoint) graphql.Marshaler {
@@ -9727,6 +14994,70 @@ func (ec *executionContext) marshalNDate2string(ctx context.Context, sel ast.Sel
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNDateRange2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐDateRange(ctx context.Context, sel ast.SelectionSet, v *model.DateRange) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DateRange(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNDayDistribution2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐDayDistributionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.DayDistribution) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNDayDistribution2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐDayDistribution(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNDayDistribution2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐDayDistribution(ctx context.Context, sel ast.SelectionSet, v *model.DayDistribution) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DayDistribution(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v any) (float64, error) {
@@ -9859,6 +15190,210 @@ func (ec *executionContext) marshalNKpiPoint2ᚖgithubᚗcomᚋepitechᚋtimeman
 		return graphql.Null
 	}
 	return ec._KpiPoint(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNOvertimeByPeriod2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐOvertimeByPeriodᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.OvertimeByPeriod) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNOvertimeByPeriod2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐOvertimeByPeriod(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNOvertimeByPeriod2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐOvertimeByPeriod(ctx context.Context, sel ast.SelectionSet, v *model.OvertimeByPeriod) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._OvertimeByPeriod(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNOvertimeReport2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐOvertimeReport(ctx context.Context, sel ast.SelectionSet, v model.OvertimeReport) graphql.Marshaler {
+	return ec._OvertimeReport(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNOvertimeReport2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐOvertimeReport(ctx context.Context, sel ast.SelectionSet, v *model.OvertimeReport) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._OvertimeReport(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProductivityMetrics2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐProductivityMetrics(ctx context.Context, sel ast.SelectionSet, v model.ProductivityMetrics) graphql.Marshaler {
+	return ec._ProductivityMetrics(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProductivityMetrics2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐProductivityMetrics(ctx context.Context, sel ast.SelectionSet, v *model.ProductivityMetrics) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ProductivityMetrics(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProductivityTrend2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐProductivityTrendᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ProductivityTrend) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNProductivityTrend2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐProductivityTrend(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNProductivityTrend2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐProductivityTrend(ctx context.Context, sel ast.SelectionSet, v *model.ProductivityTrend) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ProductivityTrend(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPunctualityMetrics2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐPunctualityMetrics(ctx context.Context, sel ast.SelectionSet, v model.PunctualityMetrics) graphql.Marshaler {
+	return ec._PunctualityMetrics(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPunctualityMetrics2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐPunctualityMetrics(ctx context.Context, sel ast.SelectionSet, v *model.PunctualityMetrics) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PunctualityMetrics(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPunctualityTrend2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐPunctualityTrendᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.PunctualityTrend) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPunctualityTrend2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐPunctualityTrend(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNPunctualityTrend2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐPunctualityTrend(ctx context.Context, sel ast.SelectionSet, v *model.PunctualityTrend) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PunctualityTrend(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNRole2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐRole(ctx context.Context, v any) (model.Role, error) {
@@ -10023,6 +15558,60 @@ func (ec *executionContext) marshalNTeam2ᚖgithubᚗcomᚋepitechᚋtimemanager
 	return ec._Team(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNTeamDetailedReport2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamDetailedReportᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TeamDetailedReport) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTeamDetailedReport2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamDetailedReport(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTeamDetailedReport2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamDetailedReport(ctx context.Context, sel ast.SelectionSet, v *model.TeamDetailedReport) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TeamDetailedReport(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNTeamKpiSummary2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamKpiSummary(ctx context.Context, sel ast.SelectionSet, v model.TeamKpiSummary) graphql.Marshaler {
 	return ec._TeamKpiSummary(ctx, sel, &v)
 }
@@ -10035,6 +15624,60 @@ func (ec *executionContext) marshalNTeamKpiSummary2ᚖgithubᚗcomᚋepitechᚋt
 		return graphql.Null
 	}
 	return ec._TeamKpiSummary(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTeamMemberContribution2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamMemberContributionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TeamMemberContribution) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTeamMemberContribution2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamMemberContribution(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTeamMemberContribution2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamMemberContribution(ctx context.Context, sel ast.SelectionSet, v *model.TeamMemberContribution) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TeamMemberContribution(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNTeamUser2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐTeamUser(ctx context.Context, sel ast.SelectionSet, v model.TeamUser) graphql.Marshaler {
@@ -10333,6 +15976,114 @@ func (ec *executionContext) marshalNUserLogged2ᚖgithubᚗcomᚋepitechᚋtimem
 	return ec._UserLogged(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNUserOvertimeDetail2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserOvertimeDetailᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.UserOvertimeDetail) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNUserOvertimeDetail2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserOvertimeDetail(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNUserOvertimeDetail2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserOvertimeDetail(ctx context.Context, sel ast.SelectionSet, v *model.UserOvertimeDetail) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UserOvertimeDetail(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNUserProductivityDetail2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserProductivityDetailᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.UserProductivityDetail) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNUserProductivityDetail2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserProductivityDetail(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNUserProductivityDetail2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserProductivityDetail(ctx context.Context, sel ast.SelectionSet, v *model.UserProductivityDetail) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UserProductivityDetail(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNUserWithAllData2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐUserWithAllDataᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.UserWithAllData) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -10385,6 +16136,74 @@ func (ec *executionContext) marshalNUserWithAllData2ᚖgithubᚗcomᚋepitechᚋ
 		return graphql.Null
 	}
 	return ec._UserWithAllData(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNWorkloadAnalysis2githubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐWorkloadAnalysis(ctx context.Context, sel ast.SelectionSet, v model.WorkloadAnalysis) graphql.Marshaler {
+	return ec._WorkloadAnalysis(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNWorkloadAnalysis2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐWorkloadAnalysis(ctx context.Context, sel ast.SelectionSet, v *model.WorkloadAnalysis) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._WorkloadAnalysis(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNWorkloadDistribution2ᚕᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐWorkloadDistributionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.WorkloadDistribution) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNWorkloadDistribution2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐWorkloadDistribution(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNWorkloadDistribution2ᚖgithubᚗcomᚋepitechᚋtimemanagerᚋinternalᚋgraphᚋmodelᚐWorkloadDistribution(ctx context.Context, sel ast.SelectionSet, v *model.WorkloadDistribution) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._WorkloadDistribution(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
