@@ -1,61 +1,29 @@
-schema {
-  query: Query
-  mutation: Mutation
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type User {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  password: String!
+  role: Role!
 }
-scalar Date
-scalar Time
-type CoveragePoint {
-  time: Time!
-  count: Int!
-}
-type KpiPoint {
-  date: Date!
-  minutes: Int!
-}
-type Mutation {
-  signUp(input: SignUpInput!): User!
-  login(email: String!, password: String!): UserLogged!
-  logout: String!
-  updateProfile(input: UpdateProfileInput!): User!
-  deleteProfile: Boolean!
-  createUser(input: CreateUserInput!): User!
-  updateUser(id: ID!, input: UpdateUserInput!): User!
-  deleteUser(id: ID!): Boolean!
-  setManagerTeam(userID: ID!, teamID: ID!): Team!
-  setRole(userID: ID!, role: Role!): User!
-  setTimeTable(start: String!, end: String!): TimeTable!
-  createMassiveUsers(input: CreateMassiveUsersInput!): [User!]!
-  createThreeUsers: [User!]!
-  createTeam(input: CreateTeamInput!): Team!
-  updateTeam(id: ID!, input: UpdateTeamInput!): Team!
-  deleteTeam(id: ID!): Boolean!
-  addUserToTeam(userID: ID!, teamID: ID!): TeamUser!
-  addUsersToTeam(input: AddUsersToTeamInput!): [TeamUser!]!
-  removeUserFromTeam(userID: ID!, teamID: ID!): Boolean!
-  createTimeEntry(input: CreateTimeEntryInput!): TimeTableEntry!
-  updateTimeEntry(id: ID!, input: UpdateTimeEntryInput!): TimeTableEntry!
-  clockIn: TimeTableEntry!
-  clockOut: TimeTableEntry!
-}
-type Query {
-  teamUsers: [TeamUser!]!
-  roles: [Role!]!
-  timeTableEntries(userID: ID, teamID: ID, from: Date, to: Date): [TimeTableEntry!]!
-  timeTables: [TimeTable!]!
-  userByEmail(email: String!): User
-  usersByGroup(inGroup: Boolean!): [User!]!
-  userWithAllData(id: ID!): UserWithAllData
-  UsersWithAllData: [UserWithAllData!]!
-  usersByTeam(teamID: ID!): [UserWithAllData!]!
-  me: SignedUser!
-  users: [User!]!
-  getUser(id: ID!): UserWithAllData
+
+type UserWithAllData {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  password: String!
+  role: Role!
   teams: [Team!]!
-  team(id: ID!): Team!
-  kpiUserSummary(userID: ID, from: Date, to: Date): UserKpiSummary!
-  kpiTeamSummary(teamID: ID!, from: Date, to: Date): TeamKpiSummary!
-  exportUserKpiCSV(userID: ID, from: Date, to: Date): String!
+  timeTableEntries: [TimeTableEntry!]!
 }
+
 type SignedUser {
   id: ID!
   firstName: String!
@@ -67,6 +35,13 @@ type SignedUser {
   hasStartedDay: Boolean!
   startedAt: String
 }
+
+enum Role {
+  USER
+  ADMIN
+  MANAGER
+}
+
 type Team {
   id: ID!
   name: String!
@@ -74,19 +49,25 @@ type Team {
   managerID: User!
   users: [UserWithAllData!]!
 }
-type TeamKpiSummary {
-  from: Date!
-  to: Date!
-  teamID: ID!
-  totalWorkedMinutes: Int!
-  avgWorkedMinutesPerUser: Float!
-  activeUsers: Int!
-  coverage: [CoveragePoint!]!
-}
+
 type TeamUser {
   userID: User!
   teamID: Team!
 }
+
+scalar Time
+scalar Date
+
+# heures pointées
+type TimeTableEntry {
+  id: ID!
+  userID: User!
+  day: Date!
+  arrival: Time!
+  departure: Time
+  status: Boolean!  # true pour entrée, false pour sortie
+}
+
 type TimeTable {
   id: ID!
   start: Time!
@@ -95,16 +76,55 @@ type TimeTable {
   effectiveTo: Time
   isActive: Boolean!
 }
-type TimeTableEntry {
-  id: ID!
-  userID: User!
-  day: Date!
-  arrival: Time!
-  departure: Time
-  status: Boolean!
+
+type UserLogged {
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  role: Role!
+  token: String!
 }
-type User {
-  id: ID!
+
+type Query {
+
+  teamUsers: [TeamUser!]!
+  roles: [Role!]!
+  timeTableEntries(userID: ID, teamID: ID, from: Date, to: Date): [TimeTableEntry!]!
+  timeTables: [TimeTable!]!
+  userByEmail(email: String!): User
+  usersByGroup(inGroup: Boolean!): [User!]!
+  userWithAllData(id: ID!): UserWithAllData
+  UsersWithAllData: [UserWithAllData!]!
+  usersByTeam(teamID: ID!): [UserWithAllData!]!
+  me: SignedUser!
+
+  # queries for admin
+  users: [User!]!
+  getUser(id: ID!): UserWithAllData
+
+  # queries for team
+  teams: [Team!]!
+  team(id: ID!): Team!
+
+  # KPI queries
+  kpiUserSummary(userID: ID, from: Date, to: Date): UserKpiSummary!
+  kpiTeamSummary(teamID: ID!, from: Date, to: Date): TeamKpiSummary!
+  exportUserKpiCSV(userID: ID, from: Date, to: Date): String!
+  
+  # Advanced Admin KPI queries
+  adminKpiDashboard(from: Date, to: Date): AdminKpiDashboard!
+  workloadAnalysis(teamID: ID, from: Date, to: Date): WorkloadAnalysis!
+  punctualityMetrics(teamID: ID, from: Date, to: Date): PunctualityMetrics!
+  overtimeReport(teamID: ID, from: Date, to: Date): OvertimeReport!
+  complianceMetrics(teamID: ID, from: Date, to: Date): ComplianceMetrics!
+  productivityMetrics(teamID: ID, from: Date, to: Date): ProductivityMetrics!
+  teamDetailedReports(from: Date, to: Date): [TeamDetailedReport!]!
+
+}
+
+
+input CreateUserInput {
   firstName: String!
   lastName: String!
   email: String!
@@ -112,6 +132,119 @@ type User {
   password: String!
   role: Role!
 }
+
+input CreateMassiveUsersInput {
+  users: [CreateUserInput!]!
+}
+
+input UpdateUserInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  password: String
+  role: Role
+}
+
+
+input CreateTeamInput {
+  name: String!
+  description: String!
+  managerID: ID!
+}
+
+input UpdateTeamInput {
+  name: String
+  description: String
+  managerID: ID
+}
+
+input CreateTimeEntryInput {
+  userID: ID!
+  day: Date!
+  arrival: Time!
+  departure: Time
+  status: Boolean!
+}
+
+input UpdateTimeEntryInput {
+  userID: ID
+  day: Date
+  arrival: Time
+  departure: Time
+  status: Boolean
+}
+
+input SignUpInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  password: String!
+}
+
+input UpdateProfileInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  password: String
+}
+
+input AddUsersToTeamInput {
+  userIDs: [ID!]!
+  teamID: ID!
+}
+
+type Mutation {
+  #auth mutations
+  signUp(input: SignUpInput!): User!
+  login(email: String!, password: String!): UserLogged!
+  logout: String!
+  updateProfile(input: UpdateProfileInput!): User!
+  deleteProfile: Boolean!
+
+  # mutations for admin
+  createUser(input: CreateUserInput!): User!
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+  deleteUser(id: ID!): Boolean!
+  setManagerTeam(userID: ID!, teamID: ID!): Team!
+  setRole(userID: ID!, role: Role!): User!
+  setTimeTable(start: String!, end: String!): TimeTable!
+  
+  
+  #user mutations
+  
+  createMassiveUsers(input: CreateMassiveUsersInput!): [User!]!
+  
+
+  # create 3 users
+  createThreeUsers: [User!]!
+
+  #team mutations
+  createTeam(input: CreateTeamInput!): Team!
+  updateTeam(id: ID!, input: UpdateTeamInput!): Team!
+  deleteTeam(id: ID!): Boolean!
+  addUserToTeam(userID: ID!, teamID: ID!): TeamUser!
+  addUsersToTeam(input: AddUsersToTeamInput!): [TeamUser!]!
+  removeUserFromTeam(userID: ID!, teamID: ID!): Boolean!
+
+  #time entry mutations
+  createTimeEntry(input: CreateTimeEntryInput!): TimeTableEntry!
+  updateTimeEntry(id: ID!, input: UpdateTimeEntryInput!): TimeTableEntry!
+
+  #pointage mutations
+  clockIn: TimeTableEntry!
+  clockOut: TimeTableEntry!
+}
+
+# KPI Types
+
+type KpiPoint {
+  date: Date!
+  minutes: Int!
+}
+
 type UserKpiSummary {
   from: Date!
   to: Date!
@@ -124,103 +257,160 @@ type UserKpiSummary {
   presentNow: Boolean!
   dailyWorked: [KpiPoint!]!
 }
-type UserLogged {
-  firstName: String!
-  lastName: String!
-  email: String!
-  phone: String!
-  role: Role!
-  token: String!
-}
-type UserWithAllData {
-  id: ID!
-  firstName: String!
-  lastName: String!
-  email: String!
-  phone: String!
-  password: String!
-  role: Role!
-  teams: [Team!]!
-  timeTableEntries: [TimeTableEntry!]!
-}
-enum Role {
-  USER
-  ADMIN
-  MANAGER
-}
-input AddUsersToTeamInput {
-  userIDs: [ID!]!
-  teamID: ID!
-}
-input CreateMassiveUsersInput {
-  users: [CreateUserInput!]!
-}
-input CreateTeamInput {
-  name: String!
-  description: String!
-  managerID: ID!
-}
-input CreateTimeEntryInput {
-  userID: ID!
-  day: Date!
-  arrival: Time!
-  departure: Time
-  status: Boolean!
-}
-input CreateUserInput {
-  firstName: String!
-  lastName: String!
-  email: String!
-  phone: String!
-  password: String!
-  role: Role!
-}
-input SignUpInput {
-  firstName: String!
-  lastName: String!
-  email: String!
-  phone: String!
-  password: String!
-}
-input UpdateProfileInput {
-  firstName: String
-  lastName: String
-  email: String
-  phone: String
-  password: String
-}
-input UpdateTeamInput {
-  name: String
-  description: String
-  managerID: ID
-}
-input UpdateTimeEntryInput {
-  userID: ID
-  day: Date
-  arrival: Time
-  departure: Time
-  status: Boolean
-}
-input UpdateUserInput {
-  firstName: String
-  lastName: String
-  email: String
-  phone: String
-  password: String
-  role: Role
-}
-"Directs the executor to defer this fragment when the `if` argument is true or undefined."
-directive @defer(
-    "Deferred when true or undefined."
-    if: Boolean = true,
-    "Unique name"
-    label: String
-  ) on FRAGMENT_SPREAD | INLINE_FRAGMENT
-"Indicates exactly one field must be supplied and this field must not be `null`."
-directive @oneOf on INPUT_OBJECT
-"Exposes a URL that specifies the behavior of this scalar."
-directive @specifiedBy(
-    "The URL that specifies the behavior of this scalar."
-    url: String!
-  ) on SCALAR
 
+type CoveragePoint {
+  time: Time!
+  count: Int!
+}
+
+type TeamKpiSummary {
+  from: Date!
+  to: Date!
+  teamID: ID!
+  totalWorkedMinutes: Int!
+  avgWorkedMinutesPerUser: Float!
+  activeUsers: Int!
+  coverage: [CoveragePoint!]!
+}
+
+# Advanced KPI Types for Admin Dashboard
+
+type WorkloadAnalysis {
+  avgDailyMinutes: Float!
+  avgWeeklyMinutes: Float!
+  peakDayMinutes: Int!
+  peakDay: Date!
+  distributionByDay: [DayDistribution!]!
+  totalOvertime: Int!
+  usersWithOvertime: Int!
+}
+
+type DayDistribution {
+  day: String!  # Monday, Tuesday, etc.
+  avgMinutes: Float!
+  totalMinutes: Int!
+}
+
+type PunctualityMetrics {
+  onTimeRate: Float!
+  lateRate: Float!
+  avgLateMinutes: Float!
+  totalLateIncidents: Int!
+  punctualUsers: Int!
+  lateUsers: Int!
+  trendByWeek: [PunctualityTrend!]!
+}
+
+type PunctualityTrend {
+  weekStart: Date!
+  onTimeRate: Float!
+  avgLateMinutes: Float!
+}
+
+type OvertimeReport {
+  totalOvertimeMinutes: Int!
+  avgOvertimePerUser: Float!
+  usersWithOvertime: Int!
+  topOvertimeUsers: [UserOvertimeDetail!]!
+  overtimeByWeek: [OvertimeByPeriod!]!
+}
+
+type UserOvertimeDetail {
+  userID: ID!
+  userName: String!
+  overtimeMinutes: Int!
+  daysWorked: Int!
+}
+
+type OvertimeByPeriod {
+  periodStart: Date!
+  totalMinutes: Int!
+  usersCount: Int!
+}
+
+type ComplianceMetrics {
+  missingEntriesCount: Int!
+  incompleteEntriesCount: Int!
+  anomaliesCount: Int!
+  complianceRate: Float!
+  usersWithIssues: Int!
+  anomalies: [ComplianceAnomaly!]!
+}
+
+type ComplianceAnomaly {
+  type: String!  # missing_clockout, excessive_hours, weekend_work, etc.
+  count: Int!
+  severity: String!  # low, medium, high
+  affectedUsers: Int!
+}
+
+type ProductivityMetrics {
+  avgEfficiencyRate: Float!
+  totalProductiveHours: Int!
+  avgHoursPerUser: Float!
+  topPerformers: [UserProductivityDetail!]!
+  productivityTrend: [ProductivityTrend!]!
+}
+
+type UserProductivityDetail {
+  userID: ID!
+  userName: String!
+  efficiencyRate: Float!
+  totalHours: Int!
+}
+
+type ProductivityTrend {
+  date: Date!
+  avgEfficiency: Float!
+  totalHours: Int!
+}
+
+type TeamDetailedReport {
+  teamID: ID!
+  teamName: String!
+  memberCount: Int!
+  totalWorkedMinutes: Int!
+  avgMinutesPerMember: Float!
+  activeNow: Int!
+  topContributors: [TeamMemberContribution!]!
+  workloadDistribution: [WorkloadDistribution!]!
+}
+
+type TeamMemberContribution {
+  userID: ID!
+  userName: String!
+  workedMinutes: Int!
+  daysPresent: Int!
+  overtimeMinutes: Int!
+}
+
+type WorkloadDistribution {
+  range: String!  # 0-40h, 40-50h, 50+h
+  userCount: Int!
+  percentage: Float!
+}
+
+type AdminKpiDashboard {
+  period: DateRange!
+  summary: AdminKpiSummary!
+  workload: WorkloadAnalysis!
+  punctuality: PunctualityMetrics!
+  overtime: OvertimeReport!
+  compliance: ComplianceMetrics!
+  productivity: ProductivityMetrics!
+  teams: [TeamDetailedReport!]!
+}
+
+type DateRange {
+  from: Date!
+  to: Date!
+}
+
+type AdminKpiSummary {
+  totalUsers: Int!
+  activeUsers: Int!
+  totalTeams: Int!
+  totalWorkedHours: Int!
+  avgHoursPerUser: Float!
+  complianceRate: Float!
+}

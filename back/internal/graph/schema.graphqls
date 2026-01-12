@@ -111,6 +111,15 @@ type Query {
   kpiUserSummary(userID: ID, from: Date, to: Date): UserKpiSummary!
   kpiTeamSummary(teamID: ID!, from: Date, to: Date): TeamKpiSummary!
   exportUserKpiCSV(userID: ID, from: Date, to: Date): String!
+  
+  # Advanced Admin KPI queries
+  adminKpiDashboard(from: Date, to: Date): AdminKpiDashboard!
+  workloadAnalysis(teamID: ID, from: Date, to: Date): WorkloadAnalysis!
+  punctualityMetrics(teamID: ID, from: Date, to: Date): PunctualityMetrics!
+  overtimeReport(teamID: ID, from: Date, to: Date): OvertimeReport!
+  complianceMetrics(teamID: ID, from: Date, to: Date): ComplianceMetrics!
+  productivityMetrics(teamID: ID, from: Date, to: Date): ProductivityMetrics!
+  teamDetailedReports(from: Date, to: Date): [TeamDetailedReport!]!
 
 }
 
@@ -262,4 +271,146 @@ type TeamKpiSummary {
   avgWorkedMinutesPerUser: Float!
   activeUsers: Int!
   coverage: [CoveragePoint!]!
+}
+
+# Advanced KPI Types for Admin Dashboard
+
+type WorkloadAnalysis {
+  avgDailyMinutes: Float!
+  avgWeeklyMinutes: Float!
+  peakDayMinutes: Int!
+  peakDay: Date!
+  distributionByDay: [DayDistribution!]!
+  totalOvertime: Int!
+  usersWithOvertime: Int!
+}
+
+type DayDistribution {
+  day: String!  # Monday, Tuesday, etc.
+  avgMinutes: Float!
+  totalMinutes: Int!
+}
+
+type PunctualityMetrics {
+  onTimeRate: Float!
+  lateRate: Float!
+  avgLateMinutes: Float!
+  totalLateIncidents: Int!
+  punctualUsers: Int!
+  lateUsers: Int!
+  trendByWeek: [PunctualityTrend!]!
+}
+
+type PunctualityTrend {
+  weekStart: Date!
+  onTimeRate: Float!
+  avgLateMinutes: Float!
+}
+
+type OvertimeReport {
+  totalOvertimeMinutes: Int!
+  avgOvertimePerUser: Float!
+  usersWithOvertime: Int!
+  topOvertimeUsers: [UserOvertimeDetail!]!
+  overtimeByWeek: [OvertimeByPeriod!]!
+}
+
+type UserOvertimeDetail {
+  userID: ID!
+  userName: String!
+  overtimeMinutes: Int!
+  daysWorked: Int!
+}
+
+type OvertimeByPeriod {
+  periodStart: Date!
+  totalMinutes: Int!
+  usersCount: Int!
+}
+
+type ComplianceMetrics {
+  missingEntriesCount: Int!
+  incompleteEntriesCount: Int!
+  anomaliesCount: Int!
+  complianceRate: Float!
+  usersWithIssues: Int!
+  anomalies: [ComplianceAnomaly!]!
+}
+
+type ComplianceAnomaly {
+  type: String!  # missing_clockout, excessive_hours, weekend_work, etc.
+  count: Int!
+  severity: String!  # low, medium, high
+  affectedUsers: Int!
+}
+
+type ProductivityMetrics {
+  avgEfficiencyRate: Float!
+  totalProductiveHours: Int!
+  avgHoursPerUser: Float!
+  topPerformers: [UserProductivityDetail!]!
+  productivityTrend: [ProductivityTrend!]!
+}
+
+type UserProductivityDetail {
+  userID: ID!
+  userName: String!
+  efficiencyRate: Float!
+  totalHours: Int!
+}
+
+type ProductivityTrend {
+  date: Date!
+  avgEfficiency: Float!
+  totalHours: Int!
+}
+
+type TeamDetailedReport {
+  teamID: ID!
+  teamName: String!
+  memberCount: Int!
+  totalWorkedMinutes: Int!
+  avgMinutesPerMember: Float!
+  activeNow: Int!
+  topContributors: [TeamMemberContribution!]!
+  workloadDistribution: [WorkloadDistribution!]!
+}
+
+type TeamMemberContribution {
+  userID: ID!
+  userName: String!
+  workedMinutes: Int!
+  daysPresent: Int!
+  overtimeMinutes: Int!
+}
+
+type WorkloadDistribution {
+  range: String!  # 0-40h, 40-50h, 50+h
+  userCount: Int!
+  percentage: Float!
+}
+
+type AdminKpiDashboard {
+  period: DateRange!
+  summary: AdminKpiSummary!
+  workload: WorkloadAnalysis!
+  punctuality: PunctualityMetrics!
+  overtime: OvertimeReport!
+  compliance: ComplianceMetrics!
+  productivity: ProductivityMetrics!
+  teams: [TeamDetailedReport!]!
+}
+
+type DateRange {
+  from: Date!
+  to: Date!
+}
+
+type AdminKpiSummary {
+  totalUsers: Int!
+  activeUsers: Int!
+  totalTeams: Int!
+  totalWorkedHours: Int!
+  avgHoursPerUser: Float!
+  complianceRate: Float!
 }

@@ -98,3 +98,108 @@ func (r *queryResolver) ExportUserKpiCSV(ctx context.Context, userID *string, fr
 	}
 	return string(csvData), nil
 }
+
+// AdminKpiDashboard returns comprehensive KPI dashboard for admins
+func (r *queryResolver) AdminKpiDashboard(ctx context.Context, from *string, to *string) (*model.AdminKpiDashboard, error) {
+	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
+		return nil, err
+	}
+
+	var fromT, toT time.Time
+	if from != nil && *from != "" {
+		if t, err := time.Parse(layoutISO, *from); err == nil {
+			fromT = t
+		}
+	}
+	if to != nil && *to != "" {
+		if t, err := time.Parse(layoutISO, *to); err == nil {
+			toT = t
+		}
+	}
+
+	return r.KpiService.GetAdminKpiDashboard(ctx, fromT, toT)
+}
+
+// WorkloadAnalysis returns workload analysis metrics
+func (r *queryResolver) WorkloadAnalysis(ctx context.Context, teamID *string, from *string, to *string) (*model.WorkloadAnalysis, error) {
+	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
+		return nil, err
+	}
+
+	dashboard, err := r.AdminKpiDashboard(ctx, from, to)
+	if err != nil {
+		return nil, err
+	}
+
+	return dashboard.Workload, nil
+}
+
+// PunctualityMetrics returns punctuality metrics
+func (r *queryResolver) PunctualityMetrics(ctx context.Context, teamID *string, from *string, to *string) (*model.PunctualityMetrics, error) {
+	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
+		return nil, err
+	}
+
+	dashboard, err := r.AdminKpiDashboard(ctx, from, to)
+	if err != nil {
+		return nil, err
+	}
+
+	return dashboard.Punctuality, nil
+}
+
+// OvertimeReport returns overtime report
+func (r *queryResolver) OvertimeReport(ctx context.Context, teamID *string, from *string, to *string) (*model.OvertimeReport, error) {
+	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
+		return nil, err
+	}
+
+	dashboard, err := r.AdminKpiDashboard(ctx, from, to)
+	if err != nil {
+		return nil, err
+	}
+
+	return dashboard.Overtime, nil
+}
+
+// ComplianceMetrics returns compliance metrics
+func (r *queryResolver) ComplianceMetrics(ctx context.Context, teamID *string, from *string, to *string) (*model.ComplianceMetrics, error) {
+	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
+		return nil, err
+	}
+
+	dashboard, err := r.AdminKpiDashboard(ctx, from, to)
+	if err != nil {
+		return nil, err
+	}
+
+	return dashboard.Compliance, nil
+}
+
+// ProductivityMetrics returns productivity metrics
+func (r *queryResolver) ProductivityMetrics(ctx context.Context, teamID *string, from *string, to *string) (*model.ProductivityMetrics, error) {
+	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
+		return nil, err
+	}
+
+	dashboard, err := r.AdminKpiDashboard(ctx, from, to)
+	if err != nil {
+		return nil, err
+	}
+
+	return dashboard.Productivity, nil
+}
+
+// TeamDetailedReports returns detailed reports for all teams
+func (r *queryResolver) TeamDetailedReports(ctx context.Context, from *string, to *string) ([]*model.TeamDetailedReport, error) {
+	if err := middlewares.VerifyRole(ctx, "ADMIN", "MANAGER"); err != nil {
+		return nil, err
+	}
+
+	dashboard, err := r.AdminKpiDashboard(ctx, from, to)
+	if err != nil {
+		return nil, err
+	}
+
+	return dashboard.Teams, nil
+}
